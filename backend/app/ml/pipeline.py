@@ -11,6 +11,7 @@ import pandas as pd
 import joblib
 from typing import Dict, List, Optional, Tuple, Any
 from datetime import datetime
+from sklearn.base import clone
 
 # Explainability
 import shap
@@ -42,6 +43,11 @@ from sklearn.metrics import (
 )
 
 from app.core.config import settings
+
+try:
+    import optuna
+except Exception:  # pragma: no cover
+    optuna = None
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +82,109 @@ class AutoMLPipeline:
         self.progress_callback = progress_callback
         self.label_encoder = None
         self.feature_names = None
+        self.tuning_meta: Dict[str, Any] = {}
+
+    def _score_metric(self, task_type: str) -> str:
+        return "accuracy" if task_type == "classification" else "r2"
+
+    def tune_estimator(
+        self,
+        model_name: str,
+        estimator,
+        preprocessor: ColumnTransformer,
+        X_train,
+        y_train,
+        task_type: str,
+        cv_folds: int,
+        tuning_trials: int,
+        tuning_time_budget_sec: int,
+    ):
+        """Tune estimator hyperparameters with Optuna (if available)."""
+        if optuna is None:
+            return estimator, {"enabled": False, "reason": "optuna_not_installed"}
+
+        score_metric = self._score_metric(task_type)
+
+        def suggest(trial):
+            if model_name == "Random Forest":
+                return {
+                    "n_estimators": trial.suggest_int("n_estimators", 80, 300),
+                    "max_depth": trial.suggest_int("max_depth", 3, 18),
+                    "min_samples_split": trial.suggest_int("min_samples_split", 2, 12),
+                    "min_samples_leaf": trial.suggest_int("min_samples_leaf", 1, 8),
+                }
+            if model_name == "XGBoost":
+                return {
+                    "n_estimators": trial.suggest_int("n_estimators", 80, 260),
+                    "max_depth": trial.suggest_int("max_depth", 3, 12),
+                    "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
+                    "subsample": trial.suggest_float("subsample", 0.6, 1.0),
+                    "colsample_bytree": trial.suggest_float("colsample_bytree", 0.6, 1.0),
+                }
+            if model_name == "LightGBM":
+                return {
+                    "n_estimators": trial.suggest_int("n_estimators", 80, 260),
+                    "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
+                    "num_leaves": trial.suggest_int("num_leaves", 16, 96),
+                    "subsample": trial.suggest_float("subsample", 0.6, 1.0),
+                    "colsample_bytree": trial.suggest_float("colsample_bytree", 0.6, 1.0),
+                }
+            if model_name == "Gradient Boosting":
+                return {
+                    "n_estimators": trial.suggest_int("n_estimators", 60, 240),
+                    "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
+                    "max_depth": trial.suggest_int("max_depth", 2, 8),
+                    "subsample": trial.suggest_float("subsample", 0.6, 1.0),
+                }
+            if model_name == "Logistic Regression":
+                return {
+                    "C": trial.suggest_float("C", 1e-3, 20.0, log=True),
+                }
+            if model_name == "Linear Regression":
+                return {
+                    "alpha": trial.suggest_float("alpha", 1e-3, 20.0, log=True),
+                }
+            return {}
+
+        def objective(trial):
+            params = suggest(trial)
+            est = clone(estimator)
+            if params:
+                est.set_params(**params)
+
+            step_name = "classifier" if task_type == "classification" else "regressor"
+            candidate = Pipeline([
+                ("preprocessor", preprocessor),
+                (step_name, est),
+            ])
+
+            if task_type == "classification":
+                cv = StratifiedKFold(n_splits=max(2, min(5, cv_folds)), shuffle=True, random_state=settings.RANDOM_STATE)
+            else:
+                cv = KFold(n_splits=max(2, min(5, cv_folds)), shuffle=True, random_state=settings.RANDOM_STATE)
+
+            scores = cross_val_score(candidate, X_train, y_train, cv=cv, scoring=score_metric)
+            return float(np.mean(scores))
+
+        try:
+            study = optuna.create_study(direction="maximize")
+            study.optimize(objective, n_trials=tuning_trials, timeout=tuning_time_budget_sec)
+
+            best_params = study.best_params or {}
+            tuned = clone(estimator)
+            if best_params:
+                tuned.set_params(**best_params)
+
+            return tuned, {
+                "enabled": True,
+                "score_metric": score_metric,
+                "n_trials": len(study.trials),
+                "best_value": float(study.best_value) if study.best_value is not None else None,
+                "best_params": best_params,
+            }
+        except Exception as e:
+            logger.warning("Tuning failed for %s: %s", model_name, e)
+            return estimator, {"enabled": True, "failed": True, "reason": str(e)}
 
     def _update_progress(self, progress: int, message: str = ""):
         """Update training progress."""
@@ -402,6 +511,9 @@ class AutoMLPipeline:
         test_size: float = 0.2,
         cv_folds: int = 5,
         models_to_train: Optional[List[str]] = None,
+        enable_tuning: bool = False,
+        tuning_trials: int = 12,
+        tuning_time_budget_sec: int = 180,
     ) -> Dict[str, Any]:
         """
         Main training entrypoint.
@@ -437,6 +549,21 @@ class AutoMLPipeline:
                 start = time.time()
 
                 # Build full pipeline
+                tuning_info = {"enabled": False}
+                if enable_tuning:
+                    tuned_estimator, tuning_info = self.tune_estimator(
+                        model_name=model_name,
+                        estimator=estimator,
+                        preprocessor=preprocessor,
+                        X_train=X_train,
+                        y_train=y_train,
+                        task_type=task_type,
+                        cv_folds=cv_folds,
+                        tuning_trials=tuning_trials,
+                        tuning_time_budget_sec=tuning_time_budget_sec,
+                    )
+                    estimator = tuned_estimator
+
                 step_name = "classifier" if task_type == "classification" else "regressor"
                 pipeline = Pipeline([
                     ("preprocessor", preprocessor),
@@ -472,6 +599,7 @@ class AutoMLPipeline:
                     "task_type": task_type,
                     "file_path": model_path,
                     "metrics": metrics,
+                    "tuning": tuning_info,
                     "feature_importance": feature_importance,
                     "training_time": training_time,
                     # Flatten key metrics

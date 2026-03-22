@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { datasetsAPI, trainingAPI } from "@/lib/api";
-import { Dataset, TrainingJob } from "@/types";
+import { datasetsAPI, trainingAPI, experimentsAPI } from "@/lib/api";
+import { Dataset, TrainingJob, ExperimentRun } from "@/types";
 import toast from "react-hot-toast";
 import { BrainCircuit, Play, Loader2, CheckCircle, AlertTriangle, ChevronRight } from "lucide-react";
 import Link from "next/link";
@@ -15,11 +15,16 @@ export default function TrainingPage() {
   const [taskType, setTaskType] = useState("auto");
   const [testSize, setTestSize] = useState(0.2);
   const [cvFolds, setCvFolds] = useState(5);
+  const [enableTuning, setEnableTuning] = useState(true);
+  const [tuningTrials, setTuningTrials] = useState(16);
+  const [tuningBudgetSec, setTuningBudgetSec] = useState(180);
   const [currentJob, setCurrentJob] = useState<TrainingJob | null>(null);
+  const [experiments, setExperiments] = useState<ExperimentRun[]>([]);
   const [training, setTraining] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   useEffect(() => {
     datasetsAPI.list().then(r => setDatasets(r.data)).catch(() => {});
+    experimentsAPI.list().then(r => setExperiments(r.data)).catch(() => {});
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, []);
 
@@ -31,6 +36,7 @@ export default function TrainingPage() {
         if (res.data.status === "completed" || res.data.status === "failed") {
           clearInterval(pollRef.current!);
           setTraining(false);
+          experimentsAPI.list().then(r => setExperiments(r.data)).catch(() => {});
           if (res.data.status === "completed") {
             toast.success("Training completed!");
           } else {
@@ -53,6 +59,9 @@ export default function TrainingPage() {
         task_type: taskType === "auto" ? undefined : taskType,
         test_size: testSize,
         cv_folds: cvFolds,
+        enable_tuning: enableTuning,
+        tuning_trials: tuningTrials,
+        tuning_time_budget_sec: tuningBudgetSec,
       });
       const job: TrainingJob = res.data;
       setCurrentJob(job);
@@ -163,6 +172,47 @@ export default function TrainingPage() {
             </div>
           </div>
 
+          <div className="mb-6 rounded-lg border border-outline/25 bg-surface-variant/25 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <label className="text-xs text-text-muted">Adaptive Hyperparameter Tuning</label>
+              <button
+                type="button"
+                onClick={() => setEnableTuning(v => !v)}
+                className={`rounded px-2 py-1 text-[11px] ${enableTuning ? "bg-primary/20 text-primary" : "bg-surface text-text-muted"}`}
+              >
+                {enableTuning ? "Enabled" : "Disabled"}
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-xs text-text-muted">Tuning Trials: {tuningTrials}</label>
+                <input
+                  type="range"
+                  min="3"
+                  max="60"
+                  step="1"
+                  value={tuningTrials}
+                  disabled={!enableTuning}
+                  onChange={e => setTuningTrials(Number(e.target.value))}
+                  className="w-full accent-sigma-500 disabled:opacity-40"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs text-text-muted">Time Budget: {tuningBudgetSec}s</label>
+                <input
+                  type="range"
+                  min="30"
+                  max="900"
+                  step="30"
+                  value={tuningBudgetSec}
+                  disabled={!enableTuning}
+                  onChange={e => setTuningBudgetSec(Number(e.target.value))}
+                  className="w-full accent-sigma-500 disabled:opacity-40"
+                />
+              </div>
+            </div>
+          </div>
+
           <button
             onClick={startTraining}
             disabled={training || !selectedDataset || !targetColumn}
@@ -261,6 +311,30 @@ export default function TrainingPage() {
           )}
         </div>
       )}
+
+      <div className="panel mt-6 rounded-xl p-6">
+        <h2 className="mb-3 font-display font-semibold text-text-primary">Experiment Registry</h2>
+        <p className="mb-4 text-xs text-text-muted">Latest runs with config snapshots and best-model summary.</p>
+        <div className="space-y-2">
+          {experiments.slice(0, 8).map((run) => (
+            <div key={run.run_id} className="rounded-lg border border-outline/20 bg-surface-variant/25 p-3 text-xs">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-mono text-text-primary">{run.run_id.slice(0, 8)}…</span>
+                <StatusBadge label={run.status} tone={run.status === "completed" ? "healthy" : run.status === "failed" ? "error" : "idle"} />
+              </div>
+              <div className="mt-1 text-text-muted">
+                job: {run.job_id.slice(0, 8)}… • target: {run.target_column} • task: {run.task_type || "auto"}
+              </div>
+              <div className="mt-1 text-text-muted">
+                best: {run.best_model_name || "-"} {typeof run.best_score === "number" ? `(${run.best_score.toFixed(4)})` : ""}
+              </div>
+            </div>
+          ))}
+          {experiments.length === 0 && (
+            <div className="text-xs text-text-muted">No experiment runs yet.</div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

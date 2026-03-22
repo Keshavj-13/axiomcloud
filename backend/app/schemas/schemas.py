@@ -50,6 +50,9 @@ class TrainingConfig(BaseModel):
     models_to_train: Optional[List[str]] = None  # train all if None
     test_size: float = Field(default=0.2, ge=0.1, le=0.4)
     cv_folds: int = Field(default=5, ge=2, le=10)
+    enable_tuning: bool = False
+    tuning_trials: int = Field(default=12, ge=3, le=200)
+    tuning_time_budget_sec: int = Field(default=180, ge=30, le=3600)
 
 
 class TrainingJobResponse(BaseModel):
@@ -64,6 +67,25 @@ class TrainingJobResponse(BaseModel):
     progress: int
     error_message: Optional[str]
     created_at: datetime
+    completed_at: Optional[datetime]
+
+
+class ExperimentRunResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    run_id: str
+    job_id: str
+    dataset_id: int
+    target_column: str
+    task_type: Optional[str]
+    status: str
+    config: Optional[Dict[str, Any]]
+    summary_metrics: Optional[Dict[str, Any]]
+    best_model_name: Optional[str]
+    best_score: Optional[float]
+    error_message: Optional[str]
+    started_at: datetime
     completed_at: Optional[datetime]
 
 

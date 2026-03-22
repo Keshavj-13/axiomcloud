@@ -51,9 +51,18 @@ export const trainingAPI = {
     task_type?: string;
     test_size?: number;
     cv_folds?: number;
+    models_to_train?: string[];
+    enable_tuning?: boolean;
+    tuning_trials?: number;
+    tuning_time_budget_sec?: number;
   }) => api.post("/train-model", config),
   getStatus: (jobId: string) => api.get(`/training-status/${jobId}`),
   listJobs: () => api.get("/training-jobs"),
+};
+
+export const experimentsAPI = {
+  list: (status?: string) => api.get("/experiments", { params: status ? { status } : {} }),
+  get: (runId: string) => api.get(`/experiments/${runId}`),
 };
 
 // ─── Model APIs ───────────────────────────────────────────────────────────────

@@ -47,6 +47,7 @@ class TrainingJob(Base):
     # Relationships
     dataset = relationship("Dataset", back_populates="training_jobs")
     trained_models = relationship("TrainedModel", back_populates="training_job")
+    experiment_runs = relationship("ExperimentRun", back_populates="training_job")
 
 
 class TrainedModel(Base):
@@ -80,3 +81,26 @@ class TrainedModel(Base):
 
     # Relationships
     training_job = relationship("TrainingJob", back_populates="trained_models")
+
+
+class ExperimentRun(Base):
+    __tablename__ = "experiment_runs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    run_id = Column(String(100), unique=True, index=True)
+    job_id = Column(String(100), ForeignKey("training_jobs.job_id"), index=True)
+    dataset_id = Column(Integer, ForeignKey("datasets.id"), index=True)
+    target_column = Column(String(255))
+    task_type = Column(String(50))
+    status = Column(String(50), default="pending")  # pending, running, completed, failed
+    config = Column(JSON)  # training + tuning config snapshot
+    summary_metrics = Column(JSON)  # best model and key metrics
+    best_model_name = Column(String(255))
+    best_score = Column(Float)
+    error_message = Column(Text)
+    started_at = Column(DateTime(timezone=True), server_default=func.now())
+    completed_at = Column(DateTime(timezone=True))
+
+    # Relationships
+    training_job = relationship("TrainingJob", back_populates="experiment_runs")
+    dataset = relationship("Dataset")

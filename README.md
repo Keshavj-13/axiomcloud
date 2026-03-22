@@ -17,21 +17,99 @@ Axiom Cloud AI mirrors the core workflow of Google Vertex AI and Kaggle AutoML:
 | **Predictions** | REST endpoint for inference on deployed models |
 | **Model Export** | Download any model as `.joblib` |
 | **Example Datasets** | California Housing, Titanic, Breast Cancer, Iris — all built-in |
+| **Adaptive Tuning (New)** | Optional Optuna-based hyperparameter tuning with trial/time budgets |
+| **Experiment Registry (New)** | Stores run config, status, best model, and summary metrics per training run |
+| **Workspace Search (New)** | Unified dashboard search page across jobs, datasets, and models |
 
 ---
 
 ## Current Project Goals
 
-We are focusing on these next-phase goals:
+Use this as the active backlog. When a goal is fully implemented and verified, move it to the **Platform Overview** table and remove it from this section.
 
-1. [x] **Explainable AI dashboard**
-  - Add SHAP/LIME-based model explanation views and APIs.
-2. [x] **Advanced interactive visualizations**
-  - Improve model/dataset visualization with richer, more interactive charts.
-3. [ ] **Auto data cleaning pipeline**
-  - Add automated data quality checks and preprocessing recommendations/fixes.
-4. [ ] **Model monitoring and drift tracking**
-  - Add post-training monitoring signals (performance drift, data drift, alerts).
+- [ ] **Data Understanding Upgrade**
+  - Automatic EDA report generation (distribution plots, correlation heatmaps)
+  - Target leakage checks
+  - Feature typing intelligence (ordinal/nominal/datetime)
+  - Data drift baseline snapshot storage
+
+- [ ] **Adaptive AutoML Search**
+  - [x] Hyperparameter optimization (Optuna)
+  - [x] Time-budget-based tuning
+  - [x] Trial-budget tuning controls
+  - [ ] Early stopping of weak candidates
+  - Progressive resource allocation
+  - Metadata-driven model priors (meta-learning)
+
+- [ ] **Feature Engineering Engine**
+  - Automatic feature generation (interactions/polynomial/encodings)
+  - Feature selection (MI/RFE)
+  - Optional dimensionality reduction (PCA)
+
+- [ ] **Experiment Tracking and Reproducibility**
+  - [x] Experiment registry (configs + summary metrics + best model)
+  - [x] Training UI panel for latest experiment runs
+  - [ ] Dataset version linkage in experiment records
+  - [ ] Seed and pipeline snapshot tracking
+  - [ ] Run-to-run comparison UI
+
+- [ ] **Explainability Deepening**
+  - Strong global/local explainability views
+  - Feature interaction visualizations
+  - Counterfactual explanations
+
+- [ ] **Deployment Intelligence**
+  - A/B testing
+  - Shadow deployment
+  - Rollback mechanism
+  - Latency monitoring
+
+- [ ] **Production Monitoring Expansion**
+  - Data drift (KS/PSI)
+  - Concept drift/performance decay
+  - Alerting workflows
+
+- [ ] **Dataset Versioning and Lineage**
+  - Version every dataset stage
+  - Track lineage from raw to transformed assets
+
+- [ ] **Advanced Prediction Interface**
+  - Batch predictions
+  - Confidence presentation improvements
+  - Explain-prediction action in UI
+  - CSV bulk inference upload
+
+- [ ] **Performance Optimization**
+  - Parallel model training
+  - GPU support toggle
+  - Preprocessing/pipeline caching
+
+- [ ] **Security and Production Hardening**
+  - API authentication (JWT or API keys)
+  - Rate limiting
+  - Input validation hardening
+
+- [ ] **Advanced UX for Model Ops**
+  - Training progress timeline
+  - Interactive leaderboard filters
+  - Model comparison radar charts
+  - Dataset insights dashboard
+
+- [ ] **Strategic Differentiator**
+  - Choose and optimize for one identity:
+    - Explainability-first AutoML, or
+    - Low-data AutoML, or
+    - Real-time adaptive models, or
+    - Domain-specific AutoML
+
+### Goal Management Rule
+
+1. Do not mark a goal complete until backend, frontend, tests, and docs are all updated.
+2. When complete:
+   - Move it from **Current Project Goals** to **Platform Overview** as a shipped capability.
+   - Remove it from the goals checklist (no duplicates).
+3. Keep backlog depth constant:
+   - Every time one goal is completed and removed, add one new next-priority goal to this section.
 
 ---
 
@@ -232,6 +310,9 @@ The pipeline in `backend/app/ml/pipeline.py` performs:
 | `POST` | `/api/load-example/{key}` | Load example dataset |
 | `POST` | `/api/train-model` | Start AutoML training job |
 | `GET` | `/api/training-status/{job_id}` | Poll training progress |
+| `GET` | `/api/training-jobs` | List training jobs |
+| `GET` | `/api/experiments` | List experiment runs |
+| `GET` | `/api/experiments/{run_id}` | Get single experiment run |
 | `GET` | `/api/models` | List trained models |
 | `GET` | `/api/models/{id}/shap` | SHAP explanation payload |
 | `GET` | `/api/models/{id}/lime` | LIME explanation payload |
@@ -252,7 +333,7 @@ curl -X POST http://localhost:8000/api/upload-dataset \
 # 2. Start training
 curl -X POST http://localhost:8000/api/train-model \
   -H "Content-Type: application/json" \
-  -d '{"dataset_id": 1, "target_column": "price", "cv_folds": 5}'
+  -d '{"dataset_id": 1, "target_column": "price", "cv_folds": 5, "enable_tuning": true, "tuning_trials": 16, "tuning_time_budget_sec": 180}'
 
 # 3. Check status
 curl http://localhost:8000/api/training-status/{job_id}
@@ -277,12 +358,13 @@ curl -X POST http://localhost:8000/api/predict \
 | Datasets | `/dashboard/datasets` | Upload, explore, delete datasets |
 | Training | `/dashboard/training` | Configure and launch AutoML jobs |
 | Leaderboard | `/dashboard/models` | Compare models, charts, confusion matrix |
+| Search | `/dashboard/search` | Cross-entity search for jobs, datasets, and models |
 | Predict | `/dashboard/predict` | Run predictions via form UI |
 | Deploy | `/dashboard/deploy` | Manage deployed models |
 
 ---
 
-## 🔧 Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|

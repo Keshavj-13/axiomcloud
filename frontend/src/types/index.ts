@@ -33,7 +33,31 @@ export interface TrainingJob {
   status: "pending" | "running" | "completed" | "failed";
   progress: number;
   error_message?: string;
+  config?: Record<string, unknown>;
   created_at: string;
+  completed_at?: string;
+}
+
+export interface ExperimentRun {
+  id: number;
+  run_id: string;
+  job_id: string;
+  dataset_id: number;
+  target_column: string;
+  task_type?: string;
+  status: "pending" | "running" | "completed" | "failed";
+  config?: Record<string, unknown>;
+  summary_metrics?: {
+    primary_metric?: string;
+    best_model?: string;
+    best_score?: number;
+    models_trained?: number;
+    failed_models?: number;
+  };
+  best_model_name?: string;
+  best_score?: number;
+  error_message?: string;
+  started_at: string;
   completed_at?: string;
 }
 

@@ -34,3 +34,479 @@
 2026-03-22 18:01:18,745 - app.main - INFO - Request completed | id=22af0ea8 method=GET path=/api/training-jobs status=200 duration_ms=7.29
 2026-03-22 18:01:18,753 - app.main - INFO - Request completed | id=60a6d1e7 method=GET path=/api/datasets status=200 duration_ms=9.96
 2026-03-22 18:01:18,847 - app.main - INFO - Request completed | id=8bc012cc method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=104.22
+2026-03-22 18:04:53,901 - app.main - INFO - Request completed | id=620be5fc method=GET path=/api/datasets status=200 duration_ms=5.81
+2026-03-22 18:04:53,908 - app.main - INFO - Request completed | id=33500cf4 method=GET path=/api/datasets status=200 duration_ms=4.22
+2026-03-22 18:04:55,721 - app.main - INFO - Request completed | id=4599fa05 method=GET path=/api/example-datasets status=200 duration_ms=1.32
+2026-03-22 18:04:55,726 - app.main - INFO - Request completed | id=c62962e9 method=GET path=/api/datasets status=200 duration_ms=7.79
+2026-03-22 18:04:55,726 - app.main - INFO - Request completed | id=0d12ba45 method=GET path=/api/example-datasets status=200 duration_ms=3.22
+2026-03-22 18:04:55,732 - app.main - INFO - Request completed | id=8bcd8421 method=GET path=/api/datasets status=200 duration_ms=3.89
+2026-03-22 18:05:02,420 - app.main - INFO - Request completed | id=b091fd18 method=GET path=/api/training-jobs status=200 duration_ms=5.25
+2026-03-22 18:05:02,425 - app.main - INFO - Request completed | id=58c580d4 method=GET path=/api/datasets status=200 duration_ms=8.31
+2026-03-22 18:05:02,430 - app.main - INFO - Request completed | id=4b5753e7 method=GET path=/api/training-jobs status=200 duration_ms=6.40
+2026-03-22 18:05:02,433 - app.main - INFO - Request completed | id=5c683584 method=GET path=/api/datasets status=200 duration_ms=6.85
+2026-03-22 18:05:02,571 - app.main - INFO - Request completed | id=82fd4165 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=90.66
+2026-03-22 18:05:17,094 - app.main - INFO - Request completed | id=1191faa8 method=GET path=/api/training-jobs status=200 duration_ms=4.32
+2026-03-22 18:05:17,098 - app.main - INFO - Request completed | id=21cc0d56 method=GET path=/api/datasets status=200 duration_ms=7.13
+2026-03-22 18:05:17,100 - app.main - INFO - Request completed | id=9701a32a method=GET path=/api/training-jobs status=200 duration_ms=3.80
+2026-03-22 18:05:17,105 - app.main - INFO - Request completed | id=d5fcbe1e method=GET path=/api/datasets status=200 duration_ms=5.09
+2026-03-22 18:05:17,242 - app.main - INFO - Request completed | id=e4542090 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=90.31
+2026-03-22 18:05:23,962 - app.main - INFO - Request completed | id=c0257a7e method=GET path=/api/training-jobs status=200 duration_ms=3.42
+2026-03-22 18:05:23,964 - app.main - INFO - Request completed | id=22da4559 method=GET path=/api/dashboard/summary status=200 duration_ms=6.35
+2026-03-22 18:05:23,971 - app.main - INFO - Request completed | id=2e5dc5c1 method=GET path=/api/training-jobs status=200 duration_ms=5.91
+2026-03-22 18:05:23,973 - app.main - INFO - Request completed | id=bfb80f30 method=GET path=/api/dashboard/summary status=200 duration_ms=6.67
+2026-03-22 18:05:58,263 - app.main - INFO - Request completed | id=c5c14638 method=GET path=/api/datasets status=200 duration_ms=6.40
+2026-03-22 18:05:58,269 - app.main - INFO - Request completed | id=ea392b09 method=GET path=/api/datasets status=200 duration_ms=3.98
+2026-03-22 18:06:01,572 - app.main - INFO - Request completed | id=d3e38978 method=GET path=/api/training-jobs status=200 duration_ms=4.39
+2026-03-22 18:06:01,573 - app.main - INFO - Request completed | id=fc92c1b8 method=GET path=/api/dashboard/summary status=200 duration_ms=6.55
+2026-03-22 18:06:01,580 - app.main - INFO - Request completed | id=add7697e method=GET path=/api/training-jobs status=200 duration_ms=6.75
+2026-03-22 18:06:01,581 - app.main - INFO - Request completed | id=f89f18e2 method=GET path=/api/dashboard/summary status=200 duration_ms=6.37
+2026-03-22 18:06:21,834 - app.main - INFO - Request completed | id=dadb9b0f method=GET path=/api/training-jobs status=200 duration_ms=5.06
+2026-03-22 18:06:21,836 - app.main - INFO - Request completed | id=5331131b method=GET path=/api/dashboard/summary status=200 duration_ms=6.95
+2026-03-22 18:06:21,842 - app.main - INFO - Request completed | id=5ddec91f method=GET path=/api/training-jobs status=200 duration_ms=6.10
+2026-03-22 18:06:21,844 - app.main - INFO - Request completed | id=8eb2128d method=GET path=/api/dashboard/summary status=200 duration_ms=6.89
+2026-03-22 18:07:54,695 - app.main - INFO - Request completed | id=1aec381c method=GET path=/api/training-jobs status=200 duration_ms=7.89
+2026-03-22 18:07:54,703 - app.main - INFO - Request completed | id=2d9bf861 method=GET path=/api/datasets status=200 duration_ms=15.64
+2026-03-22 18:07:54,729 - app.main - INFO - Request completed | id=0c3c5ab1 method=GET path=/api/models status=200 duration_ms=40.22
+2026-03-22 18:07:54,731 - app.main - INFO - Request completed | id=be67c2fc method=GET path=/api/training-jobs status=200 duration_ms=33.27
+2026-03-22 18:07:54,734 - app.main - INFO - Request completed | id=64be7d85 method=GET path=/api/datasets status=200 duration_ms=20.27
+2026-03-22 18:07:54,760 - app.main - INFO - Request completed | id=8f39ccb5 method=GET path=/api/models status=200 duration_ms=28.51
+2026-03-22 18:08:04,886 - app.main - INFO - Request completed | id=a8c430f2 method=GET path=/api/dashboard/summary status=200 duration_ms=5.25
+2026-03-22 18:08:04,886 - app.main - INFO - Request completed | id=a69f9ce4 method=GET path=/api/training-jobs status=200 duration_ms=5.08
+2026-03-22 18:08:04,893 - app.main - INFO - Request completed | id=94331fbc method=GET path=/api/training-jobs status=200 duration_ms=4.90
+2026-03-22 18:08:04,895 - app.main - INFO - Request completed | id=98311c73 method=GET path=/api/dashboard/summary status=200 duration_ms=6.33
+2026-03-22 18:12:20,653 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 18:12:20,653 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 18:12:20,653 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-22 18:12:32,584 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 18:12:32,584 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 18:12:32,584 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-22 18:12:56,570 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 18:12:56,570 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 18:12:56,570 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-22 18:13:21,714 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 18:13:21,715 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 18:13:21,715 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-22 18:13:30,727 - app.main - INFO - Request completed | id=0139b992 method=GET path=/api/datasets status=200 duration_ms=17.47
+2026-03-22 18:13:30,734 - app.main - INFO - Request completed | id=a23ae7c8 method=GET path=/api/datasets status=200 duration_ms=5.60
+2026-03-22 18:14:07,203 - app.main - INFO - Request completed | id=58d69dd5 method=GET path=/api/datasets status=200 duration_ms=8.34
+2026-03-22 18:14:07,205 - app.main - INFO - Request completed | id=14fa6a18 method=GET path=/api/experiments status=200 duration_ms=9.01
+2026-03-22 18:14:07,210 - app.main - INFO - Request completed | id=4a779c4c method=GET path=/api/experiments status=200 duration_ms=3.12
+2026-03-22 18:14:07,214 - app.main - INFO - Request completed | id=96db4bb7 method=GET path=/api/datasets status=200 duration_ms=8.74
+2026-03-22 18:17:19,444 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 18:17:19,444 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 18:17:19,444 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-22 18:17:27,209 - app.main - INFO - Request completed | id=0b18d65c method=GET path=/api/datasets status=200 duration_ms=20.22
+2026-03-22 18:17:27,210 - app.main - INFO - Request completed | id=e29ae946 method=GET path=/api/experiments status=200 duration_ms=20.62
+2026-03-22 18:17:27,214 - app.main - INFO - Request completed | id=9c8f456e method=GET path=/api/experiments status=200 duration_ms=2.26
+2026-03-22 18:17:27,217 - app.main - INFO - Request completed | id=1de20001 method=GET path=/api/datasets status=200 duration_ms=5.89
+2026-03-22 18:17:30,045 - app.main - INFO - Request completed | id=4417f906 method=GET path=/api/experiments status=200 duration_ms=5.13
+2026-03-22 18:17:30,049 - app.main - INFO - Request completed | id=6494f5c4 method=GET path=/api/datasets status=200 duration_ms=10.56
+2026-03-22 18:17:30,053 - app.main - INFO - Request completed | id=56eafe75 method=GET path=/api/datasets status=200 duration_ms=11.01
+2026-03-22 18:17:30,053 - app.main - INFO - Request completed | id=85340383 method=GET path=/api/experiments status=200 duration_ms=9.29
+2026-03-22 18:17:32,831 - app.main - INFO - Request completed | id=7b7be866 method=GET path=/api/example-datasets status=200 duration_ms=0.60
+2026-03-22 18:17:32,836 - app.main - INFO - Request completed | id=6834e970 method=GET path=/api/example-datasets status=200 duration_ms=1.89
+2026-03-22 18:17:32,838 - app.main - INFO - Request completed | id=0bab1ef4 method=GET path=/api/datasets status=200 duration_ms=7.26
+2026-03-22 18:17:32,843 - app.main - INFO - Request completed | id=5ef36abe method=GET path=/api/datasets status=200 duration_ms=3.67
+2026-03-22 18:17:45,345 - app.api.datasets - INFO - Dataset uploaded: train (891 rows)
+2026-03-22 18:17:45,346 - app.main - INFO - Request completed | id=adcd3eb5 method=POST path=/api/upload-dataset status=200 duration_ms=26.70
+2026-03-22 18:17:45,354 - app.main - INFO - Request completed | id=88afe76b method=GET path=/api/datasets status=200 duration_ms=4.83
+2026-03-22 18:17:48,559 - app.main - INFO - Request completed | id=d075cfd6 method=GET path=/api/experiments status=200 duration_ms=2.17
+2026-03-22 18:17:48,565 - app.main - INFO - Request completed | id=0773b990 method=GET path=/api/datasets status=200 duration_ms=8.45
+2026-03-22 18:17:48,566 - app.main - INFO - Request completed | id=1f293dde method=GET path=/api/experiments status=200 duration_ms=4.16
+2026-03-22 18:17:48,571 - app.main - INFO - Request completed | id=ecd8d8c5 method=GET path=/api/datasets status=200 duration_ms=4.50
+2026-03-22 18:18:12,612 - app.main - INFO - Request completed | id=25d3b0ef method=OPTIONS path=/api/train-model status=200 duration_ms=0.22
+2026-03-22 18:18:12,625 - app.api.training - INFO - Training job 25648df4-4075-41bd-9ead-37d88c3a4f91 queued
+2026-03-22 18:18:12,626 - app.main - INFO - Request completed | id=47b8dcbd method=POST path=/api/train-model status=200 duration_ms=12.36
+2026-03-22 18:18:12,644 - app.ml.pipeline - INFO - [25648df4-4075-41bd-9ead-37d88c3a4f91] Progress 5%: Preprocessing data...
+2026-03-22 18:18:12,649 - app.ml.pipeline - INFO - Task type detected: classification
+2026-03-22 18:18:12,655 - app.ml.pipeline - INFO - [25648df4-4075-41bd-9ead-37d88c3a4f91] Progress 10%: Training Logistic Regression...
+2026-03-22 18:18:12,794 - app.ml.pipeline - INFO - Logistic Regression trained in 0.05s
+2026-03-22 18:18:12,799 - app.ml.pipeline - INFO - [25648df4-4075-41bd-9ead-37d88c3a4f91] Progress 26%: Training Random Forest...
+2026-03-22 18:18:13,585 - app.ml.pipeline - INFO - Random Forest trained in 0.12s
+2026-03-22 18:18:13,590 - app.ml.pipeline - INFO - [25648df4-4075-41bd-9ead-37d88c3a4f91] Progress 42%: Training XGBoost...
+2026-03-22 18:18:14,133 - app.main - INFO - Request completed | id=c704e963 method=GET path=/api/training-status/25648df4-4075-41bd-9ead-37d88c3a4f91 status=200 duration_ms=2.93
+2026-03-22 18:18:15,504 - app.ml.pipeline - INFO - XGBoost trained in 1.59s
+2026-03-22 18:18:15,511 - app.ml.pipeline - INFO - [25648df4-4075-41bd-9ead-37d88c3a4f91] Progress 58%: Training LightGBM...
+2026-03-22 18:18:15,637 - app.main - INFO - Request completed | id=b7f4dc93 method=GET path=/api/training-status/25648df4-4075-41bd-9ead-37d88c3a4f91 status=200 duration_ms=5.79
+2026-03-22 18:18:15,852 - app.ml.pipeline - INFO - LightGBM trained in 0.08s
+2026-03-22 18:18:15,858 - app.ml.pipeline - INFO - [25648df4-4075-41bd-9ead-37d88c3a4f91] Progress 74%: Training Gradient Boosting...
+2026-03-22 18:18:16,566 - app.ml.pipeline - INFO - Gradient Boosting trained in 0.12s
+2026-03-22 18:18:16,571 - app.ml.pipeline - INFO - [25648df4-4075-41bd-9ead-37d88c3a4f91] Progress 100%: Training complete!
+2026-03-22 18:18:16,580 - app.api.training - INFO - Training job 25648df4-4075-41bd-9ead-37d88c3a4f91 completed
+2026-03-22 18:18:17,132 - app.main - INFO - Request completed | id=a1041ec8 method=GET path=/api/training-status/25648df4-4075-41bd-9ead-37d88c3a4f91 status=200 duration_ms=2.03
+2026-03-22 18:18:17,137 - app.main - INFO - Request completed | id=f28d1e0a method=GET path=/api/experiments status=200 duration_ms=1.89
+2026-03-22 18:18:21,027 - app.main - INFO - Request completed | id=2a215c61 method=GET path=/api/training-jobs status=200 duration_ms=13.79
+2026-03-22 18:18:21,028 - app.main - INFO - Request completed | id=3944e191 method=GET path=/api/datasets status=200 duration_ms=13.23
+2026-03-22 18:18:21,041 - app.main - INFO - Request completed | id=f8059464 method=GET path=/api/training-jobs status=200 duration_ms=9.11
+2026-03-22 18:18:21,049 - app.main - INFO - Request completed | id=b8ae3a84 method=GET path=/api/datasets status=200 duration_ms=17.55
+2026-03-22 18:18:21,066 - app.main - ERROR - Unhandled request error | id=2578c5d8 method=GET path=/api/metrics/25648df4-4075-41bd-9ead-37d88c3a4f91 duration_ms=50.78
+Traceback (most recent call last):
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/anyio/streams/memory.py", line 132, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/keshav/Downloads/sigmacloud/backend/app/main.py", line 83, in request_logging_middleware
+    response = await call_next(request)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/gzip.py", line 24, in __call__
+    await responder(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/gzip.py", line 44, in __call__
+    await self.app(scope, receive, self.send_with_gzip)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/cors.py", line 148, in simple_response
+    await self.app(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 65, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 756, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 776, in app
+    await route.handle(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 297, in handle
+    await self.app(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 77, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 72, in app
+    response = await func(request)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/fastapi/routing.py", line 296, in app
+    content = await serialize_response(
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/fastapi/routing.py", line 155, in serialize_response
+    raise ResponseValidationError(
+fastapi.exceptions.ResponseValidationError: 6 validation errors:
+  {'type': 'float_type', 'loc': ('response', 'models', 0, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 1, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 2, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 3, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 4, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'best_model', 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+
+2026-03-22 18:18:21,068 - app.main - ERROR - Unhandled exception | id=2578c5d8 method=GET path=/api/metrics/25648df4-4075-41bd-9ead-37d88c3a4f91
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+  |     yield
+  |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 190, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/anyio/_backends/_asyncio.py", line 783, in __aexit__
+  |     raise BaseExceptionGroup(
+  | exceptiongroup.ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 189, in __call__
+    |     with collapse_excgroups():
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/contextlib.py", line 153, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_utils.py", line 93, in collapse_excgroups
+    |     raise exc
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 191, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |   File "/home/keshav/Downloads/sigmacloud/backend/app/main.py", line 83, in request_logging_middleware
+    |     response = await call_next(request)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 165, in call_next
+    |     raise app_exc
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 151, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/gzip.py", line 24, in __call__
+    |     await responder(scope, receive, send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/gzip.py", line 44, in __call__
+    |     await self.app(scope, receive, self.send_with_gzip)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    |     await self.simple_response(scope, receive, send, request_headers=headers)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/cors.py", line 148, in simple_response
+    |     await self.app(scope, receive, send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 65, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 756, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 776, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 297, in handle
+    |     await self.app(scope, receive, send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 77, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 72, in app
+    |     response = await func(request)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/fastapi/routing.py", line 296, in app
+    |     content = await serialize_response(
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/fastapi/routing.py", line 155, in serialize_response
+    |     raise ResponseValidationError(
+    | fastapi.exceptions.ResponseValidationError: 6 validation errors:
+    |   {'type': 'float_type', 'loc': ('response', 'models', 0, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+    |   {'type': 'float_type', 'loc': ('response', 'models', 1, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+    |   {'type': 'float_type', 'loc': ('response', 'models', 2, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+    |   {'type': 'float_type', 'loc': ('response', 'models', 3, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+    |   {'type': 'float_type', 'loc': ('response', 'models', 4, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+    |   {'type': 'float_type', 'loc': ('response', 'best_model', 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+    | 
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 189, in __call__
+    with collapse_excgroups():
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_utils.py", line 93, in collapse_excgroups
+    raise exc
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 191, in __call__
+    response = await self.dispatch_func(request, call_next)
+  File "/home/keshav/Downloads/sigmacloud/backend/app/main.py", line 83, in request_logging_middleware
+    response = await call_next(request)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/gzip.py", line 24, in __call__
+    await responder(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/gzip.py", line 44, in __call__
+    await self.app(scope, receive, self.send_with_gzip)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/cors.py", line 148, in simple_response
+    await self.app(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 65, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 756, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 776, in app
+    await route.handle(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 297, in handle
+    await self.app(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 77, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 72, in app
+    response = await func(request)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/fastapi/routing.py", line 296, in app
+    content = await serialize_response(
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/fastapi/routing.py", line 155, in serialize_response
+    raise ResponseValidationError(
+fastapi.exceptions.ResponseValidationError: 6 validation errors:
+  {'type': 'float_type', 'loc': ('response', 'models', 0, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 1, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 2, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 3, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 4, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'best_model', 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+
+2026-03-22 18:18:21,096 - app.main - ERROR - Unhandled request error | id=e0ab0726 method=GET path=/api/metrics/25648df4-4075-41bd-9ead-37d88c3a4f91 duration_ms=22.04
+Traceback (most recent call last):
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/anyio/streams/memory.py", line 132, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/keshav/Downloads/sigmacloud/backend/app/main.py", line 83, in request_logging_middleware
+    response = await call_next(request)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/gzip.py", line 24, in __call__
+    await responder(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/gzip.py", line 44, in __call__
+    await self.app(scope, receive, self.send_with_gzip)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/cors.py", line 148, in simple_response
+    await self.app(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 65, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 756, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 776, in app
+    await route.handle(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 297, in handle
+    await self.app(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 77, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 72, in app
+    response = await func(request)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/fastapi/routing.py", line 296, in app
+    content = await serialize_response(
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/fastapi/routing.py", line 155, in serialize_response
+    raise ResponseValidationError(
+fastapi.exceptions.ResponseValidationError: 6 validation errors:
+  {'type': 'float_type', 'loc': ('response', 'models', 0, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 1, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 2, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 3, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 4, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'best_model', 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+
+2026-03-22 18:18:21,096 - app.main - ERROR - Unhandled exception | id=e0ab0726 method=GET path=/api/metrics/25648df4-4075-41bd-9ead-37d88c3a4f91
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+  |     yield
+  |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 190, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/anyio/_backends/_asyncio.py", line 783, in __aexit__
+  |     raise BaseExceptionGroup(
+  | exceptiongroup.ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 189, in __call__
+    |     with collapse_excgroups():
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/contextlib.py", line 153, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_utils.py", line 93, in collapse_excgroups
+    |     raise exc
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 191, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |   File "/home/keshav/Downloads/sigmacloud/backend/app/main.py", line 83, in request_logging_middleware
+    |     response = await call_next(request)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 165, in call_next
+    |     raise app_exc
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 151, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/gzip.py", line 24, in __call__
+    |     await responder(scope, receive, send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/gzip.py", line 44, in __call__
+    |     await self.app(scope, receive, self.send_with_gzip)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    |     await self.simple_response(scope, receive, send, request_headers=headers)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/cors.py", line 148, in simple_response
+    |     await self.app(scope, receive, send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 65, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 756, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 776, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 297, in handle
+    |     await self.app(scope, receive, send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 77, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 72, in app
+    |     response = await func(request)
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/fastapi/routing.py", line 296, in app
+    |     content = await serialize_response(
+    |   File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/fastapi/routing.py", line 155, in serialize_response
+    |     raise ResponseValidationError(
+    | fastapi.exceptions.ResponseValidationError: 6 validation errors:
+    |   {'type': 'float_type', 'loc': ('response', 'models', 0, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+    |   {'type': 'float_type', 'loc': ('response', 'models', 1, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+    |   {'type': 'float_type', 'loc': ('response', 'models', 2, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+    |   {'type': 'float_type', 'loc': ('response', 'models', 3, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+    |   {'type': 'float_type', 'loc': ('response', 'models', 4, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+    |   {'type': 'float_type', 'loc': ('response', 'best_model', 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+    | 
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 189, in __call__
+    with collapse_excgroups():
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_utils.py", line 93, in collapse_excgroups
+    raise exc
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 191, in __call__
+    response = await self.dispatch_func(request, call_next)
+  File "/home/keshav/Downloads/sigmacloud/backend/app/main.py", line 83, in request_logging_middleware
+    response = await call_next(request)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/gzip.py", line 24, in __call__
+    await responder(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/gzip.py", line 44, in __call__
+    await self.app(scope, receive, self.send_with_gzip)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/cors.py", line 148, in simple_response
+    await self.app(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 65, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 756, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 776, in app
+    await route.handle(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 297, in handle
+    await self.app(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 77, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py", line 72, in app
+    response = await func(request)
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/fastapi/routing.py", line 296, in app
+    content = await serialize_response(
+  File "/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/fastapi/routing.py", line 155, in serialize_response
+    raise ResponseValidationError(
+fastapi.exceptions.ResponseValidationError: 6 validation errors:
+  {'type': 'float_type', 'loc': ('response', 'models', 0, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 1, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 2, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 3, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'models', 4, 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+  {'type': 'float_type', 'loc': ('response', 'best_model', 'roc_curve_chart', 'thresholds', 0), 'msg': 'Input should be a valid number', 'input': None}
+
+2026-03-22 18:18:29,139 - app.main - INFO - Request completed | id=708853d4 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=85.50

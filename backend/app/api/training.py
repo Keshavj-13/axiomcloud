@@ -11,8 +11,8 @@ from datetime import datetime
 from typing import Optional
 
 from app.core.database import get_db
-from app.models.db_models import Dataset, TrainingJob, TrainedModel
-from app.schemas.schemas import TrainingConfig, TrainingJobResponse
+from app.models.db_models import Dataset, TrainingJob, TrainedModel, ExperimentRun
+from app.schemas.schemas import TrainingConfig, TrainingJobResponse, ExperimentRunResponse
 from app.ml.pipeline import AutoMLPipeline
 
 router = APIRouter()
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 _job_progress: dict = {}
 
 
-def run_training(job_id: str, dataset_path: str, config: dict, db_url: str):
+def run_training(job_id: str, run_id: str, dataset_path: str, config: dict, db_url: str):
     """Background training function."""
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
@@ -34,9 +34,12 @@ def run_training(job_id: str, dataset_path: str, config: dict, db_url: str):
     try:
         # Update job status
         job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
+        run = db.query(ExperimentRun).filter(ExperimentRun.run_id == run_id).first()
         if not job:
             return
         job.status = "running"
+        if run:
+            run.status = "running"
         db.commit()
 
         def update_progress(progress: int, message: str = ""):
@@ -57,6 +60,10 @@ def run_training(job_id: str, dataset_path: str, config: dict, db_url: str):
             task_type=config.get("task_type"),
             test_size=config.get("test_size", 0.2),
             cv_folds=config.get("cv_folds", 5),
+            models_to_train=config.get("models_to_train"),
+            enable_tuning=config.get("enable_tuning", False),
+            tuning_trials=config.get("tuning_trials", 12),
+            tuning_time_budget_sec=config.get("tuning_time_budget_sec", 180),
         )
 
         # Update job task_type
@@ -89,18 +96,49 @@ def run_training(job_id: str, dataset_path: str, config: dict, db_url: str):
             )
             db.add(trained_model)
 
+        best_score = None
+        best_model_name = None
+        metric_name = "accuracy" if results.get("task_type") == "classification" else "r2_score"
+        successful_models = [m for m in results["models"] if "error" not in m]
+        if successful_models:
+            ranked = sorted(
+                successful_models,
+                key=lambda m: (m.get(metric_name) if m.get(metric_name) is not None else -1e9),
+                reverse=True,
+            )
+            best_model_name = ranked[0].get("model_name")
+            best_score = ranked[0].get(metric_name)
+
         job.status = "completed"
         job.completed_at = datetime.utcnow()
         job.progress = 100
+        if run:
+            run.status = "completed"
+            run.task_type = results.get("task_type")
+            run.best_model_name = best_model_name
+            run.best_score = float(best_score) if best_score is not None else None
+            run.summary_metrics = {
+                "primary_metric": metric_name,
+                "best_model": best_model_name,
+                "best_score": best_score,
+                "models_trained": len(successful_models),
+                "failed_models": len(results["models"]) - len(successful_models),
+            }
+            run.completed_at = datetime.utcnow()
         db.commit()
         logger.info(f"Training job {job_id} completed")
 
     except Exception as e:
         logger.exception(f"Training job {job_id} failed: {e}")
         job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
+        run = db.query(ExperimentRun).filter(ExperimentRun.run_id == run_id).first()
         if job:
             job.status = "failed"
             job.error_message = str(e)
+        if run:
+            run.status = "failed"
+            run.error_message = str(e)
+            run.completed_at = datetime.utcnow()
             db.commit()
     finally:
         db.close()
@@ -124,6 +162,7 @@ async def train_model(
         raise HTTPException(status_code=400, detail=f"Target column '{config.target_column}' not found in dataset")
 
     job_id = str(uuid.uuid4())
+    run_id = str(uuid.uuid4())
 
     job = TrainingJob(
         job_id=job_id,
@@ -139,9 +178,33 @@ async def train_model(
             "test_size": config.test_size,
             "cv_folds": config.cv_folds,
             "models_to_train": config.models_to_train,
+            "enable_tuning": config.enable_tuning,
+            "tuning_trials": config.tuning_trials,
+            "tuning_time_budget_sec": config.tuning_time_budget_sec,
+            "experiment_run_id": run_id,
+        },
+    )
+
+    run = ExperimentRun(
+        run_id=run_id,
+        job_id=job_id,
+        dataset_id=config.dataset_id,
+        target_column=config.target_column,
+        task_type=config.task_type,
+        status="pending",
+        config={
+            "task_type": config.task_type,
+            "test_size": config.test_size,
+            "cv_folds": config.cv_folds,
+            "models_to_train": config.models_to_train,
+            "enable_tuning": config.enable_tuning,
+            "tuning_trials": config.tuning_trials,
+            "tuning_time_budget_sec": config.tuning_time_budget_sec,
+            "dataset_path": dataset.file_path,
         },
     )
     db.add(job)
+    db.add(run)
     db.commit()
     db.refresh(job)
 
@@ -149,12 +212,17 @@ async def train_model(
     background_tasks.add_task(
         run_training,
         job_id=job_id,
+        run_id=run_id,
         dataset_path=dataset.file_path,
         config={
             "target_column": config.target_column,
             "task_type": config.task_type,
             "test_size": config.test_size,
             "cv_folds": config.cv_folds,
+            "models_to_train": config.models_to_train,
+            "enable_tuning": config.enable_tuning,
+            "tuning_trials": config.tuning_trials,
+            "tuning_time_budget_sec": config.tuning_time_budget_sec,
         },
         db_url=settings.DATABASE_URL,
     )
@@ -177,3 +245,21 @@ def list_training_jobs(db: Session = Depends(get_db)):
     """List all training jobs."""
     jobs = db.query(TrainingJob).order_by(TrainingJob.created_at.desc()).all()
     return jobs
+
+
+@router.get("/experiments", response_model=list[ExperimentRunResponse])
+def list_experiments(db: Session = Depends(get_db), status: Optional[str] = None):
+    """List experiment runs with optional status filtering."""
+    query = db.query(ExperimentRun)
+    if status:
+        query = query.filter(ExperimentRun.status == status)
+    return query.order_by(ExperimentRun.started_at.desc()).all()
+
+
+@router.get("/experiments/{run_id}", response_model=ExperimentRunResponse)
+def get_experiment(run_id: str, db: Session = Depends(get_db)):
+    """Get a single experiment run by run_id."""
+    run = db.query(ExperimentRun).filter(ExperimentRun.run_id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Experiment run not found")
+    return run
