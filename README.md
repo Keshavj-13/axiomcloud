@@ -189,7 +189,7 @@ axiom-cloud-ai/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/axiom-cloud-ai.git
+git clone https://github.com/keshavj-13/axiom-cloud-ai.git
 cd axiom-cloud-ai
 ```
 
