@@ -295,6 +295,9 @@ class DatasetProfileCompact(BaseModel):
     summary_cards: List[Dict[str, Any]]
     target_distribution: Optional[Dict[str, Any]] = None
     correlation_heatmap: Optional[Dict[str, Any]] = None
+    typing_intelligence: Optional[Dict[str, Any]] = None
+    leakage_risks: Optional[List[Dict[str, Any]]] = None
+    drift_baseline: Optional[Dict[str, Any]] = None
     missing_by_column: List[Dict[str, Any]]
     histograms: List[Dict[str, Any]]
 

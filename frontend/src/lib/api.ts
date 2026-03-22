@@ -33,6 +33,9 @@ export const datasetsAPI = {
   list: () => api.get("/datasets"),
   get: (id: number) => api.get(`/datasets/${id}`),
   qualityReport: (id: number) => api.get(`/datasets/${id}/quality-report`),
+  edaReport: (id: number) => api.get(`/datasets/${id}/eda-report`),
+  leakageReport: (id: number) => api.get(`/datasets/${id}/leakage-report`),
+  driftBaseline: (id: number) => api.get(`/datasets/${id}/drift-baseline`),
   cleanPreview: (id: number, previewRows: number = 10) =>
     api.get(`/datasets/${id}/clean-preview`, { params: { preview_rows: previewRows } }),
   profile: (id: number) => api.get(`/datasets/${id}/profile`),
@@ -58,6 +61,7 @@ export const trainingAPI = {
   }) => api.post("/train-model", config),
   getStatus: (jobId: string) => api.get(`/training-status/${jobId}`),
   listJobs: () => api.get("/training-jobs"),
+  modelCatalog: () => api.get("/training/model-catalog"),
 };
 
 export const experimentsAPI = {
@@ -82,6 +86,8 @@ export const modelsAPI = {
     }),
   monitoring: (id: number, compareDatasetId?: number) =>
     api.get(`/models/${id}/monitoring`, { params: compareDatasetId ? { compare_dataset_id: compareDatasetId } : {} }),
+  inferenceTemplate: (id: number, randomize: boolean = true) =>
+    api.get(`/models/${id}/inference-template`, { params: { randomize } }),
   deploy: (id: number) => api.post(`/models/${id}/deploy`),
   undeploy: (id: number) => api.post(`/models/${id}/undeploy`),
   download: (id: number) => API_URL ? `${API_URL}/api/models/${id}/download` : `/api/models/${id}/download`,

@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { datasetsAPI } from "@/lib/api";
 import { logToFile } from "@/lib/logger";
-import { Dataset, ExampleDataset, DatasetQualityReport, CleanPreview, DatasetProfile } from "@/types";
+import { Dataset, ExampleDataset, DatasetQualityReport, CleanPreview, DatasetProfile, EDAReport } from "@/types";
 import toast from "react-hot-toast";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import {
@@ -35,6 +35,8 @@ export default function DatasetsPage() {
   const [cleanAndSaveLoading, setCleanAndSaveLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [profile, setProfile] = useState<DatasetProfile | null>(null);
+  const [edaLoading, setEdaLoading] = useState(false);
+  const [edaReport, setEdaReport] = useState<EDAReport | null>(null);
 
   const fetchDatasets = async () => {
     try {
@@ -150,6 +152,20 @@ export default function DatasetsPage() {
       toast.error("Failed to build dataset profile");
     } finally {
       setProfileLoading(false);
+    }
+  };
+
+  const runEDA = async () => {
+    if (!selectedDataset) return;
+    setEdaLoading(true);
+    try {
+      const res = await datasetsAPI.edaReport(selectedDataset.id);
+      setEdaReport(res.data);
+      toast.success("EDA report ready");
+    } catch {
+      toast.error("Failed to build EDA report");
+    } finally {
+      setEdaLoading(false);
     }
   };
 
@@ -299,6 +315,9 @@ export default function DatasetsPage() {
             <button onClick={runProfile} disabled={profileLoading} className="btn-outline text-xs py-1.5 px-3">
               {profileLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Table className="w-3.5 h-3.5" />} Build Profile
             </button>
+            <button onClick={runEDA} disabled={edaLoading} className="btn-outline text-xs py-1.5 px-3">
+              {edaLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <ShieldCheck className="w-3.5 h-3.5" />} EDA Report
+            </button>
           </div>
 
           <div className="overflow-x-auto">
@@ -372,6 +391,63 @@ export default function DatasetsPage() {
 
               <div className="grid lg:grid-cols-2 gap-4">
                 <div className="rounded-lg border border-outline/25 bg-surface-variant/30 p-4">
+                  <div className="text-sm font-semibold text-text-primary mb-2">Feature Typing Intelligence</div>
+                  {profile.typing_intelligence ? (
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="text-text-muted">Numeric</div>
+                      <div className="font-mono text-text-primary">{profile.typing_intelligence.numeric}</div>
+                      <div className="text-text-muted">Categorical</div>
+                      <div className="font-mono text-text-primary">{profile.typing_intelligence.categorical}</div>
+                      <div className="text-text-muted">Datetime-like</div>
+                      <div className="font-mono text-text-primary">{profile.typing_intelligence.datetime}</div>
+                      <div className="text-text-muted">Boolean</div>
+                      <div className="font-mono text-text-primary">{profile.typing_intelligence.boolean}</div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-text-muted">No typing intelligence available.</p>
+                  )}
+                  {(profile.typing_intelligence?.high_cardinality_candidates?.length || 0) > 0 && (
+                    <div className="mt-3">
+                      <div className="text-xs text-text-muted mb-1">High-cardinality candidates</div>
+                      <div className="flex flex-wrap gap-1">
+                        {profile.typing_intelligence!.high_cardinality_candidates.slice(0, 8).map((name) => (
+                          <span key={name} className="rounded bg-surface px-2 py-1 text-[10px] text-text-primary">{name}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {profile.drift_baseline && (
+                    <div className="mt-3 rounded border border-outline/20 bg-surface/40 p-2 text-xs">
+                      <div className="text-text-muted">Drift baseline snapshot</div>
+                      <div className="font-mono text-text-primary">
+                        rows: {profile.drift_baseline.rows} • cols: {profile.drift_baseline.columns}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="rounded-lg border border-outline/25 bg-surface-variant/30 p-4">
+                  <div className="text-sm font-semibold text-text-primary mb-2">Target Leakage Risk</div>
+                  {(profile.leakage_risks?.length || 0) > 0 ? (
+                    <div className="space-y-2 text-xs">
+                      {profile.leakage_risks!.slice(0, 5).map((risk) => (
+                        <div key={risk.feature} className="rounded border border-outline/20 bg-surface/40 p-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-text-primary">{risk.feature}</span>
+                            <span className="font-mono text-amber-300">score: {risk.risk_score.toFixed(2)}</span>
+                          </div>
+                          <div className="mt-1 text-text-muted">{risk.reasons.join("; ")}</div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-text-muted">No strong leakage risks detected.</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-4">
+                <div className="rounded-lg border border-outline/25 bg-surface-variant/30 p-4">
                   <div className="text-sm font-semibold text-text-primary mb-2">Missing Values by Column</div>
                   <ResponsiveContainer width="100%" height={220}>
                     <BarChart data={profile.missing_by_column.slice(0, 12)}>
@@ -404,6 +480,50 @@ export default function DatasetsPage() {
                   ) : (
                     <p className="text-xs text-text-muted">No target distribution available.</p>
                   )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {edaReport && (
+            <div className="mt-6 rounded-lg border border-outline/25 bg-surface-variant/30 p-4">
+              <div className="mb-3 text-sm font-semibold text-text-primary">Exploratory Data Analysis</div>
+              <div className="grid md:grid-cols-3 gap-3 text-xs mb-4">
+                <div className="rounded border border-outline/20 bg-surface/40 p-2">
+                  <div className="text-text-muted">Rows / Columns</div>
+                  <div className="font-mono text-text-primary">{edaReport.overview.rows} / {edaReport.overview.columns}</div>
+                </div>
+                <div className="rounded border border-outline/20 bg-surface/40 p-2">
+                  <div className="text-text-muted">Missing / Duplicates</div>
+                  <div className="font-mono text-text-primary">{edaReport.overview.missing_total} / {edaReport.overview.duplicate_rows}</div>
+                </div>
+                <div className="rounded border border-outline/20 bg-surface/40 p-2">
+                  <div className="text-text-muted">Numeric / Categorical</div>
+                  <div className="font-mono text-text-primary">{edaReport.overview.numeric_columns} / {edaReport.overview.categorical_columns}</div>
+                </div>
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-4">
+                <div>
+                  <div className="mb-2 text-xs font-semibold text-text-primary">High Correlations</div>
+                  {(edaReport.high_correlations || []).length > 0 ? (
+                    <div className="space-y-2 text-xs">
+                      {edaReport.high_correlations.slice(0, 6).map((c) => (
+                        <div key={`${c.feature_a}-${c.feature_b}`} className="rounded border border-outline/20 bg-surface/40 p-2">
+                          <div className="text-text-primary">{c.feature_a} ↔ {c.feature_b}</div>
+                          <div className="font-mono text-amber-300">corr: {c.correlation.toFixed(3)}</div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : <p className="text-xs text-text-muted">No strong correlations found.</p>}
+                </div>
+
+                <div>
+                  <div className="mb-2 text-xs font-semibold text-text-primary">Recommendations</div>
+                  <ul className="list-disc space-y-1 pl-4 text-xs text-text-muted">
+                    {(edaReport.recommendations || []).map((r, i) => <li key={i}>{r}</li>)}
+                  </ul>
+                  <div className="mt-3 text-xs font-semibold text-text-primary">Leakage Risks: {(edaReport.leakage_risks || []).length}</div>
                 </div>
               </div>
             </div>

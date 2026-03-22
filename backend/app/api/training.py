@@ -14,12 +14,52 @@ from app.core.database import get_db
 from app.models.db_models import Dataset, TrainingJob, TrainedModel, ExperimentRun
 from app.schemas.schemas import TrainingConfig, TrainingJobResponse, ExperimentRunResponse
 from app.ml.pipeline import AutoMLPipeline
+from app.ml.dataset_profiling import build_drift_baseline_snapshot
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
 # In-memory progress tracking (use Redis in production)
 _job_progress: dict = {}
+
+
+def _model_catalog_payload() -> dict:
+    classification = list(AutoMLPipeline.CLASSIFICATION_MODELS.keys())
+    regression = list(AutoMLPipeline.REGRESSION_MODELS.keys())
+    union = sorted(set(classification + regression))
+    details = {}
+    for name in union:
+        is_nn = "Neural" in name
+        is_gnn = "Graph Neural" in name
+        is_svm = "SVM" in name or "SVR" in name
+        is_heavy = is_nn or is_gnn or is_svm
+        details[name] = {
+            "family": (
+                "gnn" if is_gnn else
+                "neural" if is_nn else
+                "svm" if is_svm else
+                "tree" if ("Forest" in name or "Boost" in name or "Tree" in name) else
+                "linear"
+            ),
+            "cost_tier": "high" if is_heavy else "medium",
+            "warning": (
+                "This option can significantly increase training time."
+                if is_heavy else None
+            ),
+            "experimental": bool(is_gnn),
+        }
+    return {
+        "classification": classification,
+        "regression": regression,
+        "all": union,
+        "details": details,
+    }
+
+
+def _read_dataset_file(path: str) -> pd.DataFrame:
+    if path.endswith(".csv"):
+        return pd.read_csv(path)
+    return pd.read_excel(path)
 
 
 def run_training(job_id: str, run_id: str, dataset_path: str, config: dict, db_url: str):
@@ -50,7 +90,7 @@ def run_training(job_id: str, run_id: str, dataset_path: str, config: dict, db_u
                 db.commit()
 
         # Load dataset
-        df = pd.read_csv(dataset_path)
+        df = _read_dataset_file(dataset_path)
 
         # Run AutoML
         pipeline = AutoMLPipeline(job_id=job_id, progress_callback=update_progress)
@@ -161,8 +201,36 @@ async def train_model(
     if config.target_column not in df_cols:
         raise HTTPException(status_code=400, detail=f"Target column '{config.target_column}' not found in dataset")
 
+    catalog = _model_catalog_payload()
+    if config.models_to_train:
+        invalid = sorted(set(config.models_to_train) - set(catalog["all"]))
+        if invalid:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unsupported models requested: {', '.join(invalid)}",
+            )
+
+        if config.task_type in {"classification", "regression"}:
+            allowed = set(catalog[config.task_type])
+            incompatible = [m for m in config.models_to_train if m not in allowed]
+            if incompatible:
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        f"Selected models incompatible with task_type '{config.task_type}': "
+                        + ", ".join(incompatible)
+                    ),
+                )
+
     job_id = str(uuid.uuid4())
     run_id = str(uuid.uuid4())
+
+    try:
+        baseline_df = _read_dataset_file(dataset.file_path)
+        drift_baseline = build_drift_baseline_snapshot(baseline_df, target_column=config.target_column)
+    except Exception as exc:
+        logger.warning("Could not build drift baseline snapshot for dataset=%s reason=%s", dataset.id, exc)
+        drift_baseline = None
 
     job = TrainingJob(
         job_id=job_id,
@@ -182,6 +250,7 @@ async def train_model(
             "tuning_trials": config.tuning_trials,
             "tuning_time_budget_sec": config.tuning_time_budget_sec,
             "experiment_run_id": run_id,
+            "drift_baseline": drift_baseline,
         },
     )
 
@@ -201,6 +270,7 @@ async def train_model(
             "tuning_trials": config.tuning_trials,
             "tuning_time_budget_sec": config.tuning_time_budget_sec,
             "dataset_path": dataset.file_path,
+            "drift_baseline": drift_baseline,
         },
     )
     db.add(job)
@@ -245,6 +315,12 @@ def list_training_jobs(db: Session = Depends(get_db)):
     """List all training jobs."""
     jobs = db.query(TrainingJob).order_by(TrainingJob.created_at.desc()).all()
     return jobs
+
+
+@router.get("/training/model-catalog")
+def training_model_catalog():
+    """List trainable models by task type for UI model selection."""
+    return _model_catalog_payload()
 
 
 @router.get("/experiments", response_model=list[ExperimentRunResponse])

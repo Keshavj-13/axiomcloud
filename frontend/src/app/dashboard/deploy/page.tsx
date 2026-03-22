@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import { modelsAPI } from "@/lib/api";
+import { modelsAPI, predictionsAPI } from "@/lib/api";
+import { InferenceFeatureTemplate, PredictionResult, TrainedModel } from "@/types";
 import toast from "react-hot-toast";
 import { Rocket, Download, CheckCircle, XCircle, Trash2, Loader2, Shield } from "lucide-react";
 import PanelHeader from "@/components/ui/PanelHeader";
@@ -8,13 +9,25 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import DataTable from "@/components/ui/DataTable";
 
 export default function DeployPage() {
-  const [allModels, setAllModels] = useState<any[]>([]);
+  const [allModels, setAllModels] = useState<TrainedModel[]>([]);
   const [loading, setLoading] = useState(true);
+  const [endpointModelId, setEndpointModelId] = useState<number | "">("");
+  const [endpointPayload, setEndpointPayload] = useState("{}");
+  const [endpointResult, setEndpointResult] = useState<PredictionResult | null>(null);
+  const [endpointBusy, setEndpointBusy] = useState(false);
+  const [endpointHint, setEndpointHint] = useState<string | null>(null);
 
   const fetchModels = async () => {
     try {
       const res = await modelsAPI.list();
       setAllModels(res.data);
+
+      const deployed = (res.data as TrainedModel[]).filter((m) => m.is_deployed);
+      if (deployed.length > 0) {
+        setEndpointModelId((prev) => (prev === "" ? deployed[0].id : prev));
+      } else {
+        setEndpointModelId("");
+      }
     } catch { toast.error("Could not load models"); }
     finally { setLoading(false); }
   };
@@ -26,7 +39,9 @@ export default function DeployPage() {
       await modelsAPI.deploy(id);
       toast.success("Model deployed!");
       fetchModels();
-    } catch { toast.error("Deploy failed"); }
+    } catch (e: any) {
+      toast.error(e?.response?.data?.detail || "Deploy failed");
+    }
   };
 
   const undeploy = async (id: number) => {
@@ -34,7 +49,9 @@ export default function DeployPage() {
       await modelsAPI.undeploy(id);
       toast.success("Model undeployed");
       fetchModels();
-    } catch { toast.error("Failed"); }
+    } catch (e: any) {
+      toast.error(e?.response?.data?.detail || "Undeploy failed");
+    }
   };
 
   const deleteModel = async (id: number) => {
@@ -43,10 +60,71 @@ export default function DeployPage() {
       await modelsAPI.delete(id);
       toast.success("Deleted");
       fetchModels();
-    } catch { toast.error("Delete failed"); }
+    } catch (e: any) {
+      toast.error(e?.response?.data?.detail || "Delete failed");
+    }
   };
 
   const deployedModels = allModels.filter(m => m.is_deployed);
+
+  useEffect(() => {
+    if (endpointModelId === "") {
+      setEndpointPayload("{}");
+      setEndpointHint(null);
+      return;
+    }
+
+    modelsAPI.inferenceTemplate(Number(endpointModelId), true)
+      .then((res) => {
+        const features: Record<string, unknown> = {};
+        (res.data.features || []).forEach((f: InferenceFeatureTemplate) => {
+          features[f.name] = f.default_value;
+        });
+        setEndpointPayload(JSON.stringify(features, null, 2));
+        if (res.data.artifact_compatible === false) {
+          setEndpointHint("Loaded fallback template (artifact compatibility warning). Consider retraining this model.");
+        } else {
+          setEndpointHint(null);
+        }
+      })
+      .catch(async () => {
+        try {
+          const modelRes = await modelsAPI.get(Number(endpointModelId));
+          const fi = modelRes.data?.feature_importance || {};
+          const fallback = Object.keys(fi).reduce<Record<string, unknown>>((acc, key) => {
+            acc[key] = null;
+            return acc;
+          }, {});
+          setEndpointPayload(JSON.stringify(fallback, null, 2));
+          setEndpointHint("Template unavailable for this model. Using fallback payload from feature schema.");
+        } catch {
+          setEndpointPayload("{}");
+          setEndpointHint("Template unavailable. Enter payload manually.");
+        }
+      });
+  }, [endpointModelId]);
+
+  const runEndpointOperation = async () => {
+    if (endpointModelId === "") return toast.error("Select a deployed model first");
+
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = JSON.parse(endpointPayload || "{}");
+    } catch {
+      return toast.error("Payload must be valid JSON");
+    }
+
+    setEndpointBusy(true);
+    try {
+      const res = await predictionsAPI.predict(Number(endpointModelId), parsed);
+      setEndpointResult(res.data);
+      toast.success("Endpoint operation succeeded");
+    } catch (e: any) {
+      toast.error(e?.response?.data?.detail || "Endpoint call failed");
+    } finally {
+      setEndpointBusy(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -77,13 +155,58 @@ export default function DeployPage() {
       {/* API info */}
       <div className="panel mb-6 rounded-xl border-primary/20 p-6">
         <PanelHeader title="API Control" subtitle="Once deployed, call the prediction endpoint." icon={Shield} className="mb-3" />
-        <div className="rounded-lg bg-surface-variant/35 p-4 font-mono text-sm">
+        <div className="rounded-lg bg-surface-variant/35 p-4 font-mono text-sm mb-4">
           <div className="text-primary">POST</div>
           <div className="text-text-primary">/api/predict</div>
           <div className="mt-2 text-text-muted">{"{"}</div>
           <div className="ml-4 text-text-primary">{`  "model_id": 1,`}</div>
           <div className="ml-4 text-text-primary">{`  "features": {"feature1": value, ...}`}</div>
           <div className="text-text-muted">{"}"}</div>
+        </div>
+
+        <div className="grid gap-3">
+          <div>
+            <label className="mb-1.5 block text-xs text-text-muted">Deployed model</label>
+            <select
+              value={endpointModelId}
+              onChange={(e) => setEndpointModelId(e.target.value ? Number(e.target.value) : "")}
+              className="w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary/50"
+            >
+              <option value="">Select deployed model...</option>
+              {deployedModels.map((m) => (
+                <option key={m.id} value={m.id}>{m.model_name} (id:{m.id})</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs text-text-muted">Features JSON</label>
+            <textarea
+              value={endpointPayload}
+              onChange={(e) => setEndpointPayload(e.target.value)}
+              rows={8}
+              className="w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 font-mono text-xs text-text-primary focus:outline-none focus:border-primary/50"
+            />
+          </div>
+          <button
+            onClick={runEndpointOperation}
+            disabled={endpointBusy || endpointModelId === ""}
+            className="btn-primary w-fit disabled:opacity-50"
+          >
+            {endpointBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />} Run Endpoint Operation
+          </button>
+
+          {endpointHint && (
+            <div className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-2 text-xs text-amber-200">
+              {endpointHint}
+            </div>
+          )}
+
+          {endpointResult && (
+            <div className="rounded-lg border border-outline/25 bg-surface-variant/25 p-3 text-xs">
+              <div className="mb-1 text-text-muted">Response</div>
+              <pre className="max-h-48 overflow-auto text-text-primary">{JSON.stringify(endpointResult, null, 2)}</pre>
+            </div>
+          )}
         </div>
       </div>
 

@@ -1,9 +1,18 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { datasetsAPI, trainingAPI, experimentsAPI } from "@/lib/api";
-import { Dataset, TrainingJob, ExperimentRun } from "@/types";
+import {
+  Dataset,
+  TrainingJob,
+  ExperimentRun,
+  TrainingModelCatalog,
+  DatasetQualityReport,
+  CleanPreview,
+  LeakageReport,
+  EDAReport,
+} from "@/types";
 import toast from "react-hot-toast";
-import { BrainCircuit, Play, Loader2, CheckCircle, AlertTriangle, ChevronRight } from "lucide-react";
+import { BrainCircuit, Play, Loader2, CheckCircle, AlertTriangle, ChevronRight, Layers } from "lucide-react";
 import Link from "next/link";
 import PanelHeader from "@/components/ui/PanelHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -18,6 +27,12 @@ export default function TrainingPage() {
   const [enableTuning, setEnableTuning] = useState(true);
   const [tuningTrials, setTuningTrials] = useState(16);
   const [tuningBudgetSec, setTuningBudgetSec] = useState(180);
+  const [trainingDepth, setTrainingDepth] = useState<"quick" | "balanced" | "deep">("balanced");
+  const [modelCatalog, setModelCatalog] = useState<TrainingModelCatalog>({ classification: [], regression: [], all: [] });
+  const [selectedModels, setSelectedModels] = useState<string[]>([]);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [analysisReasons, setAnalysisReasons] = useState<string[]>([]);
+  const [analysisWarning, setAnalysisWarning] = useState<string | null>(null);
   const [currentJob, setCurrentJob] = useState<TrainingJob | null>(null);
   const [experiments, setExperiments] = useState<ExperimentRun[]>([]);
   const [training, setTraining] = useState(false);
@@ -25,8 +40,118 @@ export default function TrainingPage() {
   useEffect(() => {
     datasetsAPI.list().then(r => setDatasets(r.data)).catch(() => {});
     experimentsAPI.list().then(r => setExperiments(r.data)).catch(() => {});
+    trainingAPI.modelCatalog().then(r => {
+      setModelCatalog(r.data);
+    }).catch(() => {});
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, []);
+
+  useEffect(() => {
+    if (trainingDepth === "quick") {
+      setCvFolds(3);
+      setEnableTuning(false);
+      setTuningTrials(6);
+      setTuningBudgetSec(60);
+      return;
+    }
+    if (trainingDepth === "deep") {
+      setCvFolds(7);
+      setEnableTuning(true);
+      setTuningTrials(40);
+      setTuningBudgetSec(480);
+      return;
+    }
+    setCvFolds(5);
+    setEnableTuning(true);
+    setTuningTrials(16);
+    setTuningBudgetSec(180);
+  }, [trainingDepth]);
+
+  const visibleModelOptions = taskType === "classification"
+    ? modelCatalog.classification
+    : taskType === "regression"
+      ? modelCatalog.regression
+      : modelCatalog.all;
+
+  useEffect(() => {
+    if (!visibleModelOptions.length) return;
+    setSelectedModels(prev => {
+      const filtered = prev.filter(m => visibleModelOptions.includes(m));
+      return filtered;
+    });
+  }, [taskType, modelCatalog.classification, modelCatalog.regression, modelCatalog.all]);
+
+  const recommendModelsFromAnalysis = (
+    options: string[],
+    task: string,
+    quality?: DatasetQualityReport,
+    clean?: CleanPreview,
+    leakage?: LeakageReport,
+    eda?: EDAReport,
+  ) => {
+    const picked = new Set<string>();
+    const reasons: string[] = [];
+
+    const add = (name: string) => {
+      if (options.includes(name)) picked.add(name);
+    };
+
+    if (task === "classification") {
+      add("Logistic Regression");
+      add("Random Forest");
+      add("XGBoost");
+      reasons.push("Classification detected: baseline linear + robust tree ensembles selected.");
+    } else {
+      add("Linear Regression");
+      add("Random Forest");
+      add("XGBoost");
+      reasons.push("Regression detected: baseline linear + nonlinear ensembles selected.");
+    }
+
+    const rows = quality?.rows ?? eda?.overview?.rows ?? 0;
+    const cols = quality?.columns ?? eda?.overview?.columns ?? 0;
+    const droppedRatio = clean && quality?.rows ? Math.max(0, (quality.rows - clean.rows_after_cleaning) / quality.rows) : 0;
+    const maxLeak = leakage?.leakage_risks?.length ? Math.max(...leakage.leakage_risks.map(r => r.risk_score)) : 0;
+
+    if (rows > 60000) {
+      add("LightGBM");
+      add("Gradient Boosting");
+      reasons.push("Large row count: preferred scalable boosting over instance-based methods.");
+    } else {
+      add("KNN");
+      add(task === "classification" ? "Linear SVM" : "Linear SVR");
+      reasons.push("Moderate row count: included local-margin methods (KNN/SVM family).");
+    }
+
+    if (cols > 80) {
+      add("LightGBM");
+      add("MLP Neural Net");
+      reasons.push("High feature count: added neural and gradient methods for nonlinear interactions.");
+    }
+
+    if ((quality?.missing_cells ?? 0) > 0 || droppedRatio > 0.05) {
+      add("Random Forest");
+      add("Extra Trees");
+      add("LightGBM");
+      reasons.push("Cleaning/missingness detected: tree ensembles emphasized for robustness.");
+    }
+
+    if (maxLeak >= 0.8) {
+      reasons.push("High leakage risk detected: review target-proxy features before trusting metrics.");
+    }
+
+    // Never auto-select experimental GNN in tabular mode.
+    if (options.includes("Graph Neural Network (experimental)")) {
+      reasons.push("GNN kept optional only (requires graph-structured data and longer runtime). ");
+    }
+
+    if (picked.size < 3) {
+      add("Gradient Boosting");
+      add("LightGBM");
+    }
+
+    return { recommended: Array.from(picked), reasons, maxLeak };
+  };
 
   const pollStatus = (jobId: string) => {
     pollRef.current = setInterval(async () => {
@@ -50,6 +175,7 @@ export default function TrainingPage() {
   const startTraining = async () => {
     if (!selectedDataset) return toast.error("Select a dataset");
     if (!targetColumn) return toast.error("Enter target column");
+    if (selectedModels.length === 0) return toast.error("Select at least one model");
     setTraining(true);
     setCurrentJob(null);
     try {
@@ -59,6 +185,7 @@ export default function TrainingPage() {
         task_type: taskType === "auto" ? undefined : taskType,
         test_size: testSize,
         cv_folds: cvFolds,
+        models_to_train: selectedModels,
         enable_tuning: enableTuning,
         tuning_trials: tuningTrials,
         tuning_time_budget_sec: tuningBudgetSec,
@@ -73,13 +200,71 @@ export default function TrainingPage() {
     }
   };
 
-  const handleDatasetSelect = (ds: Dataset) => {
+  const handleDatasetSelect = async (ds: Dataset) => {
     setSelectedDataset(ds);
     if (ds.target_column) setTargetColumn(ds.target_column);
     if (ds.task_type) setTaskType(ds.task_type);
+
+    if (!modelCatalog.all.length) return;
+    setAnalysisLoading(true);
+    setAnalysisReasons([]);
+    setAnalysisWarning(null);
+    try {
+      const [cleanRes, qualityRes, leakageRes, edaRes] = await Promise.all([
+        datasetsAPI.cleanPreview(ds.id, 200),
+        datasetsAPI.qualityReport(ds.id),
+        datasetsAPI.leakageReport(ds.id),
+        datasetsAPI.edaReport(ds.id),
+      ]);
+
+      const inferredTask = ds.task_type || taskType;
+      const taskResolved = inferredTask === "classification" || inferredTask === "regression"
+        ? inferredTask
+        : "classification";
+      if (taskType === "auto" || !taskType) {
+        setTaskType(taskResolved);
+      }
+
+      const options = taskResolved === "classification"
+        ? modelCatalog.classification
+        : modelCatalog.regression;
+
+      const recommendation = recommendModelsFromAnalysis(
+        options,
+        taskResolved,
+        qualityRes.data,
+        cleanRes.data,
+        leakageRes.data,
+        edaRes.data,
+      );
+
+      setSelectedModels(recommendation.recommended);
+      setAnalysisReasons(recommendation.reasons);
+      if (recommendation.maxLeak >= 0.8) {
+        setAnalysisWarning("High leakage risk detected. Validate feature set before long/deep training.");
+      }
+      toast.success("Dataset cleaned + analyzed. Recommended model stack selected.");
+    } catch {
+      const fallbackTask = ds.task_type === "regression" ? "regression" : "classification";
+      const options = fallbackTask === "classification" ? modelCatalog.classification : modelCatalog.regression;
+      const fallback = options.filter((m) => ["Logistic Regression", "Linear Regression", "Random Forest", "XGBoost"].includes(m));
+      setSelectedModels(fallback.slice(0, 3));
+      setAnalysisReasons(["Auto-analysis unavailable; selected a conservative starter stack."]);
+      toast.error("Could not run full automatic analysis, using fallback recommendation");
+    } finally {
+      setAnalysisLoading(false);
+    }
   };
 
+  useEffect(() => {
+    if (!selectedDataset) return;
+    if (!modelCatalog.all.length) return;
+    if (selectedModels.length > 0) return;
+    handleDatasetSelect(selectedDataset);
+  }, [modelCatalog.all.length]);
+
   const progressBar = currentJob ? currentJob.progress : 0;
+  const heavySelected = selectedModels.filter((m) => modelCatalog.details?.[m]?.cost_tier === "high");
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -173,6 +358,25 @@ export default function TrainingPage() {
           </div>
 
           <div className="mb-6 rounded-lg border border-outline/25 bg-surface-variant/25 p-3">
+            <div className="mb-3">
+              <label className="mb-1 block text-xs text-text-muted">Training Depth</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { key: "quick", label: "Quick" },
+                  { key: "balanced", label: "Balanced" },
+                  { key: "deep", label: "Deep" },
+                ].map(level => (
+                  <button
+                    key={level.key}
+                    type="button"
+                    onClick={() => setTrainingDepth(level.key as "quick" | "balanced" | "deep")}
+                    className={`rounded px-2 py-1.5 text-xs ${trainingDepth === level.key ? "bg-primary/20 text-primary border border-primary/30" : "bg-surface text-text-muted border border-outline/20"}`}
+                  >
+                    {level.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="mb-2 flex items-center justify-between">
               <label className="text-xs text-text-muted">Adaptive Hyperparameter Tuning</label>
               <button
@@ -225,25 +429,72 @@ export default function TrainingPage() {
 
         {/* Models to train */}
         <div className="panel p-6">
-          <PanelHeader title="Model Set" subtitle="Algorithms included in this run." className="mb-4" />
-          <div className="space-y-2">
-            {[
-              { name: "Logistic / Linear Regression", tag: "baseline" },
-              { name: "Random Forest", tag: "ensemble" },
-              { name: "XGBoost", tag: "boosting" },
-              { name: "LightGBM", tag: "boosting" },
-              { name: "Gradient Boosting", tag: "ensemble" },
-            ].map(({ name, tag }) => (
-              <div key={name} className="flex items-center gap-3 rounded-lg bg-surface-variant/30 p-3">
-                <CheckCircle className="h-4 w-4 text-emerald-300" />
-                <span className="flex-1 text-sm text-text-primary">{name}</span>
-                <StatusBadge label={tag} tone="idle" />
-              </div>
-            ))}
+          <PanelHeader title="Model Set" subtitle="Choose exactly which algorithms to run." icon={Layers} className="mb-4" />
+          <div className="mb-3 rounded-lg border border-outline/20 bg-surface-variant/25 p-3 text-xs">
+            <div className="mb-1 text-text-primary">Automatic first-pass analysis</div>
+            <div className="text-text-muted">
+              On dataset selection: cleaning preview is computed first, then quality/leakage/EDA analysis recommends the model stack.
+            </div>
+            {analysisLoading && (
+              <div className="mt-2 flex items-center gap-2 text-text-muted"><Loader2 className="h-3.5 w-3.5 animate-spin" /> analyzing…</div>
+            )}
+            {!analysisLoading && analysisReasons.length > 0 && (
+              <ul className="mt-2 space-y-1 text-text-muted">
+                {analysisReasons.slice(0, 4).map((r, i) => <li key={`${r}-${i}`}>• {r}</li>)}
+              </ul>
+            )}
+            {analysisWarning && <div className="mt-2 text-amber-300">Warning: {analysisWarning}</div>}
           </div>
+          <div className="mb-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setSelectedModels([...visibleModelOptions])}
+              className="btn-ghost px-2.5 py-1 text-xs"
+            >
+              Select visible
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedModels([])}
+              className="btn-ghost px-2.5 py-1 text-xs"
+            >
+              Clear
+            </button>
+            <div className="rounded border border-outline/20 px-2.5 py-1 text-xs text-text-muted">
+              {selectedModels.length} selected
+            </div>
+          </div>
+          <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
+            {visibleModelOptions.map((name) => {
+              const checked = selectedModels.includes(name);
+              const detail = modelCatalog.details?.[name];
+              const tag = detail?.family || (/Boost|XGBoost|LightGBM/i.test(name) ? "boosting" : /Forest/i.test(name) ? "ensemble" : "baseline");
+              return (
+                <label key={name} className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 ${checked ? "border-primary/40 bg-primary/10" : "border-outline/20 bg-surface-variant/30"}`}>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => setSelectedModels(prev => checked ? prev.filter(m => m !== name) : [...prev, name])}
+                    className="accent-sigma-500"
+                  />
+                  <span className="flex-1 text-sm text-text-primary">
+                    {name}
+                    {detail?.warning ? <span className="ml-2 text-[11px] text-amber-300">(longer training)</span> : null}
+                    {detail?.experimental ? <span className="ml-2 text-[11px] text-fuchsia-300">(experimental)</span> : null}
+                  </span>
+                  <StatusBadge label={tag} tone="idle" />
+                </label>
+              );
+            })}
+          </div>
+          {heavySelected.length > 0 && (
+            <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200">
+              Heavy models selected ({heavySelected.length}): {heavySelected.join(", ")}. Training can take significantly longer.
+            </div>
+          )}
           <div className="mt-4 rounded-lg border border-outline/25 bg-surface-variant/25 p-3">
             <p className="text-xs text-text-muted">
-              All models include: cross-validation, feature importance, and full evaluation metrics.
+              Model list is fully configurable per run. Current task filter: <span className="text-text-primary">{taskType}</span>.
             </p>
           </div>
         </div>

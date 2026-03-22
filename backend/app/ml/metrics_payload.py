@@ -63,7 +63,9 @@ def _build_roc_chart(roc_data: Any) -> Optional[Dict[str, Any]]:
         "tpr": [_safe_float(v) or 0.0 for v in tpr],
     }
     if isinstance(thresholds, list) and len(thresholds) == len(fpr):
-        payload["thresholds"] = [_safe_float(v) for v in thresholds]
+        cleaned_thresholds = [_safe_float(v) for v in thresholds]
+        if all(v is not None for v in cleaned_thresholds):
+            payload["thresholds"] = cleaned_thresholds
     return payload
 
 

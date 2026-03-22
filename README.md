@@ -20,6 +20,7 @@ Axiom Cloud AI mirrors the core workflow of Google Vertex AI and Kaggle AutoML:
 | **Adaptive Tuning (New)** | Optional Optuna-based hyperparameter tuning with trial/time budgets |
 | **Experiment Registry (New)** | Stores run config, status, best model, and summary metrics per training run |
 | **Workspace Search (New)** | Unified dashboard search page across jobs, datasets, and models |
+| **EDA Report (New)** | Structured exploratory analysis with correlations, leakage warnings, typing intelligence, and recommendations |
 
 ---
 
@@ -28,10 +29,12 @@ Axiom Cloud AI mirrors the core workflow of Google Vertex AI and Kaggle AutoML:
 Use this as the active backlog. When a goal is fully implemented and verified, move it to the **Platform Overview** table and remove it from this section.
 
 - [ ] **Data Understanding Upgrade**
-  - Automatic EDA report generation (distribution plots, correlation heatmaps)
-  - Target leakage checks
-  - Feature typing intelligence (ordinal/nominal/datetime)
-  - Data drift baseline snapshot storage
+  - [x] Automatic EDA report generation (distribution plots, correlation summaries)
+  - [x] Target leakage checks
+  - [x] Feature typing intelligence (ordinal/nominal/datetime-like)
+  - [x] Data drift baseline snapshot storage
+  - [ ] Pairplot-style feature relationship exploration
+  - [ ] Downloadable EDA artifact export (JSON/PDF)
 
 - [ ] **Adaptive AutoML Search**
   - [x] Hyperparameter optimization (Optuna)
@@ -68,6 +71,16 @@ Use this as the active backlog. When a goal is fully implemented and verified, m
   - Data drift (KS/PSI)
   - Concept drift/performance decay
   - Alerting workflows
+
+- [ ] **Advanced EDA and Discovery**
+  - Class imbalance diagnostics with auto-threshold warnings
+  - Outlier cluster exploration views
+  - Target-feature interaction ranking
+
+- [ ] **Data Contract and Validation Layer**
+  - Schema expectation checks before training
+  - Constraint validation (ranges, enums, nullability)
+  - Contract drift alerts between versions
 
 - [ ] **Dataset Versioning and Lineage**
   - Version every dataset stage
@@ -305,6 +318,9 @@ The pipeline in `backend/app/ml/pipeline.py` performs:
 | `POST` | `/api/upload-dataset` | Upload CSV/Excel file |
 | `GET` | `/api/datasets` | List all datasets |
 | `GET` | `/api/datasets/{id}/quality-report` | Dataset quality report + recommendations |
+| `GET` | `/api/datasets/{id}/eda-report` | Structured exploratory data analysis report |
+| `GET` | `/api/datasets/{id}/leakage-report` | Target leakage risk report |
+| `GET` | `/api/datasets/{id}/drift-baseline` | Baseline distribution snapshot for drift monitoring |
 | `GET` | `/api/datasets/{id}/clean-preview` | Non-destructive auto-clean preview |
 | `POST` | `/api/datasets/{id}/clean-and-save` | Create and store cleaned dataset copy |
 | `POST` | `/api/load-example/{key}` | Load example dataset |

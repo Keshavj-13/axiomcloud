@@ -12,6 +12,7 @@ import joblib
 from typing import Dict, List, Optional, Tuple, Any
 from datetime import datetime
 from sklearn.base import clone
+from sklearn.base import BaseEstimator
 
 # Explainability
 import shap
@@ -28,8 +29,20 @@ from sklearn.impute import SimpleImputer
 
 # Classification models
 from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, GradientBoostingClassifier, GradientBoostingRegressor
+from sklearn.ensemble import (
+    RandomForestClassifier,
+    RandomForestRegressor,
+    GradientBoostingClassifier,
+    GradientBoostingRegressor,
+    ExtraTreesClassifier,
+    ExtraTreesRegressor,
+    AdaBoostClassifier,
+    AdaBoostRegressor,
+)
 from sklearn.svm import SVC, SVR
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
+from sklearn.neural_network import MLPClassifier, MLPRegressor
 from xgboost import XGBClassifier, XGBRegressor
 from lightgbm import LGBMClassifier, LGBMRegressor
 
@@ -52,6 +65,22 @@ except Exception:  # pragma: no cover
 logger = logging.getLogger(__name__)
 
 
+class UnsupportedGraphNN(BaseEstimator):
+    """Placeholder estimator to keep GNN visible in catalog for future support."""
+
+    def __init__(self, task_type: str = "classification"):
+        self.task_type = task_type
+
+    def fit(self, X, y):
+        raise ValueError(
+            "Graph Neural Network requires graph-structured data and is not supported "
+            "in this tabular pipeline yet."
+        )
+
+    def predict(self, X):  # pragma: no cover
+        return np.zeros(len(X))
+
+
 class AutoMLPipeline:
     """Production-grade AutoML pipeline that automatically:
     1. Detects problem type (classification/regression)
@@ -63,18 +92,36 @@ class AutoMLPipeline:
 
     CLASSIFICATION_MODELS = {
         "Logistic Regression": LogisticRegression(max_iter=1000, random_state=settings.RANDOM_STATE),
+        "Linear SVM": SVC(kernel="linear", probability=True, random_state=settings.RANDOM_STATE),
+        "RBF SVM": SVC(kernel="rbf", probability=True, random_state=settings.RANDOM_STATE),
+        "KNN": KNeighborsClassifier(n_neighbors=7),
+        "Decision Tree": DecisionTreeClassifier(random_state=settings.RANDOM_STATE),
         "Random Forest": RandomForestClassifier(n_estimators=100, random_state=settings.RANDOM_STATE),
+        "Extra Trees": ExtraTreesClassifier(n_estimators=160, random_state=settings.RANDOM_STATE),
+        "AdaBoost": AdaBoostClassifier(n_estimators=160, random_state=settings.RANDOM_STATE),
         "XGBoost": XGBClassifier(n_estimators=100, random_state=settings.RANDOM_STATE, eval_metric="logloss", verbosity=0),
         "LightGBM": LGBMClassifier(n_estimators=100, random_state=settings.RANDOM_STATE, verbose=-1),
         "Gradient Boosting": GradientBoostingClassifier(n_estimators=100, random_state=settings.RANDOM_STATE),
+        "MLP Neural Net": MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=320, random_state=settings.RANDOM_STATE),
+        "Deep MLP Neural Net": MLPClassifier(hidden_layer_sizes=(256, 128, 64), max_iter=420, random_state=settings.RANDOM_STATE),
+        "Graph Neural Network (experimental)": UnsupportedGraphNN(task_type="classification"),
     }
 
     REGRESSION_MODELS = {
         "Linear Regression": Ridge(alpha=1.0),
+        "Linear SVR": SVR(kernel="linear", C=1.0),
+        "RBF SVR": SVR(kernel="rbf", C=1.0),
+        "KNN": KNeighborsRegressor(n_neighbors=7),
+        "Decision Tree": DecisionTreeRegressor(random_state=settings.RANDOM_STATE),
         "Random Forest": RandomForestRegressor(n_estimators=100, random_state=settings.RANDOM_STATE),
+        "Extra Trees": ExtraTreesRegressor(n_estimators=160, random_state=settings.RANDOM_STATE),
+        "AdaBoost": AdaBoostRegressor(n_estimators=160, random_state=settings.RANDOM_STATE),
         "XGBoost": XGBRegressor(n_estimators=100, random_state=settings.RANDOM_STATE, verbosity=0),
         "LightGBM": LGBMRegressor(n_estimators=100, random_state=settings.RANDOM_STATE, verbose=-1),
         "Gradient Boosting": GradientBoostingRegressor(n_estimators=100, random_state=settings.RANDOM_STATE),
+        "MLP Neural Net": MLPRegressor(hidden_layer_sizes=(64, 32), max_iter=320, random_state=settings.RANDOM_STATE),
+        "Deep MLP Neural Net": MLPRegressor(hidden_layer_sizes=(256, 128, 64), max_iter=420, random_state=settings.RANDOM_STATE),
+        "Graph Neural Network (experimental)": UnsupportedGraphNN(task_type="regression"),
     }
 
     def __init__(self, job_id: str, progress_callback=None):
@@ -537,6 +584,12 @@ class AutoMLPipeline:
 
         if models_to_train:
             model_catalog = {k: v for k, v in model_catalog.items() if k in models_to_train}
+
+        if not model_catalog:
+            raise ValueError(
+                "No compatible models selected for this task type. "
+                "Pick at least one valid model for the detected task."
+            )
 
         results = []
         n_models = len(model_catalog)

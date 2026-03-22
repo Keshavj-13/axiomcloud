@@ -1,10 +1,28 @@
+"use client";
+
 import Sidebar from "@/components/layout/Sidebar";
 import Link from "next/link";
 import { Bell, CircleUserRound, Command, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export const dynamic = "force-dynamic";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem("dashboard.sidebar.collapsed");
+    if (stored === "1") setSidebarCollapsed(true);
+  }, []);
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      window.localStorage.setItem("dashboard.sidebar.collapsed", next ? "1" : "0");
+      return next;
+    });
+  };
+
   return (
     <div className="min-h-screen bg-bg text-text-primary">
       <header className="fixed inset-x-0 top-0 z-50 border-b border-outline/30 bg-bg/90 backdrop-blur">
@@ -55,9 +73,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </header>
 
-      <Sidebar />
+      <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
 
-      <main className="pt-16 lg:pl-72">
+      <main className={`pt-16 transition-all duration-300 ${sidebarCollapsed ? "lg:pl-16" : "lg:pl-72"}`}>
         <div className="mx-auto min-h-[calc(100vh-4rem)] max-w-[1800px] px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
           {children}
         </div>

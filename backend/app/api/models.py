@@ -4,11 +4,14 @@ List, retrieve, deploy, and download trained models.
 """
 import os
 import logging
+import random
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, Body
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import List
 import numpy as np
+import joblib
 
 from app.core.database import get_db
 from app.models.db_models import TrainedModel, TrainingJob, Dataset
@@ -33,16 +36,69 @@ def _load_dataset_frame(path: str) -> pd.DataFrame:
     return pd.read_excel(path)
 
 
-@router.get("/models", response_model=List[ModelResponse])
+def _random_default_from_series(series: pd.Series) -> tuple[str, dict, object]:
+    """Infer input type, constraints, and randomized default from a series."""
+    s = series.dropna()
+    if s.empty:
+        return "text", {}, ""
+
+    if pd.api.types.is_numeric_dtype(series):
+        min_v = float(s.min())
+        max_v = float(s.max())
+        default_v = float(np.random.uniform(min_v, max_v)) if min_v != max_v else min_v
+        stats = {
+            "min": min_v,
+            "max": max_v,
+            "mean": float(s.mean()),
+            "std": float(s.std()) if len(s) > 1 else 0.0,
+        }
+        return "number", stats, round(default_v, 6)
+
+    values = [str(v) for v in s.astype(str).value_counts().head(20).index.tolist()]
+    default_v = random.choice(values) if values else ""
+    return "select", {"options": values}, default_v
+
+
+@router.get("/models")
 def list_models(
     job_id: str = None,
     db: Session = Depends(get_db)
 ):
     """List trained models, optionally filtered by job."""
-    query = db.query(TrainedModel)
-    if job_id:
-        query = query.filter(TrainedModel.job_id == job_id)
-    return query.order_by(TrainedModel.created_at.desc()).all()
+    try:
+        query = db.query(TrainedModel)
+        if job_id:
+            query = query.filter(TrainedModel.job_id == job_id)
+        models = query.order_by(TrainedModel.created_at.desc()).all()
+        
+        # Manually serialize to handle potential datetime issues
+        result = []
+        for m in models:
+            result.append({
+                "id": m.id,
+                "job_id": m.job_id,
+                "model_name": m.model_name,
+                "model_type": m.model_type,
+                "task_type": m.task_type,
+                "is_deployed": m.is_deployed,
+                "accuracy": m.accuracy,
+                "f1_score": m.f1_score,
+                "roc_auc": m.roc_auc,
+                "rmse": m.rmse,
+                "mae": m.mae,
+                "r2_score": m.r2_score,
+                "metrics": m.metrics,
+                "feature_importance": m.feature_importance,
+                "confusion_matrix": m.confusion_matrix,
+                "roc_curve_data": m.roc_curve_data,
+                "cv_scores": m.cv_scores,
+                "training_time": m.training_time,
+                "created_at": m.created_at.isoformat() if m.created_at else None,
+            })
+        return result
+    except Exception as exc:
+        logger.error("Error listing models: %s", exc, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to list models: {str(exc)}")
 
 
 @router.get("/models/{model_id}", response_model=ModelResponse)
@@ -52,6 +108,95 @@ def get_model(model_id: int, db: Session = Depends(get_db)):
     if not model:
         raise HTTPException(status_code=404, detail="Model not found")
     return model
+
+
+@router.get("/models/{model_id}/inference-template")
+def get_model_inference_template(
+    model_id: int,
+    randomize: bool = Query(default=True),
+    db: Session = Depends(get_db),
+):
+    """Return model-aware inference feature template with dataset-bounded defaults."""
+    model = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
+    if not model:
+        raise HTTPException(status_code=404, detail="Model not found")
+    if not model.file_path or not os.path.exists(model.file_path):
+        raise HTTPException(status_code=404, detail="Model artifact not found")
+
+    job = db.query(TrainingJob).filter(TrainingJob.job_id == model.job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Training job not found")
+
+    dataset = db.query(Dataset).filter(Dataset.id == job.dataset_id).first()
+    dataset_path = (job.config or {}).get("dataset_path") if job.config else None
+    if not dataset_path and dataset:
+        dataset_path = dataset.file_path
+    if not dataset_path or not os.path.exists(dataset_path):
+        raise HTTPException(status_code=404, detail="Training dataset not found")
+
+    feature_names = []
+    artifact_issue = None
+    try:
+        bundle = joblib.load(model.file_path)
+        feature_names = bundle.get("feature_names") or []
+    except Exception as exc:
+        # Keep endpoint functional for older/incompatible artifacts by falling back to dataset/schema.
+        artifact_issue = str(exc)
+        logger.warning("Inference template fallback for model_id=%s reason=%s", model_id, exc)
+
+    try:
+        df = _load_dataset_frame(dataset_path)
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=f"Could not parse training dataset: {exc}")
+
+    target_col = job.target_column
+    if target_col in df.columns:
+        df = df.drop(columns=[target_col], errors="ignore")
+
+    if not feature_names:
+        if model.feature_importance and isinstance(model.feature_importance, dict):
+            feature_names = list(model.feature_importance.keys())
+        else:
+            feature_names = list(df.columns)
+
+    features = []
+    for name in feature_names:
+        if name in df.columns:
+            input_type, meta, default_value = _random_default_from_series(df[name])
+            if not randomize and input_type == "number" and isinstance(meta, dict):
+                default_value = round(float(meta.get("mean", 0.0)), 6)
+            features.append(
+                {
+                    "name": name,
+                    "dtype": str(df[name].dtype),
+                    "input_type": input_type,
+                    "default_value": default_value,
+                    **meta,
+                }
+            )
+        else:
+            features.append(
+                {
+                    "name": name,
+                    "dtype": "unknown",
+                    "input_type": "text",
+                    "default_value": "",
+                }
+            )
+
+    return {
+        "model_id": model.id,
+        "model_name": model.model_name,
+        "task_type": model.task_type,
+        "job_id": model.job_id,
+        "dataset_id": dataset.id if dataset else None,
+        "dataset_name": dataset.name if dataset else None,
+        "target_column": job.target_column,
+        "generated_at": datetime.utcnow().isoformat(),
+        "features": features,
+        "artifact_compatible": artifact_issue is None,
+        "artifact_issue": artifact_issue,
+    }
 
 
 # --- Explainability Endpoints ---
@@ -280,6 +425,18 @@ def deploy_model(model_id: int, db: Session = Depends(get_db)):
     model = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
     if not model:
         raise HTTPException(status_code=404, detail="Model not found")
+    if not model.file_path or not os.path.exists(model.file_path):
+        raise HTTPException(status_code=404, detail="Model artifact not found")
+
+    try:
+        artifact = joblib.load(model.file_path)
+        if not isinstance(artifact, dict) or "pipeline" not in artifact or "feature_names" not in artifact:
+            raise ValueError("Model artifact missing required keys")
+    except Exception as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Model artifact is not runtime-compatible: {exc}. Retrain this model in current environment.",
+        )
 
     # Un-deploy other models from same job
     db.query(TrainedModel).filter(

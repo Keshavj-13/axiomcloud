@@ -38,6 +38,18 @@ export interface TrainingJob {
   completed_at?: string;
 }
 
+export interface TrainingModelCatalog {
+  classification: string[];
+  regression: string[];
+  all: string[];
+  details?: Record<string, {
+    family?: string;
+    cost_tier?: "low" | "medium" | "high";
+    warning?: string | null;
+    experimental?: boolean;
+  }>;
+}
+
 export interface ExperimentRun {
   id: number;
   run_id: string;
@@ -145,6 +157,32 @@ export interface PredictionResult {
   confidence?: number;
 }
 
+export interface InferenceFeatureTemplate {
+  name: string;
+  dtype: string;
+  input_type: "number" | "select" | "text";
+  default_value: string | number;
+  min?: number;
+  max?: number;
+  mean?: number;
+  std?: number;
+  options?: string[];
+}
+
+export interface InferenceTemplate {
+  model_id: number;
+  model_name: string;
+  task_type: string;
+  job_id: string;
+  dataset_id?: number;
+  dataset_name?: string;
+  target_column?: string;
+  generated_at: string;
+  artifact_compatible?: boolean;
+  artifact_issue?: string | null;
+  features: InferenceFeatureTemplate[];
+}
+
 export interface ExampleDataset {
   key: string;
   name: string;
@@ -166,6 +204,17 @@ export interface DatasetQualityReport {
   recommendations: string[];
 }
 
+export interface LeakageReport {
+  dataset_id: number;
+  dataset_name: string;
+  target_column?: string;
+  leakage_risks: Array<{
+    feature: string;
+    risk_score: number;
+    reasons: string[];
+  }>;
+}
+
 export interface CleanPreview {
   dataset_id: number;
   dataset_name: string;
@@ -173,6 +222,31 @@ export interface CleanPreview {
   rows_after_cleaning: number;
   applied_fixes: string[];
   clean_preview: Record<string, unknown>[];
+}
+
+export interface EDAReport {
+  dataset_id: number;
+  dataset_name: string;
+  overview: {
+    rows: number;
+    columns: number;
+    missing_total: number;
+    duplicate_rows: number;
+    numeric_columns: number;
+    categorical_columns: number;
+    target_column?: string;
+  };
+  high_correlations: Array<{
+    feature_a: string;
+    feature_b: string;
+    correlation: number;
+  }>;
+  leakage_risks: Array<{
+    feature: string;
+    risk_score: number;
+    reasons: string[];
+  }>;
+  recommendations: string[];
 }
 
 export interface ShapResult {
@@ -249,6 +323,8 @@ export interface DatasetProfile {
     name: string;
     dtype: string;
     dtype_group: string;
+    semantic_type?: string;
+    datetime_parse_ratio?: number;
     missing: number;
     missing_rate: number;
     unique: number;
@@ -266,6 +342,25 @@ export interface DatasetProfile {
   correlation_heatmap?: {
     labels: string[];
     matrix: number[][];
+  };
+  typing_intelligence?: {
+    numeric: number;
+    categorical: number;
+    datetime: number;
+    boolean: number;
+    high_cardinality_candidates: string[];
+  };
+  leakage_risks?: Array<{
+    feature: string;
+    risk_score: number;
+    reasons: string[];
+  }>;
+  drift_baseline?: {
+    rows: number;
+    columns: number;
+    target_column?: string;
+    numeric?: Record<string, unknown>;
+    categorical?: Record<string, unknown>;
   };
   missing_by_column: Array<{ column: string; missing: number }>;
   histograms: Array<{ column: string; labels: string[]; counts: number[] }>;

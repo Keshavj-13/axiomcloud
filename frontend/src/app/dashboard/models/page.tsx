@@ -2,7 +2,19 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { metricsAPI, trainingAPI, modelsAPI, datasetsAPI } from "@/lib/api";
-import { MetricsData, TrainedModel, ShapResult, LimeResult, ModelMonitoring, Dataset } from "@/types";
+import {
+  MetricsData,
+  TrainedModel,
+  ShapResult,
+  LimeResult,
+  ModelMonitoring,
+  Dataset,
+  DatasetQualityReport,
+  CleanPreview,
+  LeakageReport,
+  EDAReport,
+  TrainingJob,
+} from "@/types";
 import toast from "react-hot-toast";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -19,7 +31,7 @@ const COLORS = ["#3b6ef6", "#00f5ff", "#00ff94", "#ffb700", "#7b2fff"];
 export default function ModelsPage() {
   const searchParams = useSearchParams();
   const [jobId, setJobId] = useState(searchParams.get("job") || "");
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<TrainingJob[]>([]);
   const [metrics, setMetrics] = useState<MetricsData | null>(null);
   const [selectedModel, setSelectedModel] = useState<TrainedModel | null>(null);
   const [loading, setLoading] = useState(false);
@@ -34,10 +46,15 @@ export default function ModelsPage() {
   const [sampleIndex, setSampleIndex] = useState(0);
   const [customInput, setCustomInput] = useState("{}");
   const [explainError, setExplainError] = useState<string | null>(null);
+  const [qualityReport, setQualityReport] = useState<DatasetQualityReport | null>(null);
+  const [cleanPreview, setCleanPreview] = useState<CleanPreview | null>(null);
+  const [leakageReport, setLeakageReport] = useState<LeakageReport | null>(null);
+  const [edaReport, setEdaReport] = useState<EDAReport | null>(null);
+  const [qualityLoading, setQualityLoading] = useState(false);
 
   useEffect(() => {
     trainingAPI.listJobs().then(r => {
-      const completed = r.data.filter((j: any) => j.status === "completed");
+      const completed = (r.data as TrainingJob[]).filter((j) => j.status === "completed");
       setJobs(completed);
       if (!jobId && completed.length > 0) setJobId(completed[0].job_id);
     }).catch(() => {});
@@ -58,6 +75,36 @@ export default function ModelsPage() {
     }).catch(() => toast.error("Could not load metrics"))
     .finally(() => setLoading(false));
   }, [jobId]);
+
+  useEffect(() => {
+    if (!jobId || jobs.length === 0) return;
+    const selectedJob = jobs.find((j) => j.job_id === jobId);
+    if (!selectedJob?.dataset_id) return;
+
+    setQualityLoading(true);
+    Promise.all([
+      datasetsAPI.qualityReport(selectedJob.dataset_id),
+      datasetsAPI.cleanPreview(selectedJob.dataset_id, 200),
+      datasetsAPI.leakageReport(selectedJob.dataset_id),
+      datasetsAPI.edaReport(selectedJob.dataset_id),
+    ]).then(([qualityRes, cleanRes, leakageRes, edaRes]) => {
+      setQualityReport(qualityRes.data);
+      setCleanPreview(cleanRes.data);
+      setLeakageReport(leakageRes.data);
+      setEdaReport(edaRes.data);
+    }).catch(() => {
+      setQualityReport(null);
+      setCleanPreview(null);
+      setLeakageReport(null);
+      setEdaReport(null);
+    }).finally(() => setQualityLoading(false));
+  }, [jobId, jobs]);
+
+  const selectedJob = jobs.find((j) => j.job_id === jobId) || null;
+  const droppedRows = cleanPreview && qualityReport ? Math.max(0, qualityReport.rows - cleanPreview.rows_after_cleaning) : 0;
+  const leakageMax = leakageReport?.leakage_risks?.length
+    ? Math.max(...leakageReport.leakage_risks.map(r => r.risk_score))
+    : 0;
 
   const bestModel = metrics?.models?.find((m) => m.id === metrics?.best_model_id)
     || metrics?.best_model
@@ -140,6 +187,11 @@ export default function ModelsPage() {
   })) || [];
 
   const isClassification = metrics?.task_type === "classification";
+  const metricEntries = selectedModel?.metrics
+    ? Object.entries(selectedModel.metrics)
+        .filter(([, value]) => ["number", "string", "boolean"].includes(typeof value) || value === null)
+        .map(([key, value]) => ({ key, value: value === null ? "null" : String(value) }))
+    : [];
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -166,6 +218,63 @@ export default function ModelsPage() {
             ))}
           </select>
         </div>
+      </div>
+
+      <div className="panel mb-6 rounded-xl p-6">
+        <PanelHeader title="Dataset Validity & Preparation" subtitle="Multi-level quality gates before trusting model performance." className="mb-4" />
+        {qualityLoading ? (
+          <div className="flex items-center gap-2 text-xs text-text-muted">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading dataset diagnostics...
+          </div>
+        ) : qualityReport ? (
+          <div className="grid lg:grid-cols-3 gap-4 text-xs">
+            <div className="rounded-lg border border-outline/20 bg-surface-variant/30 p-4 space-y-2">
+              <div className="text-sm font-semibold text-text-primary">Level 1 • Raw Quality</div>
+              <div className="flex justify-between"><span className="text-text-muted">Dataset</span><span className="font-mono text-text-primary">{qualityReport.dataset_name}</span></div>
+              <div className="flex justify-between"><span className="text-text-muted">Quality score</span><span className="font-mono text-text-primary">{qualityReport.quality_score.toFixed(1)}</span></div>
+              <div className="flex justify-between"><span className="text-text-muted">Rows × cols</span><span className="font-mono text-text-primary">{qualityReport.rows} × {qualityReport.columns}</span></div>
+              <div className="flex justify-between"><span className="text-text-muted">Missing cells</span><span className="font-mono text-text-primary">{qualityReport.missing_cells}</span></div>
+              <div className="flex justify-between"><span className="text-text-muted">Duplicate rows</span><span className="font-mono text-text-primary">{qualityReport.duplicate_rows}</span></div>
+            </div>
+
+            <div className="rounded-lg border border-outline/20 bg-surface-variant/30 p-4 space-y-2">
+              <div className="text-sm font-semibold text-text-primary">Level 2 • Cleaning Impact</div>
+              <div className="flex justify-between"><span className="text-text-muted">Rows after cleaning</span><span className="font-mono text-text-primary">{cleanPreview?.rows_after_cleaning ?? "—"}</span></div>
+              <div className="flex justify-between"><span className="text-text-muted">Rows dropped</span><span className="font-mono text-text-primary">{cleanPreview ? droppedRows : "—"}</span></div>
+              <div className="flex justify-between"><span className="text-text-muted">Fixes applied</span><span className="font-mono text-text-primary">{cleanPreview?.applied_fixes?.length ?? 0}</span></div>
+              <div className="mt-2">
+                <div className="mb-1 text-text-muted">Top fixes</div>
+                <ul className="space-y-1">
+                  {(cleanPreview?.applied_fixes || []).slice(0, 4).map((fix, idx) => (
+                    <li key={`${fix}-${idx}`} className="truncate text-text-primary">• {fix}</li>
+                  ))}
+                  {(cleanPreview?.applied_fixes || []).length === 0 && <li className="text-text-muted">No automatic fixes detected.</li>}
+                </ul>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-outline/20 bg-surface-variant/30 p-4 space-y-2">
+              <div className="text-sm font-semibold text-text-primary">Level 3 • Leakage & Validity</div>
+              <div className="flex justify-between"><span className="text-text-muted">Target</span><span className="font-mono text-text-primary">{selectedJob?.target_column || leakageReport?.target_column || "—"}</span></div>
+              <div className="flex justify-between"><span className="text-text-muted">Leakage candidates</span><span className="font-mono text-text-primary">{leakageReport?.leakage_risks?.length ?? 0}</span></div>
+              <div className="flex justify-between"><span className="text-text-muted">Max leakage risk</span><span className="font-mono text-text-primary">{(leakageMax * 100).toFixed(1)}%</span></div>
+              <div className="flex justify-between"><span className="text-text-muted">High correlations</span><span className="font-mono text-text-primary">{edaReport?.high_correlations?.length ?? 0}</span></div>
+              <div className="mt-2">
+                <div className="mb-1 text-text-muted">Top risky features</div>
+                <ul className="space-y-1">
+                  {(leakageReport?.leakage_risks || []).slice(0, 4).map((risk) => (
+                    <li key={risk.feature} className="truncate text-text-primary">
+                      • {risk.feature} ({(risk.risk_score * 100).toFixed(1)}%)
+                    </li>
+                  ))}
+                  {(leakageReport?.leakage_risks || []).length === 0 && <li className="text-text-muted">No strong leakage indicators found.</li>}
+                </ul>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs text-text-muted">Select a completed job to load quality, cleaning impact, and validity diagnostics.</p>
+        )}
       </div>
 
       {loading && (
@@ -357,6 +466,29 @@ export default function ModelsPage() {
               </div>
             )}
           </div>
+
+          {selectedModel && (
+            <div className="panel mb-6 rounded-xl p-6">
+              <PanelHeader title="Full Metric Surface" subtitle="Complete scalar metric payload for model audit and validity checks." className="mb-4" />
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
+                {metricEntries.map((entry) => (
+                  <div key={entry.key} className="rounded border border-outline/20 bg-surface-variant/30 px-3 py-2">
+                    <div className="text-text-muted truncate">{entry.key}</div>
+                    <div className="font-mono text-text-primary truncate">{entry.value}</div>
+                  </div>
+                ))}
+                {metricEntries.length === 0 && (
+                  <div className="text-text-muted">No scalar metrics found in payload.</div>
+                )}
+              </div>
+              <div className="mt-4">
+                <div className="mb-1 text-xs text-text-muted">Raw metric payload (full)</div>
+                <pre className="max-h-64 overflow-auto rounded border border-outline/20 bg-surface-variant/30 p-3 text-[11px] text-text-primary">
+                  {JSON.stringify(selectedModel.metrics || {}, null, 2)}
+                </pre>
+              </div>
+            </div>
+          )}
 
           {/* Feature Importance */}
           {featureImportanceData.length > 0 && (

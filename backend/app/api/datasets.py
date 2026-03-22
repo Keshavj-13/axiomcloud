@@ -15,7 +15,7 @@ from app.core.database import get_db
 from app.models.db_models import Dataset
 from app.schemas.schemas import DatasetResponse, DatasetProfileCompact
 from app.ml.datasets import EXAMPLE_DATASETS
-from app.ml.dataset_profiling import build_dataset_profile
+from app.ml.dataset_profiling import build_dataset_profile, build_drift_baseline_snapshot, build_eda_report
 from app.core.config import settings
 
 router = APIRouter()
@@ -476,6 +476,79 @@ def dataset_profile(dataset_id: int, db: Session = Depends(get_db)):
         dataset_name=dataset.name,
         target_column=dataset.target_column,
     )
+
+
+@router.get("/datasets/{dataset_id}/leakage-report")
+def dataset_leakage_report(dataset_id: int, db: Session = Depends(get_db)):
+    """Return target leakage risk indicators for a dataset."""
+    dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    if not os.path.exists(dataset.file_path):
+        raise HTTPException(status_code=404, detail="Dataset file not found on disk")
+
+    try:
+        df = _load_dataset_file(dataset.file_path)
+    except Exception as e:
+        logger.exception(f"Failed leakage report for dataset {dataset_id}: {e}")
+        raise HTTPException(status_code=422, detail="Could not parse dataset")
+
+    profile = build_dataset_profile(
+        df,
+        dataset_id=dataset.id,
+        dataset_name=dataset.name,
+        target_column=dataset.target_column,
+    )
+    return {
+        "dataset_id": dataset.id,
+        "dataset_name": dataset.name,
+        "target_column": dataset.target_column,
+        "leakage_risks": profile.get("leakage_risks", []),
+    }
+
+
+@router.get("/datasets/{dataset_id}/drift-baseline")
+def dataset_drift_baseline(dataset_id: int, db: Session = Depends(get_db)):
+    """Return baseline distribution snapshot for future drift monitoring."""
+    dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    if not os.path.exists(dataset.file_path):
+        raise HTTPException(status_code=404, detail="Dataset file not found on disk")
+
+    try:
+        df = _load_dataset_file(dataset.file_path)
+    except Exception as e:
+        logger.exception(f"Failed drift baseline for dataset {dataset_id}: {e}")
+        raise HTTPException(status_code=422, detail="Could not parse dataset")
+
+    return {
+        "dataset_id": dataset.id,
+        "dataset_name": dataset.name,
+        "target_column": dataset.target_column,
+        "drift_baseline": build_drift_baseline_snapshot(df, target_column=dataset.target_column),
+    }
+
+
+@router.get("/datasets/{dataset_id}/eda-report")
+def dataset_eda_report(dataset_id: int, db: Session = Depends(get_db)):
+    """Return structured EDA report for deep dataset understanding."""
+    dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    if not os.path.exists(dataset.file_path):
+        raise HTTPException(status_code=404, detail="Dataset file not found on disk")
+
+    try:
+        df = _load_dataset_file(dataset.file_path)
+    except Exception as e:
+        logger.exception(f"Failed EDA report for dataset {dataset_id}: {e}")
+        raise HTTPException(status_code=422, detail="Could not parse dataset")
+
+    return {
+        "dataset_id": dataset.id,
+        **build_eda_report(df, dataset_name=dataset.name, target_column=dataset.target_column),
+    }
 
 
 @router.delete("/datasets/{dataset_id}")

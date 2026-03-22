@@ -1,18 +1,20 @@
 "use client";
 import { useState, useEffect } from "react";
 import { modelsAPI, predictionsAPI } from "@/lib/api";
-import { PredictionResult } from "@/types";
+import { InferenceFeatureTemplate, InferenceTemplate, PredictionResult, TrainedModel } from "@/types";
 import toast from "react-hot-toast";
-import { Zap, Loader2, CheckCircle, BarChart2 } from "lucide-react";
+import { Zap, Loader2, CheckCircle, BarChart2, Shuffle, RotateCcw } from "lucide-react";
 import PanelHeader from "@/components/ui/PanelHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
 
 export default function PredictPage() {
-  const [deployedModels, setDeployedModels] = useState<any[]>([]);
+  const [deployedModels, setDeployedModels] = useState<TrainedModel[]>([]);
   const [selectedModelId, setSelectedModelId] = useState<number | null>(null);
-  const [selectedModel, setSelectedModel] = useState<any>(null);
+  const [selectedModel, setSelectedModel] = useState<TrainedModel | null>(null);
+  const [template, setTemplate] = useState<InferenceTemplate | null>(null);
   const [features, setFeatures] = useState<Record<string, string>>({});
   const [result, setResult] = useState<PredictionResult | null>(null);
+  const [loadingTemplate, setLoadingTemplate] = useState(false);
   const [predicting, setPredicting] = useState(false);
 
   useEffect(() => {
@@ -23,16 +25,92 @@ export default function PredictPage() {
 
   useEffect(() => {
     if (!selectedModelId) return;
-    modelsAPI.get(selectedModelId).then(r => {
-      setSelectedModel(r.data);
-      // Initialize feature inputs
-      const fi = r.data.feature_importance || {};
-      const init: Record<string, string> = {};
-      Object.keys(fi).forEach(k => init[k] = "");
-      setFeatures(init);
-      setResult(null);
-    }).catch(() => {});
+    const loadSelection = async () => {
+      setLoadingTemplate(true);
+      try {
+        const modelRes = await modelsAPI.get(selectedModelId);
+        setSelectedModel(modelRes.data);
+
+        try {
+          const templateRes = await modelsAPI.inferenceTemplate(selectedModelId, true);
+          setTemplate(templateRes.data);
+          const init: Record<string, string> = {};
+          (templateRes.data.features || []).forEach((f: InferenceFeatureTemplate) => {
+            init[f.name] = String(f.default_value ?? "");
+          });
+          setFeatures(init);
+        } catch {
+          const fi = modelRes.data.feature_importance || {};
+          const fallbackFeatures = Object.keys(fi);
+          const fallbackTemplate: InferenceTemplate = {
+            model_id: modelRes.data.id,
+            model_name: modelRes.data.model_name,
+            task_type: modelRes.data.task_type,
+            job_id: modelRes.data.job_id,
+            generated_at: new Date().toISOString(),
+            features: fallbackFeatures.map((name) => ({
+              name,
+              dtype: "unknown",
+              input_type: "text",
+              default_value: "",
+            })),
+          };
+          setTemplate(fallbackTemplate);
+          const init: Record<string, string> = {};
+          fallbackFeatures.forEach((name) => {
+            init[name] = "";
+          });
+          setFeatures(init);
+          toast.error("Using basic feature inputs; dataset defaults unavailable for this model");
+        }
+
+        setResult(null);
+      } catch {
+        toast.error("Failed to load selected model");
+      } finally {
+        setLoadingTemplate(false);
+      }
+    };
+    loadSelection();
   }, [selectedModelId]);
+
+  const randomizeDefaults = async () => {
+    if (!selectedModelId) return;
+    setLoadingTemplate(true);
+    try {
+      const templateRes = await modelsAPI.inferenceTemplate(selectedModelId, true);
+      setTemplate(templateRes.data);
+      const randomized: Record<string, string> = {};
+      (templateRes.data.features || []).forEach((f: InferenceFeatureTemplate) => {
+        randomized[f.name] = String(f.default_value ?? "");
+      });
+      setFeatures(randomized);
+      toast.success("Feature defaults randomized");
+    } catch {
+      toast.error("Could not randomize defaults");
+    } finally {
+      setLoadingTemplate(false);
+    }
+  };
+
+  const resetToMeanDefaults = async () => {
+    if (!selectedModelId) return;
+    setLoadingTemplate(true);
+    try {
+      const templateRes = await modelsAPI.inferenceTemplate(selectedModelId, false);
+      setTemplate(templateRes.data);
+      const centered: Record<string, string> = {};
+      (templateRes.data.features || []).forEach((f: InferenceFeatureTemplate) => {
+        centered[f.name] = String(f.default_value ?? "");
+      });
+      setFeatures(centered);
+      toast.success("Defaults reset from dataset profile");
+    } catch {
+      toast.error("Could not reset defaults");
+    } finally {
+      setLoadingTemplate(false);
+    }
+  };
 
   const runPrediction = async () => {
     if (!selectedModelId) return toast.error("Select a model");
@@ -51,7 +129,7 @@ export default function PredictPage() {
     } finally { setPredicting(false); }
   };
 
-  const featureKeys = Object.keys(features);
+  const featureSpecs = template?.features || [];
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -88,21 +166,77 @@ export default function PredictPage() {
         )}
       </div>
 
-      {selectedModel && featureKeys.length > 0 && (
+      {selectedModel && featureSpecs.length > 0 && (
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Feature inputs */}
           <div className="panel p-6">
-            <PanelHeader title="Feature Input" subtitle="Provide values for the selected model schema." className="mb-4" />
+            <PanelHeader title="Feature Input" subtitle="Defaults are sampled from the model's training dataset." className="mb-4" />
+            <div className="mb-4 rounded-lg border border-outline/20 bg-surface-variant/30 p-3 text-xs text-text-muted">
+              <div><span className="text-text-primary">Model:</span> {selectedModel.model_name}</div>
+              <div><span className="text-text-primary">Dataset:</span> {template?.dataset_name || "Unknown"}</div>
+              {template?.target_column && <div><span className="text-text-primary">Target:</span> {template.target_column}</div>}
+            </div>
+            <div className="mb-4 flex gap-2">
+              <button
+                onClick={randomizeDefaults}
+                disabled={loadingTemplate}
+                className="btn-ghost px-3 py-2 text-xs disabled:opacity-60"
+              >
+                {loadingTemplate ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Shuffle className="h-3.5 w-3.5" />}
+                Randomize Defaults
+              </button>
+              <button
+                onClick={resetToMeanDefaults}
+                disabled={loadingTemplate}
+                className="btn-ghost px-3 py-2 text-xs disabled:opacity-60"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                Reset to Stable Defaults
+              </button>
+            </div>
             <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
-              {featureKeys.map(feat => (
-                <div key={feat}>
-                  <label className="mb-1 block font-mono text-xs text-text-muted">{feat}</label>
-                  <input
-                    value={features[feat]}
-                    onChange={e => setFeatures(prev => ({ ...prev, [feat]: e.target.value }))}
-                    placeholder="Enter value..."
-                    className="w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 font-mono text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary/50"
-                  />
+              {featureSpecs.map((spec) => (
+                <div key={spec.name}>
+                  <label className="mb-1 block font-mono text-xs text-text-muted">{spec.name}</label>
+                  {spec.input_type === "select" ? (
+                    (spec.options && spec.options.length > 0) ? (
+                    <select
+                      value={features[spec.name] ?? ""}
+                      onChange={e => setFeatures(prev => ({ ...prev, [spec.name]: e.target.value }))}
+                      className="w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 font-mono text-sm text-text-primary focus:outline-none focus:border-primary/50"
+                    >
+                      {(spec.options || []).map(option => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                    ) : (
+                      <input
+                        type="text"
+                        value={features[spec.name] ?? ""}
+                        onChange={e => setFeatures(prev => ({ ...prev, [spec.name]: e.target.value }))}
+                        placeholder="Enter category value..."
+                        className="w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 font-mono text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary/50"
+                      />
+                    )
+                  ) : (
+                    <input
+                      type={spec.input_type === "number" ? "number" : "text"}
+                      value={features[spec.name] ?? ""}
+                      onChange={e => setFeatures(prev => ({ ...prev, [spec.name]: e.target.value }))}
+                      min={spec.min}
+                      max={spec.max}
+                      step={spec.input_type === "number" ? "any" : undefined}
+                      placeholder={spec.input_type === "number"
+                        ? `Range ${spec.min ?? "?"} to ${spec.max ?? "?"}`
+                        : "Enter value..."}
+                      className="w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 font-mono text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary/50"
+                    />
+                  )}
+                  {spec.input_type === "number" && spec.min !== undefined && spec.max !== undefined && (
+                    <div className="mt-1 text-[11px] text-text-muted">
+                      observed min/max: {spec.min.toFixed(4)} / {spec.max.toFixed(4)}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
