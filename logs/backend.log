@@ -314,3 +314,23 @@
 2026-03-22 17:20:46,640 - app.main - INFO - Request completed | id=6a6e2534 method=GET path=/api/training-jobs status=200 duration_ms=12.64
 2026-03-22 17:20:46,656 - app.main - INFO - Request completed | id=f56692e9 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=24.05
 2026-03-22 17:20:46,661 - app.main - INFO - Request completed | id=32d7319f method=GET path=/api/datasets status=200 duration_ms=11.45
+2026-03-22 17:23:04,802 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 17:23:04,802 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:23:04,802 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:23:12,964 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 17:23:12,964 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:23:12,964 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:23:19,741 - app.main - INFO - Request completed | id=ae5afdfc method=GET path=/api/datasets status=200 duration_ms=16.45
+2026-03-22 17:23:19,747 - app.main - INFO - Request completed | id=ca09f94a method=GET path=/api/datasets status=200 duration_ms=4.27
+2026-03-22 17:23:21,608 - app.main - INFO - Request completed | id=35259cea method=GET path=/api/datasets status=200 duration_ms=4.10
+2026-03-22 17:23:21,613 - app.main - INFO - Request completed | id=45a3677e method=GET path=/api/example-datasets status=200 duration_ms=1.10
+2026-03-22 17:23:21,617 - app.main - INFO - Request completed | id=40ec50b4 method=GET path=/api/example-datasets status=200 duration_ms=1.91
+2026-03-22 17:23:21,620 - app.main - INFO - Request completed | id=893627d9 method=GET path=/api/datasets status=200 duration_ms=8.16
+2026-03-22 17:23:23,327 - app.main - INFO - Request completed | id=88a1c20f method=GET path=/api/training-jobs status=200 duration_ms=5.10
+2026-03-22 17:23:23,331 - app.main - INFO - Request completed | id=e9a1dd20 method=GET path=/api/datasets status=200 duration_ms=8.15
+2026-03-22 17:23:23,337 - app.main - INFO - Request completed | id=68d54dd1 method=GET path=/api/training-jobs status=200 duration_ms=8.04
+2026-03-22 17:23:23,359 - app.main - INFO - Request completed | id=4f99d46a method=GET path=/api/datasets status=200 duration_ms=25.57
+2026-03-22 17:23:23,368 - app.main - INFO - Request completed | id=17881235 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=35.15
+2026-03-22 17:23:28,387 - app.main - INFO - Request completed | id=ff907dbc method=GET path=/api/models/20/shap status=200 duration_ms=99.90
+2026-03-22 17:23:28,395 - app.ml.pipeline - WARNING - LIME explanation failed: list index out of range
+2026-03-22 17:23:28,396 - app.main - INFO - Request completed | id=96901985 method=GET path=/api/models/20/lime status=200 duration_ms=108.44

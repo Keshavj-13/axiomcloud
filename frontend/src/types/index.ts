@@ -47,9 +47,15 @@ export interface TrainedModel {
   accuracy?: number;
   f1_score?: number;
   roc_auc?: number;
+  precision?: number;
+  recall?: number;
+  balanced_accuracy?: number;
   rmse?: number;
   mae?: number;
   r2_score?: number;
+  mape?: number;
+  explained_variance?: number;
+  median_ae?: number;
   metrics?: Record<string, unknown>;
   feature_importance?: Record<string, number>;
   confusion_matrix?: number[][];
@@ -117,6 +123,7 @@ export interface ShapResult {
   expected_value?: number[] | number;
   data?: number[][];
   feature_names?: string[];
+  global_importance?: { feature: string; importance: number }[];
   error?: string;
 }
 

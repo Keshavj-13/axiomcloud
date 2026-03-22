@@ -37,12 +37,16 @@ def get_metrics(job_id: str, db: Session = Depends(get_db)):
             "training_time": m.training_time,
             "is_deployed": m.is_deployed,
             "cv_scores": m.cv_scores,
+            "metrics": m.metrics,
         }
         if task_type == "classification":
             data.update({
                 "accuracy": m.accuracy,
                 "f1_score": m.f1_score,
                 "roc_auc": m.roc_auc,
+                "precision": (m.metrics or {}).get("precision") if m.metrics else None,
+                "recall": (m.metrics or {}).get("recall") if m.metrics else None,
+                "balanced_accuracy": (m.metrics or {}).get("balanced_accuracy") if m.metrics else None,
                 "confusion_matrix": m.confusion_matrix,
                 "roc_curve_data": m.roc_curve_data,
             })
@@ -51,6 +55,9 @@ def get_metrics(job_id: str, db: Session = Depends(get_db)):
                 "rmse": m.rmse,
                 "mae": m.mae,
                 "r2_score": m.r2_score,
+                "mape": (m.metrics or {}).get("mape") if m.metrics else None,
+                "explained_variance": (m.metrics or {}).get("explained_variance") if m.metrics else None,
+                "median_ae": (m.metrics or {}).get("median_ae") if m.metrics else None,
             })
 
         data["feature_importance"] = m.feature_importance

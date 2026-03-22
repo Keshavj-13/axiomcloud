@@ -33,7 +33,10 @@ from lightgbm import LGBMClassifier, LGBMRegressor
 from sklearn.metrics import (
     accuracy_score, f1_score, roc_auc_score,
     mean_squared_error, mean_absolute_error, r2_score,
-    confusion_matrix, roc_curve, classification_report
+    confusion_matrix, roc_curve, classification_report,
+    precision_score, recall_score, balanced_accuracy_score,
+    explained_variance_score, median_absolute_error,
+    mean_absolute_percentage_error
 )
 
 from app.core.config import settings
@@ -157,9 +160,13 @@ class AutoMLPipeline:
             if estimator is None:
                 return {}
 
+            fitted_preprocessor = model.named_steps.get("preprocessor")
+            if fitted_preprocessor is None:
+                return {}
+
             # Get feature names after one-hot encoding
             ohe_features = []
-            for name, transformer, cols in preprocessor.transformers_:
+            for name, transformer, cols in fitted_preprocessor.transformers_:
                 if name == "num":
                     ohe_features.extend(cols)
                 elif name == "cat":
@@ -204,15 +211,43 @@ class AutoMLPipeline:
 
             preprocessor = pipeline.named_steps["preprocessor"]
             X_proc = preprocessor.transform(X_sample)
+            if hasattr(X_proc, "toarray"):
+                X_proc = X_proc.toarray()
+
+            feature_names = list(getattr(X_sample, "columns", []))
+            if not feature_names:
+                feature_names = [str(i) for i in range(X_proc.shape[1])]
 
             explainer = shap.Explainer(estimator, X_proc)
             shap_values = explainer(X_proc[:nsamples])
 
+            values = np.array(shap_values.values)
+            if values.ndim == 2:
+                mean_abs = np.abs(values).mean(axis=0)
+            elif values.ndim == 3:
+                mean_abs = np.abs(values).mean(axis=(0, 2))
+            else:
+                mean_abs = np.array([])
+
+            global_importance = []
+            if mean_abs.size:
+                for idx, val in enumerate(mean_abs.tolist()):
+                    fname = feature_names[idx] if idx < len(feature_names) else str(idx)
+                    global_importance.append({"feature": fname, "importance": float(val)})
+                global_importance = sorted(global_importance, key=lambda x: x["importance"], reverse=True)[:20]
+
+            base_values = getattr(shap_values, "base_values", None)
+            if isinstance(base_values, np.ndarray):
+                expected_value = base_values.tolist()
+            else:
+                expected_value = base_values
+
             return {
-                "shap_values": shap_values.values.tolist(),
-                "expected_value": getattr(shap_values, "base_values", None),
+                "shap_values": values.tolist(),
+                "expected_value": expected_value,
                 "data": X_proc[:nsamples].tolist(),
-                "feature_names": getattr(X_sample, "columns", None) or []
+                "feature_names": feature_names,
+                "global_importance": global_importance,
             }
         except Exception as e:
             logger.warning(f"SHAP explanation failed: {e}")
@@ -227,11 +262,16 @@ class AutoMLPipeline:
 
             preprocessor = pipeline.named_steps["preprocessor"]
             X_proc = preprocessor.transform(X_sample)
-            feature_names = getattr(X_sample, "columns", None) or [str(i) for i in range(X_proc.shape[1])]
+            if hasattr(X_proc, "toarray"):
+                X_proc = X_proc.toarray()
+
+            feature_names = list(getattr(X_sample, "columns", []))
+            if not feature_names:
+                feature_names = [str(i) for i in range(X_proc.shape[1])]
 
             class_names = None
             if task_type == "classification":
-                class_names = list(sorted(set(y_sample)))
+                class_names = [str(v) for v in sorted(pd.Series(y_sample).dropna().unique().tolist())]
 
             explainer = LimeTabularExplainer(
                 X_proc,
@@ -265,6 +305,9 @@ class AutoMLPipeline:
         metrics = {
             "accuracy": float(accuracy_score(y_test, y_pred)),
             "f1_score": float(f1_score(y_test, y_pred, average="weighted", zero_division=0)),
+            "precision": float(precision_score(y_test, y_pred, average="weighted", zero_division=0)),
+            "recall": float(recall_score(y_test, y_pred, average="weighted", zero_division=0)),
+            "balanced_accuracy": float(balanced_accuracy_score(y_test, y_pred)),
         }
 
         # ROC-AUC (binary and multiclass)
@@ -288,6 +331,13 @@ class AutoMLPipeline:
         cm = confusion_matrix(y_test, y_pred)
         metrics["confusion_matrix"] = cm.tolist()
 
+        # Classification report (macro/weighted diagnostics)
+        try:
+            report = classification_report(y_test, y_pred, output_dict=True, zero_division=0)
+            metrics["classification_report"] = report
+        except Exception:
+            metrics["classification_report"] = None
+
         # Cross-validation
         cv = StratifiedKFold(n_splits=cv_folds, shuffle=True, random_state=settings.RANDOM_STATE)
         cv_scores = cross_val_score(pipeline, pd.concat([X_train, X_test]), pd.concat([y_train, y_test]), cv=cv, scoring="accuracy")
@@ -307,11 +357,22 @@ class AutoMLPipeline:
             "rmse": float(np.sqrt(mean_squared_error(y_test, y_pred))),
             "mae": float(mean_absolute_error(y_test, y_pred)),
             "r2_score": float(r2_score(y_test, y_pred)),
+            "explained_variance": float(explained_variance_score(y_test, y_pred)),
+            "median_ae": float(median_absolute_error(y_test, y_pred)),
             "residuals": {
                 "predicted": y_pred.tolist()[:200],
                 "actual": y_test.tolist()[:200],
             }
         }
+
+        # Robust MAPE (avoid divide-by-zero explosions)
+        try:
+            epsilon = 1e-8
+            denom = np.where(np.abs(np.array(y_test)) < epsilon, epsilon, np.abs(np.array(y_test)))
+            mape = float(np.mean(np.abs((np.array(y_test) - np.array(y_pred)) / denom)))
+            metrics["mape"] = mape
+        except Exception:
+            metrics["mape"] = None
 
         # Cross-validation
         cv = KFold(n_splits=cv_folds, shuffle=True, random_state=settings.RANDOM_STATE)
