@@ -11,6 +11,29 @@ export const api = axios.create({
   timeout: 120000, // 2 min for training
 });
 
+// Request interceptor: Attach Firebase ID token to all requests
+api.interceptors.request.use(
+  async (config) => {
+    try {
+      // Dynamically import auth to avoid circular dependencies
+      const { getAuth } = await import("firebase/auth");
+      const auth = getAuth();
+      
+      if (auth?.currentUser) {
+        const token = await auth.currentUser.getIdToken();
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (error) {
+      // Firebase not configured or user not authenticated - skip token injection
+      if (typeof window !== "undefined") {
+        console.debug("Token injection skipped (not authenticated or Firebase not configured)");
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // Log errors to file (Node.js only)
 if (typeof window === "undefined") {
   api.interceptors.response.use(

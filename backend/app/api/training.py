@@ -11,6 +11,7 @@ from datetime import datetime
 from typing import Optional
 
 from app.core.database import get_db
+from app.api.deps import get_current_user
 from app.models.db_models import Dataset, TrainingJob, TrainedModel, ExperimentRun
 from app.schemas.schemas import TrainingConfig, TrainingJobResponse, ExperimentRunResponse
 from app.ml.pipeline import AutoMLPipeline
@@ -189,8 +190,9 @@ async def train_model(
     config: TrainingConfig,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
+    user=Depends(get_current_user),
 ):
-    """Launch an AutoML training job."""
+    """Launch an AutoML training job. Requires Firebase authentication."""
     # Validate dataset
     dataset = db.query(Dataset).filter(Dataset.id == config.dataset_id).first()
     if not dataset:
