@@ -7,10 +7,9 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth, firebaseConfigured } from "@/lib/firebase";
 import toast from "react-hot-toast";
 import { Mail, Lock, LogIn, UserPlus, Chrome } from "lucide-react";
-import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,6 +20,10 @@ export default function LoginPage() {
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!firebaseConfigured || !auth) {
+      toast.error("Firebase keys are missing. Add NEXT_PUBLIC_FIREBASE_* variables.");
+      return;
+    }
     if (!email || !password) {
       toast.error("Please enter email and password");
       return;
@@ -55,6 +58,10 @@ export default function LoginPage() {
   };
 
   const handleGoogleSignIn = async () => {
+    if (!firebaseConfigured || !auth) {
+      toast.error("Firebase keys are missing. Add NEXT_PUBLIC_FIREBASE_* variables.");
+      return;
+    }
     setLoading(true);
     try {
       const provider = new GoogleAuthProvider();
@@ -75,7 +82,7 @@ export default function LoginPage() {
           {/* Header */}
           <div className="text-center">
             <h1 className="text-3xl font-bold text-text-primary mb-2">
-              SigmaCloud
+              Axiom Cloud
             </h1>
             <p className="text-text-secondary">
               {isSignup ? "Create your account" : "Welcome back"}
@@ -84,6 +91,11 @@ export default function LoginPage() {
 
           {/* Form */}
           <form onSubmit={handleEmailAuth} className="space-y-4">
+            {!firebaseConfigured && (
+              <div className="rounded-lg border border-amber-300/50 bg-amber-100/50 px-3 py-2 text-xs text-amber-900">
+                Firebase config not found. Add NEXT_PUBLIC_FIREBASE_* keys in frontend/.env.local.
+              </div>
+            )}
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
@@ -97,7 +109,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   className="w-full pl-10 pr-4 py-2 border border-outline rounded-lg bg-surface text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  disabled={loading}
+                  disabled={loading || !firebaseConfigured}
                 />
               </div>
             </div>
@@ -115,7 +127,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full pl-10 pr-4 py-2 border border-outline rounded-lg bg-surface text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  disabled={loading}
+                  disabled={loading || !firebaseConfigured}
                 />
               </div>
             </div>
@@ -123,7 +135,7 @@ export default function LoginPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !firebaseConfigured}
               className="w-full bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg transition flex items-center justify-center gap-2"
             >
               {loading ? (
@@ -158,7 +170,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            disabled={loading}
+            disabled={loading || !firebaseConfigured}
             className="w-full border border-outline hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed text-text-primary font-semibold py-2 rounded-lg transition flex items-center justify-center gap-2"
           >
             <Chrome className="w-5 h-5" />
@@ -193,7 +205,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <div className="text-center mt-8 text-white/80 text-sm">
-          <p>© 2026 SigmaCloud. All rights reserved.</p>
+          <p>© 2026 Axiom Cloud. All rights reserved.</p>
         </div>
       </div>
     </div>

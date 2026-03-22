@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { Auth, getAuth } from "firebase/auth";
+import { FirebaseApp } from "firebase/app";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,6 +11,17 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+export const firebaseConfigured = Object.values(firebaseConfig).every(
+  (value) => typeof value === "string" && value.trim().length > 0 && !value.includes("your_")
+);
+
+let app: FirebaseApp | null = null;
+let authInstance: Auth | null = null;
+
+if (firebaseConfigured) {
+  app = initializeApp(firebaseConfig);
+  authInstance = getAuth(app);
+}
+
+export const auth = authInstance;
 export default app;
