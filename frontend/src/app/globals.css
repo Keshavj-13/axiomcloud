@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sigma-bg: #0e0e10;
+  --sigma-surface: #19191d;
+  --sigma-surface-2: #25252b;
+  --sigma-border: rgba(71, 71, 77, 0.5);
+  --sigma-text: #e7e4ec;
+  --sigma-muted: #acaab1;
+  --sigma-primary: #d0bcff;
+  --sigma-primary-deep: #6e3bd7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--sigma-bg);
+  color: var(--sigma-text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+}
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--sigma-bg); }
+::-webkit-scrollbar-thumb { background: rgba(117,117,123,0.4); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(117,117,123,0.75); }
+
+/* Glass card */
+.glass {
+  background: rgba(37, 37, 43, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--sigma-border);
+}
+
+/* Subtle depth effects */
+.void-shadow { box-shadow: 0 24px 48px -12px rgba(0,0,0,0.5); }
+.glow-blue  { box-shadow: 0 0 24px rgba(110,59,215,0.18); }
+.glow-cyan  { box-shadow: 0 0 24px rgba(208,188,255,0.16); }
+.glow-green { box-shadow: 0 0 24px rgba(80,220,170,0.15); }
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #d0bcff 0%, #6e3bd7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-green {
+  background: linear-gradient(135deg, #d0bcff 0%, #8ddcc2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animated border */
+@keyframes borderPulse {
+  0%, 100% { border-color: rgba(110,59,215,0.25); }
+  50% { border-color: rgba(110,59,215,0.55); }
+}
+.border-pulse {
+  animation: borderPulse 3s ease-in-out infinite;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-primary-deep hover:bg-primary-deep/90 text-text-primary font-medium px-5 py-2.5 rounded-lg transition-all duration-200 inline-flex items-center gap-2;
+  box-shadow: 0 4px 20px rgba(110,59,215,0.35);
+}
+.btn-primary:hover {
+  box-shadow: 0 4px 28px rgba(110,59,215,0.5);
+}
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-outline {
+  @apply border border-outline/35 hover:border-primary/40 text-text-muted hover:text-text-primary font-medium px-5 py-2.5 rounded-lg transition-all duration-200 inline-flex items-center gap-2 bg-surface-variant/50;
+}
+
+/* Card */
+.sigma-card {
+  @apply glass rounded-xl p-6;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.sigma-card:hover {
+  border-color: rgba(110,59,215,0.35);
+}
+
+/* Stat badge */
+.metric-badge {
+  @apply text-xs font-mono px-2.5 py-1 rounded-full;
+}
+
+.panel {
+  @apply rounded-lg border border-outline/20 bg-surface;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.34);
+}
+
+.panel-glass {
+  @apply rounded-xl border border-primary/20;
+  background: linear-gradient(135deg, rgba(37, 37, 43, 0.8) 0%, rgba(25, 25, 29, 0.88) 100%);
+  backdrop-filter: blur(10px);
+}
+
+.section-kicker {
+  @apply text-[10px] uppercase tracking-[0.14em] text-text-muted;
+}
+
+input, select, textarea {
+  @apply transition-colors;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(208, 188, 255, 0.7);
+  outline-offset: 1px;
+}

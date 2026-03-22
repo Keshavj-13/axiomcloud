@@ -1,0 +1,316 @@
+2026-03-22 14:42:57,094 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 14:42:57,094 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 14:42:57,094 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 14:43:12,065 - app.main - INFO - Request completed | id=60d3a287 method=GET path=/api/example-datasets status=200 duration_ms=1.50
+2026-03-22 14:43:12,070 - app.main - INFO - Request completed | id=7427414d method=GET path=/api/datasets status=200 duration_ms=18.85
+2026-03-22 14:43:19,945 - app.api.datasets - INFO - 📁 Dataset uploaded: online_shoppers_intention (12330 rows)
+2026-03-22 14:43:19,947 - app.main - INFO - Request completed | id=cd4f7eb2 method=POST path=/api/upload-dataset status=200 duration_ms=98.01
+2026-03-22 14:44:26,138 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 14:44:26,138 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 14:44:26,139 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 14:44:35,771 - app.api.datasets - INFO - 📁 Dataset uploaded: train (891 rows)
+2026-03-22 14:44:35,772 - app.main - INFO - Request completed | id=45756b6b method=POST path=/api/upload-dataset status=200 duration_ms=36.93
+2026-03-22 14:50:57,353 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 14:50:57,353 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 14:50:57,353 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 14:51:13,486 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 14:51:13,486 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 14:51:13,486 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 15:03:57,535 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 15:03:57,535 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 15:03:57,535 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 15:04:43,747 - app.main - INFO - Request completed | id=d8e8dc21 method=GET path=/api/example-datasets status=200 duration_ms=2.61
+2026-03-22 15:04:43,762 - app.main - INFO - Request completed | id=aaae4b3c method=GET path=/api/example-datasets status=200 duration_ms=1.89
+2026-03-22 15:04:43,764 - app.main - INFO - Request completed | id=0204eaf7 method=GET path=/api/datasets status=200 duration_ms=20.32
+2026-03-22 15:04:43,771 - app.main - INFO - Request completed | id=9eaab67d method=GET path=/api/datasets status=200 duration_ms=4.36
+2026-03-22 15:05:10,746 - app.main - INFO - Request completed | id=250895ac method=GET path=/api/datasets status=200 duration_ms=3.62
+2026-03-22 15:05:10,752 - app.main - INFO - Request completed | id=c7bc6926 method=GET path=/api/datasets status=200 duration_ms=3.52
+2026-03-22 15:05:41,209 - app.main - INFO - Request completed | id=0e62c78f method=OPTIONS path=/api/train-model status=200 duration_ms=0.22
+2026-03-22 15:05:41,222 - app.api.training - INFO - 🚀 Training job 5c86be77-25ea-4b9a-ad42-58d8d2a4f98a queued
+2026-03-22 15:05:41,223 - app.main - INFO - Request completed | id=dcafa7c9 method=POST path=/api/train-model status=200 duration_ms=11.66
+2026-03-22 15:05:41,253 - app.ml.pipeline - INFO - [5c86be77-25ea-4b9a-ad42-58d8d2a4f98a] Progress 5%: Preprocessing data...
+2026-03-22 15:05:41,266 - app.ml.pipeline - INFO - Task type detected: classification
+2026-03-22 15:05:41,271 - app.ml.pipeline - INFO - [5c86be77-25ea-4b9a-ad42-58d8d2a4f98a] Progress 10%: Training Logistic Regression...
+2026-03-22 15:05:42,742 - app.main - INFO - Request completed | id=aee0fdbf method=GET path=/api/training-status/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=14.81
+2026-03-22 15:05:43,897 - app.ml.pipeline - INFO - ✅ Logistic Regression trained in 0.66s
+2026-03-22 15:05:43,909 - app.ml.pipeline - INFO - [5c86be77-25ea-4b9a-ad42-58d8d2a4f98a] Progress 26%: Training Random Forest...
+2026-03-22 15:05:44,231 - app.main - INFO - Request completed | id=8590a1fb method=GET path=/api/training-status/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=3.55
+2026-03-22 15:05:45,729 - app.main - INFO - Request completed | id=5e8fb942 method=GET path=/api/training-status/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=1.84
+2026-03-22 15:05:47,229 - app.main - INFO - Request completed | id=59e0c777 method=GET path=/api/training-status/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=2.31
+2026-03-22 15:05:48,729 - app.main - INFO - Request completed | id=a52cc2f7 method=GET path=/api/training-status/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=2.54
+2026-03-22 15:05:49,265 - app.ml.pipeline - INFO - ✅ Random Forest trained in 0.91s
+2026-03-22 15:05:49,270 - app.ml.pipeline - INFO - [5c86be77-25ea-4b9a-ad42-58d8d2a4f98a] Progress 42%: Training XGBoost...
+2026-03-22 15:05:50,229 - app.main - INFO - Request completed | id=d0c5ca15 method=GET path=/api/training-status/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=1.95
+2026-03-22 15:05:51,735 - app.main - INFO - Request completed | id=00c514b0 method=GET path=/api/training-status/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=6.86
+2026-03-22 15:05:52,176 - app.ml.pipeline - INFO - ✅ XGBoost trained in 1.67s
+2026-03-22 15:05:52,182 - app.ml.pipeline - INFO - [5c86be77-25ea-4b9a-ad42-58d8d2a4f98a] Progress 58%: Training LightGBM...
+2026-03-22 15:05:52,860 - app.ml.pipeline - INFO - ✅ LightGBM trained in 0.11s
+2026-03-22 15:05:52,866 - app.ml.pipeline - INFO - [5c86be77-25ea-4b9a-ad42-58d8d2a4f98a] Progress 74%: Training Gradient Boosting...
+2026-03-22 15:05:53,231 - app.main - INFO - Request completed | id=35d276aa method=GET path=/api/training-status/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=3.59
+2026-03-22 15:05:54,729 - app.main - INFO - Request completed | id=5ec57b90 method=GET path=/api/training-status/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=2.43
+2026-03-22 15:05:56,229 - app.main - INFO - Request completed | id=b282baf3 method=GET path=/api/training-status/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=1.74
+2026-03-22 15:05:57,729 - app.main - INFO - Request completed | id=f692c9fc method=GET path=/api/training-status/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=1.93
+2026-03-22 15:05:59,229 - app.main - INFO - Request completed | id=d3df7edb method=GET path=/api/training-status/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=2.02
+2026-03-22 15:06:00,729 - app.main - INFO - Request completed | id=bb2810f7 method=GET path=/api/training-status/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=2.14
+2026-03-22 15:06:01,328 - app.ml.pipeline - INFO - ✅ Gradient Boosting trained in 1.45s
+2026-03-22 15:06:01,334 - app.ml.pipeline - INFO - [5c86be77-25ea-4b9a-ad42-58d8d2a4f98a] Progress 100%: Training complete!
+2026-03-22 15:06:01,345 - app.api.training - INFO - ✅ Training job 5c86be77-25ea-4b9a-ad42-58d8d2a4f98a completed
+2026-03-22 15:06:02,229 - app.main - INFO - Request completed | id=33b6da2e method=GET path=/api/training-status/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=2.14
+2026-03-22 15:06:08,003 - app.main - INFO - Request completed | id=f5431d3a method=GET path=/api/training-jobs status=200 duration_ms=4.55
+2026-03-22 15:06:08,023 - app.main - INFO - Request completed | id=eef6ab93 method=GET path=/api/metrics/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=24.17
+2026-03-22 15:06:08,025 - app.main - INFO - Request completed | id=87ed3e28 method=GET path=/api/training-jobs status=200 duration_ms=16.18
+2026-03-22 15:06:08,047 - app.main - INFO - Request completed | id=1bb6ad59 method=GET path=/api/metrics/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=21.57
+2026-03-22 15:06:30,368 - app.api.models - INFO - 🚀 Model 10 (Gradient Boosting) deployed
+2026-03-22 15:06:30,369 - app.main - INFO - Request completed | id=f8cdffe3 method=POST path=/api/models/10/deploy status=200 duration_ms=10.96
+2026-03-22 15:06:30,387 - app.main - INFO - Request completed | id=d3de9edb method=GET path=/api/metrics/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=15.50
+2026-03-22 15:06:37,387 - app.main - INFO - Request completed | id=1e9124c4 method=GET path=/api/deployed-models status=200 duration_ms=5.57
+2026-03-22 15:06:37,392 - app.main - INFO - Request completed | id=01ff2817 method=GET path=/api/deployed-models status=200 duration_ms=3.15
+2026-03-22 15:06:41,818 - app.main - INFO - Request completed | id=b2a38351 method=GET path=/api/models/10 status=200 duration_ms=5.32
+2026-03-22 15:07:09,397 - app.main - INFO - Request completed | id=1485432f method=GET path=/api/models status=200 duration_ms=16.26
+2026-03-22 15:07:09,414 - app.main - INFO - Request completed | id=340dc3b9 method=GET path=/api/models status=200 duration_ms=14.33
+2026-03-22 15:07:31,417 - app.main - INFO - Request completed | id=74f434a4 method=GET path=/api/training-jobs status=200 duration_ms=7.67
+2026-03-22 15:07:31,426 - app.main - INFO - Request completed | id=9f9e10b5 method=GET path=/api/dashboard/summary status=200 duration_ms=16.67
+2026-03-22 15:07:31,429 - app.main - INFO - Request completed | id=2ce9f8aa method=GET path=/api/training-jobs status=200 duration_ms=5.37
+2026-03-22 15:07:31,432 - app.main - INFO - Request completed | id=c0a108e5 method=GET path=/api/dashboard/summary status=200 duration_ms=4.09
+2026-03-22 15:07:52,651 - app.main - INFO - Request completed | id=e1a5a373 method=GET path=/api/training-jobs status=200 duration_ms=4.09
+2026-03-22 15:07:52,654 - app.main - INFO - Request completed | id=7a17c66f method=GET path=/api/dashboard/summary status=200 duration_ms=9.38
+2026-03-22 15:07:52,658 - app.main - INFO - Request completed | id=6c003299 method=GET path=/api/training-jobs status=200 duration_ms=4.58
+2026-03-22 15:07:52,662 - app.main - INFO - Request completed | id=1b9aad5b method=GET path=/api/dashboard/summary status=200 duration_ms=5.00
+2026-03-22 15:07:57,781 - app.main - INFO - Request completed | id=545c9cd4 method=GET path=/api/training-jobs status=200 duration_ms=3.93
+2026-03-22 15:07:57,784 - app.main - INFO - Request completed | id=e572f6b8 method=GET path=/api/dashboard/summary status=200 duration_ms=7.69
+2026-03-22 15:07:57,788 - app.main - INFO - Request completed | id=964fe107 method=GET path=/api/training-jobs status=200 duration_ms=3.94
+2026-03-22 15:07:57,792 - app.main - INFO - Request completed | id=133572fa method=GET path=/api/dashboard/summary status=200 duration_ms=6.00
+2026-03-22 16:46:12,182 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 16:46:12,182 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 16:46:12,182 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 16:46:37,050 - app.main - INFO - Request completed | id=41ff5174 method=GET path=/api/training-jobs status=200 duration_ms=15.83
+2026-03-22 16:46:37,062 - app.main - INFO - Request completed | id=c41dbfc1 method=GET path=/api/dashboard/summary status=200 duration_ms=29.06
+2026-03-22 16:46:42,072 - app.main - INFO - Request completed | id=211634d6 method=GET path=/api/datasets status=200 duration_ms=6.14
+2026-03-22 16:46:42,074 - app.main - INFO - Request completed | id=a5776e1d method=GET path=/api/example-datasets status=200 duration_ms=0.87
+2026-03-22 16:46:43,527 - app.main - INFO - Request completed | id=e858e727 method=GET path=/api/datasets status=200 duration_ms=3.53
+2026-03-22 16:46:45,483 - app.main - INFO - Request completed | id=a6fd465a method=GET path=/api/training-jobs status=200 duration_ms=2.26
+2026-03-22 16:46:45,507 - app.main - INFO - Request completed | id=5bafcaca method=GET path=/api/metrics/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=20.57
+2026-03-22 16:47:30,159 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 16:47:30,159 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 16:47:30,159 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 16:52:10,094 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 16:52:10,094 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 16:52:10,094 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 16:59:41,897 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 16:59:41,897 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 16:59:41,897 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:00:08,653 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 17:00:08,653 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:00:08,653 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:00:32,098 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 17:00:32,098 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:00:32,098 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:00:40,795 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 17:00:40,795 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:00:40,795 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:06:43,544 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 17:06:43,544 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:06:43,545 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:06:52,227 - app.main - INFO - Request completed | id=f402f4a0 method=GET path=/api/example-datasets status=200 duration_ms=8.89
+2026-03-22 17:06:52,231 - app.main - INFO - Request completed | id=82f57cf6 method=GET path=/api/datasets status=200 duration_ms=21.42
+2026-03-22 17:06:59,631 - app.main - INFO - Request completed | id=3a7c4c4e method=GET path=/api/datasets status=200 duration_ms=4.14
+2026-03-22 17:07:02,116 - app.main - INFO - Request completed | id=18231e20 method=GET path=/api/training-jobs status=200 duration_ms=3.10
+2026-03-22 17:07:02,144 - app.main - INFO - Request completed | id=af544787 method=GET path=/api/metrics/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=20.52
+2026-03-22 17:07:06,003 - app.main - INFO - Request completed | id=3758e450 method=GET path=/api/deployed-models status=200 duration_ms=3.53
+2026-03-22 17:07:07,327 - app.main - INFO - Request completed | id=ca609b53 method=GET path=/api/models status=200 duration_ms=14.62
+2026-03-22 17:07:11,731 - app.main - INFO - Request completed | id=4146bf31 method=GET path=/api/dashboard/summary status=200 duration_ms=14.79
+2026-03-22 17:07:11,733 - app.main - INFO - Request completed | id=5626c0a9 method=GET path=/api/training-jobs status=200 duration_ms=4.59
+2026-03-22 17:07:31,302 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 17:07:31,302 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:07:31,302 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:07:36,057 - app.main - INFO - Request completed | id=5d91b449 method=GET path=/api/training-jobs status=200 duration_ms=24.22
+2026-03-22 17:07:36,063 - app.main - INFO - Request completed | id=8c5af71a method=GET path=/api/dashboard/summary status=200 duration_ms=31.69
+2026-03-22 17:11:13,174 - app.main - INFO - Request completed | id=ec07affe method=GET path=/api/training-jobs status=200 duration_ms=3.47
+2026-03-22 17:11:13,178 - app.main - INFO - Request completed | id=949d0a5c method=GET path=/api/dashboard/summary status=200 duration_ms=9.12
+2026-03-22 17:11:13,180 - app.main - INFO - Request completed | id=def394f9 method=GET path=/api/training-jobs status=200 duration_ms=3.43
+2026-03-22 17:11:13,187 - app.main - INFO - Request completed | id=d8a0d0b7 method=GET path=/api/dashboard/summary status=200 duration_ms=5.49
+2026-03-22 17:11:22,956 - app.main - INFO - Request completed | id=f5791411 method=GET path=/api/example-datasets status=200 duration_ms=0.64
+2026-03-22 17:11:22,962 - app.main - INFO - Request completed | id=4dccd5b6 method=GET path=/api/example-datasets status=200 duration_ms=2.67
+2026-03-22 17:11:22,965 - app.main - INFO - Request completed | id=8bc07cda method=GET path=/api/datasets status=200 duration_ms=10.24
+2026-03-22 17:11:22,972 - app.main - INFO - Request completed | id=043b31a7 method=GET path=/api/datasets status=200 duration_ms=5.79
+2026-03-22 17:11:26,683 - app.main - INFO - Request completed | id=e13ebc6d method=GET path=/api/datasets status=200 duration_ms=3.77
+2026-03-22 17:11:26,688 - app.main - INFO - Request completed | id=5f2b5dd9 method=GET path=/api/datasets status=200 duration_ms=3.30
+2026-03-22 17:11:32,545 - app.main - INFO - Request completed | id=d816530e method=GET path=/api/training-jobs status=200 duration_ms=3.49
+2026-03-22 17:11:32,550 - app.main - INFO - Request completed | id=12a86025 method=GET path=/api/datasets status=200 duration_ms=7.19
+2026-03-22 17:11:32,555 - app.main - INFO - Request completed | id=47747e7d method=GET path=/api/training-jobs status=200 duration_ms=6.72
+2026-03-22 17:11:32,572 - app.main - INFO - Request completed | id=a3b47b3c method=GET path=/api/datasets status=200 duration_ms=18.29
+2026-03-22 17:11:32,579 - app.main - INFO - Request completed | id=67467520 method=GET path=/api/metrics/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=26.46
+2026-03-22 17:11:45,325 - app.main - INFO - Request completed | id=fbf7b38a method=GET path=/api/deployed-models status=200 duration_ms=4.42
+2026-03-22 17:11:45,329 - app.main - INFO - Request completed | id=63ebddbb method=GET path=/api/deployed-models status=200 duration_ms=2.40
+2026-03-22 17:11:47,302 - app.main - INFO - Request completed | id=8186b765 method=GET path=/api/models status=200 duration_ms=14.37
+2026-03-22 17:11:47,317 - app.main - INFO - Request completed | id=527c9a22 method=GET path=/api/models status=200 duration_ms=12.42
+2026-03-22 17:14:13,105 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 17:14:13,105 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:14:13,105 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:14:21,869 - app.main - INFO - Request completed | id=da7a779b method=GET path=/api/models status=200 duration_ms=23.24
+2026-03-22 17:14:21,883 - app.main - INFO - Request completed | id=87a6adef method=GET path=/api/models status=200 duration_ms=12.17
+2026-03-22 17:15:20,312 - app.main - INFO - Request completed | id=ac586092 method=GET path=/api/training-jobs status=200 duration_ms=11.08
+2026-03-22 17:15:20,316 - app.main - INFO - Request completed | id=b8f31c23 method=GET path=/api/dashboard/summary status=200 duration_ms=15.93
+2026-03-22 17:15:20,323 - app.main - INFO - Request completed | id=7a7eac7a method=GET path=/api/training-jobs status=200 duration_ms=5.75
+2026-03-22 17:15:20,325 - app.main - INFO - Request completed | id=3e64db83 method=GET path=/api/dashboard/summary status=200 duration_ms=6.63
+2026-03-22 17:15:50,077 - app.main - INFO - 🚀 SigmaCloud AI started successfully
+2026-03-22 17:15:50,077 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:15:50,077 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:16:05,578 - app.main - INFO - Request completed | id=bfd75578 method=GET path=/api/training-jobs status=200 duration_ms=15.96
+2026-03-22 17:16:05,586 - app.main - INFO - Request completed | id=abda6b76 method=GET path=/api/datasets status=200 duration_ms=21.81
+2026-03-22 17:16:05,587 - app.main - INFO - Request completed | id=2b8b1713 method=GET path=/api/training-jobs status=200 duration_ms=6.52
+2026-03-22 17:16:05,610 - app.main - INFO - Request completed | id=603528e3 method=GET path=/api/metrics/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=24.72
+2026-03-22 17:16:05,612 - app.main - INFO - Request completed | id=6ccc54ac method=GET path=/api/datasets status=200 duration_ms=20.23
+2026-03-22 17:16:08,135 - app.main - INFO - Request completed | id=1b9a5aaf method=GET path=/api/datasets status=200 duration_ms=3.84
+2026-03-22 17:16:08,141 - app.main - INFO - Request completed | id=02d65c3d method=GET path=/api/datasets status=200 duration_ms=3.34
+2026-03-22 17:16:12,197 - app.main - INFO - Request completed | id=1eadb842 method=GET path=/api/example-datasets status=200 duration_ms=0.82
+2026-03-22 17:16:12,202 - app.main - INFO - Request completed | id=2f841f38 method=GET path=/api/example-datasets status=200 duration_ms=2.50
+2026-03-22 17:16:12,204 - app.main - INFO - Request completed | id=82f5ea89 method=GET path=/api/datasets status=200 duration_ms=8.04
+2026-03-22 17:16:12,209 - app.main - INFO - Request completed | id=75bcf346 method=GET path=/api/datasets status=200 duration_ms=3.50
+2026-03-22 17:16:17,041 - sklearn.datasets._california_housing - INFO - Downloading Cal. housing from https://ndownloader.figshare.com/files/5976036 to /home/keshav/scikit_learn_data
+2026-03-22 17:16:19,645 - app.api.datasets - INFO - 📊 Example dataset loaded: California Housing
+2026-03-22 17:16:19,646 - app.main - INFO - Request completed | id=88ced603 method=POST path=/api/load-example/california_housing status=200 duration_ms=2607.48
+2026-03-22 17:16:19,654 - app.main - INFO - Request completed | id=2af6f1dd method=GET path=/api/datasets status=200 duration_ms=3.69
+2026-03-22 17:16:24,197 - app.main - INFO - Request completed | id=2f04aac9 method=GET path=/api/datasets status=200 duration_ms=4.02
+2026-03-22 17:16:24,203 - app.main - INFO - Request completed | id=4c81fbcc method=GET path=/api/datasets status=200 duration_ms=4.00
+2026-03-22 17:16:31,313 - app.main - INFO - Request completed | id=a87f21eb method=OPTIONS path=/api/train-model status=200 duration_ms=0.22
+2026-03-22 17:16:31,324 - app.api.training - INFO - 🚀 Training job 1f09b413-27f0-410c-97c2-304253104abb queued
+2026-03-22 17:16:31,325 - app.main - INFO - Request completed | id=f7603904 method=POST path=/api/train-model status=200 duration_ms=10.49
+2026-03-22 17:16:31,355 - app.ml.pipeline - INFO - [1f09b413-27f0-410c-97c2-304253104abb] Progress 5%: Preprocessing data...
+2026-03-22 17:16:31,362 - app.ml.pipeline - INFO - Task type detected: regression
+2026-03-22 17:16:31,366 - app.ml.pipeline - INFO - [1f09b413-27f0-410c-97c2-304253104abb] Progress 10%: Training Linear Regression...
+2026-03-22 17:16:31,524 - app.ml.pipeline - WARNING - Could not extract feature importances: This OneHotEncoder instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-22 17:16:31,526 - app.ml.pipeline - INFO - ✅ Linear Regression trained in 0.06s
+2026-03-22 17:16:31,531 - app.ml.pipeline - INFO - [1f09b413-27f0-410c-97c2-304253104abb] Progress 26%: Training Random Forest...
+2026-03-22 17:16:32,831 - app.main - INFO - Request completed | id=797cb7c8 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.69
+2026-03-22 17:16:34,330 - app.main - INFO - Request completed | id=c65731c4 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.83
+2026-03-22 17:16:35,830 - app.main - INFO - Request completed | id=b9da98bf method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.85
+2026-03-22 17:16:37,330 - app.main - INFO - Request completed | id=d71dc487 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.89
+2026-03-22 17:16:38,830 - app.main - INFO - Request completed | id=60b6ab3f method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.19
+2026-03-22 17:16:40,330 - app.main - INFO - Request completed | id=4e1a5976 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.87
+2026-03-22 17:16:41,830 - app.main - INFO - Request completed | id=1b83ea74 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.99
+2026-03-22 17:16:43,330 - app.main - INFO - Request completed | id=c7b5a5b9 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.77
+2026-03-22 17:16:44,831 - app.main - INFO - Request completed | id=fc691f33 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.75
+2026-03-22 17:16:46,330 - app.main - INFO - Request completed | id=da5627ee method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.87
+2026-03-22 17:16:47,830 - app.main - INFO - Request completed | id=77e727ba method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.84
+2026-03-22 17:16:49,330 - app.main - INFO - Request completed | id=80e7bcd4 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.04
+2026-03-22 17:16:50,830 - app.main - INFO - Request completed | id=29766232 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.79
+2026-03-22 17:16:52,330 - app.main - INFO - Request completed | id=29ef7b93 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.20
+2026-03-22 17:16:53,830 - app.main - INFO - Request completed | id=ed1c80e2 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.84
+2026-03-22 17:16:55,330 - app.main - INFO - Request completed | id=5884b6ba method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.87
+2026-03-22 17:16:56,830 - app.main - INFO - Request completed | id=bdcd9a32 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.76
+2026-03-22 17:16:58,330 - app.main - INFO - Request completed | id=341de71d method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.99
+2026-03-22 17:16:59,830 - app.main - INFO - Request completed | id=d966a0cd method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.07
+2026-03-22 17:17:01,330 - app.main - INFO - Request completed | id=5e752bea method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.04
+2026-03-22 17:17:02,831 - app.main - INFO - Request completed | id=2303a9ee method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.27
+2026-03-22 17:17:04,330 - app.main - INFO - Request completed | id=b17c9d9b method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.10
+2026-03-22 17:17:05,830 - app.main - INFO - Request completed | id=961d1458 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.87
+2026-03-22 17:17:07,330 - app.main - INFO - Request completed | id=5c2bb716 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.89
+2026-03-22 17:17:08,831 - app.main - INFO - Request completed | id=ae9a18c1 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.55
+2026-03-22 17:17:10,330 - app.main - INFO - Request completed | id=157cd6ad method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.88
+2026-03-22 17:17:11,830 - app.main - INFO - Request completed | id=612c86f5 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.23
+2026-03-22 17:17:13,331 - app.main - INFO - Request completed | id=c4e32859 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.41
+2026-03-22 17:17:14,830 - app.main - INFO - Request completed | id=2c9e1664 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.90
+2026-03-22 17:17:16,330 - app.main - INFO - Request completed | id=9061d4fb method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.82
+2026-03-22 17:17:17,830 - app.main - INFO - Request completed | id=66781d04 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.05
+2026-03-22 17:17:19,330 - app.main - INFO - Request completed | id=11609078 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.81
+2026-03-22 17:17:20,830 - app.main - INFO - Request completed | id=ed65c0c3 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.74
+2026-03-22 17:17:22,331 - app.main - INFO - Request completed | id=5cad8f38 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.78
+2026-03-22 17:17:23,830 - app.main - INFO - Request completed | id=4e78a949 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.88
+2026-03-22 17:17:25,330 - app.main - INFO - Request completed | id=511dcc67 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.98
+2026-03-22 17:17:26,830 - app.main - INFO - Request completed | id=8a01a716 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.06
+2026-03-22 17:17:28,330 - app.main - INFO - Request completed | id=b8e37f44 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.00
+2026-03-22 17:17:29,830 - app.main - INFO - Request completed | id=8a22be0b method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.73
+2026-03-22 17:17:30,935 - app.ml.pipeline - WARNING - Could not extract feature importances: This OneHotEncoder instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-22 17:17:31,068 - app.ml.pipeline - INFO - ✅ Random Forest trained in 9.85s
+2026-03-22 17:17:31,073 - app.ml.pipeline - INFO - [1f09b413-27f0-410c-97c2-304253104abb] Progress 42%: Training XGBoost...
+2026-03-22 17:17:31,330 - app.main - INFO - Request completed | id=1674445f method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.69
+2026-03-22 17:17:32,831 - app.main - INFO - Request completed | id=b795b9c7 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.20
+2026-03-22 17:17:33,226 - app.ml.pipeline - WARNING - Could not extract feature importances: This OneHotEncoder instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-22 17:17:33,230 - app.ml.pipeline - INFO - ✅ XGBoost trained in 1.62s
+2026-03-22 17:17:33,236 - app.ml.pipeline - INFO - [1f09b413-27f0-410c-97c2-304253104abb] Progress 58%: Training LightGBM...
+2026-03-22 17:17:33,732 - app.ml.pipeline - WARNING - Could not extract feature importances: This OneHotEncoder instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-22 17:17:33,735 - app.ml.pipeline - INFO - ✅ LightGBM trained in 0.11s
+2026-03-22 17:17:33,740 - app.ml.pipeline - INFO - [1f09b413-27f0-410c-97c2-304253104abb] Progress 74%: Training Gradient Boosting...
+2026-03-22 17:17:34,330 - app.main - INFO - Request completed | id=8bbf801d method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.90
+2026-03-22 17:17:35,831 - app.main - INFO - Request completed | id=d3dea1e2 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.29
+2026-03-22 17:17:37,330 - app.main - INFO - Request completed | id=c8eb7259 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.97
+2026-03-22 17:17:38,831 - app.main - INFO - Request completed | id=8a63a6fe method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.18
+2026-03-22 17:17:40,330 - app.main - INFO - Request completed | id=15f964c1 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.92
+2026-03-22 17:17:41,830 - app.main - INFO - Request completed | id=61ab65fb method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.11
+2026-03-22 17:17:43,330 - app.main - INFO - Request completed | id=9f1291ac method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.91
+2026-03-22 17:17:44,830 - app.main - INFO - Request completed | id=cf75d217 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.09
+2026-03-22 17:17:46,330 - app.main - INFO - Request completed | id=3834bfd1 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=1.75
+2026-03-22 17:17:47,830 - app.main - INFO - Request completed | id=67cadab8 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.25
+2026-03-22 17:17:49,330 - app.main - INFO - Request completed | id=e8b5c088 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.20
+2026-03-22 17:17:50,830 - app.main - INFO - Request completed | id=1737d0c3 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.16
+2026-03-22 17:17:51,052 - app.ml.pipeline - WARNING - Could not extract feature importances: This OneHotEncoder instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-22 17:17:51,055 - app.ml.pipeline - INFO - ✅ Gradient Boosting trained in 2.74s
+2026-03-22 17:17:51,061 - app.ml.pipeline - INFO - [1f09b413-27f0-410c-97c2-304253104abb] Progress 100%: Training complete!
+2026-03-22 17:17:51,069 - app.api.training - INFO - ✅ Training job 1f09b413-27f0-410c-97c2-304253104abb completed
+2026-03-22 17:17:52,331 - app.main - INFO - Request completed | id=1400d376 method=GET path=/api/training-status/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=2.36
+2026-03-22 17:17:58,508 - app.main - INFO - Request completed | id=2a4cc16b method=GET path=/api/training-jobs status=200 duration_ms=6.97
+2026-03-22 17:17:58,514 - app.main - INFO - Request completed | id=f7a07c2b method=GET path=/api/datasets status=200 duration_ms=12.20
+2026-03-22 17:17:58,517 - app.main - INFO - Request completed | id=3b81b8ed method=GET path=/api/training-jobs status=200 duration_ms=5.64
+2026-03-22 17:17:58,517 - app.main - INFO - Request completed | id=21696a63 method=GET path=/api/metrics/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=15.60
+2026-03-22 17:17:58,528 - app.main - INFO - Request completed | id=2f798b0c method=GET path=/api/datasets status=200 duration_ms=10.94
+2026-03-22 17:17:58,529 - app.main - INFO - Request completed | id=328e0926 method=GET path=/api/metrics/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=9.04
+2026-03-22 17:18:10,135 - app.ml.pipeline - WARNING - LIME explanation failed: The truth value of a Index is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+2026-03-22 17:18:10,137 - app.main - INFO - Request completed | id=50a6e836 method=GET path=/api/models/14/lime status=200 duration_ms=33.14
+2026-03-22 17:18:10,539 - app.ml.pipeline - WARNING - SHAP explanation failed: The truth value of a Index is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+2026-03-22 17:18:10,540 - app.main - INFO - Request completed | id=e7f7b39c method=GET path=/api/models/14/shap status=200 duration_ms=436.64
+2026-03-22 17:18:17,065 - app.main - INFO - Request completed | id=0b459142 method=GET path=/api/models/14/monitoring status=200 duration_ms=2.62
+2026-03-22 17:18:24,655 - app.main - INFO - Request completed | id=de6a8e8f method=GET path=/api/example-datasets status=200 duration_ms=1.20
+2026-03-22 17:18:24,660 - app.main - INFO - Request completed | id=a3cd4993 method=GET path=/api/example-datasets status=200 duration_ms=2.23
+2026-03-22 17:18:24,662 - app.main - INFO - Request completed | id=2e8a0c33 method=GET path=/api/datasets status=200 duration_ms=8.84
+2026-03-22 17:18:24,668 - app.main - INFO - Request completed | id=b7e13c9f method=GET path=/api/datasets status=200 duration_ms=4.14
+2026-03-22 17:18:29,604 - app.main - INFO - Request completed | id=d980b593 method=POST path=/api/load-example/iris status=200 duration_ms=1.95
+2026-03-22 17:18:29,611 - app.main - INFO - Request completed | id=8ed68d50 method=GET path=/api/datasets status=200 duration_ms=4.35
+2026-03-22 17:18:32,929 - app.main - INFO - Request completed | id=d8790068 method=GET path=/api/datasets status=200 duration_ms=4.05
+2026-03-22 17:18:32,936 - app.main - INFO - Request completed | id=90f4ce4e method=GET path=/api/datasets status=200 duration_ms=3.94
+2026-03-22 17:18:54,988 - app.api.training - INFO - 🚀 Training job c452a7e8-1151-411e-b797-6be19a7de74f queued
+2026-03-22 17:18:54,989 - app.main - INFO - Request completed | id=06765150 method=POST path=/api/train-model status=200 duration_ms=7.84
+2026-03-22 17:18:55,015 - app.ml.pipeline - INFO - [c452a7e8-1151-411e-b797-6be19a7de74f] Progress 5%: Preprocessing data...
+2026-03-22 17:18:55,028 - app.ml.pipeline - INFO - Task type detected: classification
+2026-03-22 17:18:55,033 - app.ml.pipeline - INFO - [c452a7e8-1151-411e-b797-6be19a7de74f] Progress 10%: Training Logistic Regression...
+2026-03-22 17:18:55,410 - app.ml.pipeline - INFO - ✅ Logistic Regression trained in 0.04s
+2026-03-22 17:18:55,417 - app.ml.pipeline - INFO - [c452a7e8-1151-411e-b797-6be19a7de74f] Progress 26%: Training Random Forest...
+2026-03-22 17:18:56,496 - app.main - INFO - Request completed | id=d2fe4c5b method=GET path=/api/training-status/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=2.90
+2026-03-22 17:18:57,995 - app.main - INFO - Request completed | id=d68da222 method=GET path=/api/training-status/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=2.07
+2026-03-22 17:18:59,496 - app.main - INFO - Request completed | id=ed98b82b method=GET path=/api/training-status/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=2.60
+2026-03-22 17:19:00,802 - app.ml.pipeline - INFO - ✅ Random Forest trained in 0.91s
+2026-03-22 17:19:00,807 - app.ml.pipeline - INFO - [c452a7e8-1151-411e-b797-6be19a7de74f] Progress 42%: Training XGBoost...
+2026-03-22 17:19:00,997 - app.main - INFO - Request completed | id=2f92f101 method=GET path=/api/training-status/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=2.88
+2026-03-22 17:19:01,765 - app.ml.pipeline - INFO - ✅ XGBoost trained in 0.11s
+2026-03-22 17:19:01,770 - app.ml.pipeline - INFO - [c452a7e8-1151-411e-b797-6be19a7de74f] Progress 58%: Training LightGBM...
+2026-03-22 17:19:02,464 - app.ml.pipeline - INFO - ✅ LightGBM trained in 0.14s
+2026-03-22 17:19:02,468 - app.ml.pipeline - INFO - [c452a7e8-1151-411e-b797-6be19a7de74f] Progress 74%: Training Gradient Boosting...
+2026-03-22 17:19:02,497 - app.main - INFO - Request completed | id=f1d57bd8 method=GET path=/api/training-status/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=2.99
+2026-03-22 17:19:03,995 - app.main - INFO - Request completed | id=f9b566dc method=GET path=/api/training-status/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=1.91
+2026-03-22 17:19:05,495 - app.main - INFO - Request completed | id=a1ebfe19 method=GET path=/api/training-status/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=2.05
+2026-03-22 17:19:06,995 - app.main - INFO - Request completed | id=7358de37 method=GET path=/api/training-status/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=1.87
+2026-03-22 17:19:08,495 - app.main - INFO - Request completed | id=d335fb49 method=GET path=/api/training-status/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=1.83
+2026-03-22 17:19:09,995 - app.main - INFO - Request completed | id=53a1a45a method=GET path=/api/training-status/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=1.92
+2026-03-22 17:19:11,144 - app.ml.pipeline - INFO - ✅ Gradient Boosting trained in 1.46s
+2026-03-22 17:19:11,149 - app.ml.pipeline - INFO - [c452a7e8-1151-411e-b797-6be19a7de74f] Progress 100%: Training complete!
+2026-03-22 17:19:11,159 - app.api.training - INFO - ✅ Training job c452a7e8-1151-411e-b797-6be19a7de74f completed
+2026-03-22 17:19:11,495 - app.main - INFO - Request completed | id=738e1bbb method=GET path=/api/training-status/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=2.21
+2026-03-22 17:19:16,128 - app.main - INFO - Request completed | id=a89adac2 method=GET path=/api/training-jobs status=200 duration_ms=7.08
+2026-03-22 17:19:16,147 - app.main - INFO - Request completed | id=af79a4e4 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=25.36
+2026-03-22 17:19:16,148 - app.main - INFO - Request completed | id=548e01a6 method=GET path=/api/datasets status=200 duration_ms=26.41
+2026-03-22 17:19:16,152 - app.main - INFO - Request completed | id=b168e202 method=GET path=/api/training-jobs status=200 duration_ms=12.37
+2026-03-22 17:19:16,169 - app.main - INFO - Request completed | id=9ec4d3a0 method=GET path=/api/datasets status=200 duration_ms=18.53
+2026-03-22 17:19:16,178 - app.main - INFO - Request completed | id=508a60f2 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=26.56
+2026-03-22 17:19:22,727 - app.ml.pipeline - WARNING - LIME explanation failed: The truth value of a Index is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+2026-03-22 17:19:22,729 - app.main - INFO - Request completed | id=b9172415 method=GET path=/api/models/20/lime status=200 duration_ms=45.72
+2026-03-22 17:19:22,766 - app.ml.pipeline - WARNING - SHAP explanation failed: The truth value of a Index is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+2026-03-22 17:19:22,767 - app.main - INFO - Request completed | id=b75c32c1 method=GET path=/api/models/20/shap status=200 duration_ms=84.66
+2026-03-22 17:19:25,086 - app.main - INFO - Request completed | id=fb0ebd75 method=GET path=/api/models/20/monitoring status=200 duration_ms=3.18
+2026-03-22 17:20:01,145 - app.main - INFO - Request completed | id=83dfc641 method=GET path=/api/models/20/monitoring status=200 duration_ms=32.47
+2026-03-22 17:20:44,277 - app.main - INFO - Request completed | id=d1f706ec method=GET path=/api/deployed-models status=200 duration_ms=4.58
+2026-03-22 17:20:44,282 - app.main - INFO - Request completed | id=f7d9f268 method=GET path=/api/deployed-models status=200 duration_ms=3.01
+2026-03-22 17:20:46,622 - app.main - INFO - Request completed | id=d19d3a81 method=GET path=/api/training-jobs status=200 duration_ms=2.56
+2026-03-22 17:20:46,637 - app.main - INFO - Request completed | id=c3e88d96 method=GET path=/api/datasets status=200 duration_ms=11.31
+2026-03-22 17:20:46,640 - app.main - INFO - Request completed | id=6a6e2534 method=GET path=/api/training-jobs status=200 duration_ms=12.64
+2026-03-22 17:20:46,656 - app.main - INFO - Request completed | id=f56692e9 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=24.05
+2026-03-22 17:20:46,661 - app.main - INFO - Request completed | id=32d7319f method=GET path=/api/datasets status=200 duration_ms=11.45
