@@ -419,12 +419,17 @@ export default function TrainingPage() {
 
           <button
             onClick={startTraining}
-            disabled={training || !selectedDataset || !targetColumn}
+            disabled={training}
             className="btn-primary w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {training ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
             {training ? "Training..." : "Start AutoML Training"}
           </button>
+          {!selectedDataset || !targetColumn ? (
+            <p className="mt-2 text-xs text-amber-300">
+              Select a dataset and target column to start training.
+            </p>
+          ) : null}
         </div>
 
         {/* Models to train */}
