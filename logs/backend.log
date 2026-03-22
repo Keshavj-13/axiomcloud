@@ -411,3 +411,6 @@
 2026-03-22 17:29:05,673 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
 2026-03-22 17:29:05,673 - app.main - INFO - 📊 Model storage: ./storage/models
 2026-03-22 17:29:05,673 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:30:39,618 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:30:39,618 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:30:39,619 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
