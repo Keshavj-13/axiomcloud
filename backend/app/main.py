@@ -14,9 +14,10 @@ import os
 from time import perf_counter
 from uuid import uuid4
 
-from app.api import datasets, training, models, predictions, metrics
+from app.api import datasets, training, models, predictions, metrics, auth
 from app.core.config import settings
 from app.core.database import engine, Base
+from sqlalchemy.exc import OperationalError
 
 
 # File-based logging setup
@@ -70,6 +71,7 @@ app.include_router(training.router, prefix="/api", tags=["Training"])
 app.include_router(models.router, prefix="/api", tags=["Models"])
 app.include_router(predictions.router, prefix="/api", tags=["Predictions"])
 app.include_router(metrics.router, prefix="/api", tags=["Metrics"])
+app.include_router(auth.router, prefix="/api", tags=["Auth"])
 
 
 @app.middleware("http")
@@ -142,20 +144,21 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 @app.on_event("startup")
 async def startup_event():
     """Initialize database tables on startup."""
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+    except OperationalError as exc:
+        if "already exists" not in str(exc).lower():
+            raise
+        logger.warning("Startup table creation race detected, continuing: %s", exc)
     logger.info("Axiom Cloud AI started successfully")
     logger.info(f"Model storage: {settings.MODEL_STORAGE_PATH}")
     logger.info(f"Dataset storage: {settings.DATASET_STORAGE_PATH}")
 
 
 @app.get("/api/health")
-async def health_check():
+def health():
     """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "service": "Axiom Cloud AI",
-        "version": "1.0.0"
-    }
+    return {"status": "ok"}
 
 
 @app.get("/")

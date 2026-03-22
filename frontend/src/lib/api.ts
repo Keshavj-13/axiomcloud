@@ -107,4 +107,10 @@ export const predictionsAPI = {
     api.post("/predict", { model_id: modelId, features }),
 };
 
+export const authAPI = {
+  syncUser: (payload: { firebase_uid: string; email: string; display_name?: string }) =>
+    api.post("/auth/user", null, { params: payload }),
+  getUser: (firebaseUid: string) => api.get(`/auth/user/${firebaseUid}`),
+};
+
 export default api;

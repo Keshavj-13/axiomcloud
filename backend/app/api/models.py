@@ -5,9 +5,10 @@ List, retrieve, deploy, and download trained models.
 import os
 import logging
 import random
+import json
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, Body
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from sqlalchemy.orm import Session
 from typing import List
 import numpy as np
@@ -71,7 +72,21 @@ def list_models(
             query = query.filter(TrainedModel.job_id == job_id)
         models = query.order_by(TrainedModel.created_at.desc()).all()
         
-        # Manually serialize to handle potential datetime issues
+        def clean_value(val):
+            """Recursively clean NaN/inf from nested structures."""
+            if val is None:
+                return None
+            if isinstance(val, dict):
+                return {k: clean_value(v) for k, v in val.items()}
+            if isinstance(val, list):
+                return [clean_value(v) for v in val]
+            if isinstance(val, float):
+                if np.isnan(val) or np.isinf(val):
+                    return None
+                return val
+            return val
+        
+        # Manually serialize to handle NaN/inf values recursively
         result = []
         for m in models:
             result.append({
@@ -81,21 +96,23 @@ def list_models(
                 "model_type": m.model_type,
                 "task_type": m.task_type,
                 "is_deployed": m.is_deployed,
-                "accuracy": m.accuracy,
-                "f1_score": m.f1_score,
-                "roc_auc": m.roc_auc,
-                "rmse": m.rmse,
-                "mae": m.mae,
-                "r2_score": m.r2_score,
-                "metrics": m.metrics,
-                "feature_importance": m.feature_importance,
-                "confusion_matrix": m.confusion_matrix,
-                "roc_curve_data": m.roc_curve_data,
-                "cv_scores": m.cv_scores,
-                "training_time": m.training_time,
+                "accuracy": clean_value(m.accuracy),
+                "f1_score": clean_value(m.f1_score),
+                "roc_auc": clean_value(m.roc_auc),
+                "rmse": clean_value(m.rmse),
+                "mae": clean_value(m.mae),
+                "r2_score": clean_value(m.r2_score),
+                "metrics": clean_value(m.metrics),
+                "feature_importance": clean_value(m.feature_importance),
+                "confusion_matrix": clean_value(m.confusion_matrix),
+                "roc_curve_data": clean_value(m.roc_curve_data),
+                "cv_scores": clean_value(m.cv_scores),
+                "training_time": clean_value(m.training_time),
                 "created_at": m.created_at.isoformat() if m.created_at else None,
             })
-        return result
+        
+        # Use JSONResponse to ensure proper encoding
+        return JSONResponse(content=result)
     except Exception as exc:
         logger.error("Error listing models: %s", exc, exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to list models: {str(exc)}")

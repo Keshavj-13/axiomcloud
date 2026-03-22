@@ -28,7 +28,11 @@ export default function DeployPage() {
       } else {
         setEndpointModelId("");
       }
-    } catch { toast.error("Could not load models"); }
+    } catch (e: any) {
+      const msg = e?.response?.data?.detail || e?.message || "Could not load models";
+      toast.error(msg);
+      console.error("Failed to fetch models:", e);
+    }
     finally { setLoading(false); }
   };
 
