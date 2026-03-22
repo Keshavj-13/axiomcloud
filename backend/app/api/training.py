@@ -22,6 +22,9 @@ logger = logging.getLogger(__name__)
 
 # In-memory progress tracking (use Redis in production)
 _job_progress: dict = {}
+MAX_TRAINING_ROWS = 50_000
+MAX_MODELS_PER_RUN = 5
+MAX_CV_FOLDS = 5
 
 
 def _model_catalog_payload() -> dict:
@@ -204,7 +207,20 @@ async def train_model(
         raise HTTPException(status_code=400, detail=f"Target column '{config.target_column}' not found in dataset")
 
     catalog = _model_catalog_payload()
+
+    if config.cv_folds and config.cv_folds > MAX_CV_FOLDS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"cv_folds cannot exceed {MAX_CV_FOLDS} for demo tier",
+        )
+
     if config.models_to_train:
+        if len(config.models_to_train) > MAX_MODELS_PER_RUN:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Select at most {MAX_MODELS_PER_RUN} models per run",
+            )
+
         invalid = sorted(set(config.models_to_train) - set(catalog["all"]))
         if invalid:
             raise HTTPException(
@@ -229,7 +245,14 @@ async def train_model(
 
     try:
         baseline_df = _read_dataset_file(dataset.file_path)
+        if len(baseline_df) > MAX_TRAINING_ROWS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Dataset too large for demo tier. Max {MAX_TRAINING_ROWS} rows.",
+            )
         drift_baseline = build_drift_baseline_snapshot(baseline_df, target_column=config.target_column)
+    except HTTPException:
+        raise
     except Exception as exc:
         logger.warning("Could not build drift baseline snapshot for dataset=%s reason=%s", dataset.id, exc)
         drift_baseline = None

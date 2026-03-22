@@ -21,7 +21,7 @@ from app.core.config import settings
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
 
 
 def analyze_dataframe(df: pd.DataFrame) -> List[dict]:
@@ -229,7 +229,7 @@ async def upload_dataset(
 
     content = await file.read()
     if len(content) > MAX_FILE_SIZE:
-        raise HTTPException(status_code=413, detail="File too large. Max 50MB.")
+        raise HTTPException(status_code=413, detail="File too large. Max 5MB.")
 
     # Save file
     file_id = str(uuid.uuid4())[:8]

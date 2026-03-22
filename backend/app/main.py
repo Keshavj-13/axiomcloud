@@ -3,7 +3,7 @@ Axiom Cloud AI - FastAPI Backend
 Production-grade AutoML Platform
 """
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
@@ -15,6 +15,7 @@ from time import perf_counter
 from uuid import uuid4
 
 from app.api import datasets, training, models, predictions, metrics, auth
+from app.api.deps import get_current_user
 from app.core.config import settings
 from app.core.database import engine, Base
 from sqlalchemy.exc import OperationalError
@@ -66,11 +67,11 @@ os.makedirs(settings.DATASET_STORAGE_PATH, exist_ok=True)
 app.mount("/static/models", StaticFiles(directory=settings.MODEL_STORAGE_PATH), name="models")
 
 # Include routers
-app.include_router(datasets.router, prefix="/api", tags=["Datasets"])
-app.include_router(training.router, prefix="/api", tags=["Training"])
-app.include_router(models.router, prefix="/api", tags=["Models"])
-app.include_router(predictions.router, prefix="/api", tags=["Predictions"])
-app.include_router(metrics.router, prefix="/api", tags=["Metrics"])
+app.include_router(datasets.router, prefix="/api", tags=["Datasets"], dependencies=[Depends(get_current_user)])
+app.include_router(training.router, prefix="/api", tags=["Training"], dependencies=[Depends(get_current_user)])
+app.include_router(models.router, prefix="/api", tags=["Models"], dependencies=[Depends(get_current_user)])
+app.include_router(predictions.router, prefix="/api", tags=["Predictions"], dependencies=[Depends(get_current_user)])
+app.include_router(metrics.router, prefix="/api", tags=["Metrics"], dependencies=[Depends(get_current_user)])
 app.include_router(auth.router, prefix="/api", tags=["Auth"])
 
 
