@@ -1,6 +1,6 @@
-# SigmaCloud AI Deployment Guide
+# Axiom Cloud AI Deployment Guide
 
-This guide deploys SigmaCloud AI with Docker using the existing `docker-compose.yml`.
+This guide deploys Axiom Cloud AI with Docker using the existing `docker-compose.yml`.
 
 ## 1. Prerequisites on server
 

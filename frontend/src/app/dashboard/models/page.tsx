@@ -93,11 +93,11 @@ export default function ModelsPage() {
 
   const leaderboardData = metrics?.models.map(m => ({
     name: m.model_name,
-    Accuracy: m.accuracy ? +(m.accuracy * 100).toFixed(1) : undefined,
-    "R²": m.r2_score ? +(m.r2_score * 100).toFixed(1) : undefined,
-    F1: m.f1_score ? +(m.f1_score * 100).toFixed(1) : undefined,
-    "ROC-AUC": m.roc_auc ? +(m.roc_auc * 100).toFixed(1) : undefined,
-    "Training Time (s)": m.training_time ? +m.training_time.toFixed(2) : undefined,
+    Accuracy: m.accuracy !== undefined && m.accuracy !== null ? +(m.accuracy * 100).toFixed(1) : undefined,
+    "R²": m.r2_score !== undefined && m.r2_score !== null ? +(m.r2_score * 100).toFixed(1) : undefined,
+    F1: m.f1_score !== undefined && m.f1_score !== null ? +(m.f1_score * 100).toFixed(1) : undefined,
+    "ROC-AUC": m.roc_auc !== undefined && m.roc_auc !== null ? +(m.roc_auc * 100).toFixed(1) : undefined,
+    "Training Time (s)": m.training_time !== undefined && m.training_time !== null ? +m.training_time.toFixed(2) : undefined,
   })) || [];
 
   const featureImportanceData = selectedModel?.feature_importance
@@ -162,6 +162,12 @@ export default function ModelsPage() {
                     {metrics.best_model.accuracy && (
                       <span className="metric-badge bg-blue-900/40 text-blue-300">Accuracy: {(metrics.best_model.accuracy * 100).toFixed(1)}%</span>
                     )}
+                    {metrics.best_model.precision !== undefined && metrics.best_model.precision !== null && (
+                      <span className="metric-badge bg-fuchsia-900/40 text-fuchsia-300">Precision: {(metrics.best_model.precision * 100).toFixed(1)}%</span>
+                    )}
+                    {metrics.best_model.recall !== undefined && metrics.best_model.recall !== null && (
+                      <span className="metric-badge bg-indigo-900/40 text-indigo-300">Recall: {(metrics.best_model.recall * 100).toFixed(1)}%</span>
+                    )}
                     {metrics.best_model.f1_score && (
                       <span className="metric-badge bg-cyan-900/40 text-cyan-300">F1: {(metrics.best_model.f1_score * 100).toFixed(1)}%</span>
                     )}
@@ -173,6 +179,9 @@ export default function ModelsPage() {
                     )}
                     {metrics.best_model.rmse && (
                       <span className="metric-badge bg-red-900/40 text-red-300">RMSE: {metrics.best_model.rmse.toFixed(3)}</span>
+                    )}
+                    {metrics.best_model.mape !== undefined && metrics.best_model.mape !== null && (
+                      <span className="metric-badge bg-orange-900/40 text-orange-300">MAPE: {(metrics.best_model.mape * 100).toFixed(2)}%</span>
                     )}
                   </div>
                 </div>
@@ -223,6 +232,18 @@ export default function ModelsPage() {
                       <span className="font-mono text-text-primary">{(model.roc_auc * 100).toFixed(1)}%</span>
                     </div>
                   )}
+                  {model.precision !== undefined && model.precision !== null && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-text-muted">Precision</span>
+                      <span className="font-mono text-text-primary">{(model.precision * 100).toFixed(1)}%</span>
+                    </div>
+                  )}
+                  {model.recall !== undefined && model.recall !== null && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-text-muted">Recall</span>
+                      <span className="font-mono text-text-primary">{(model.recall * 100).toFixed(1)}%</span>
+                    </div>
+                  )}
                   {model.r2_score !== undefined && model.r2_score !== null && (
                     <div className="flex justify-between text-xs">
                       <span className="text-text-muted">R² Score</span>
@@ -233,6 +254,18 @@ export default function ModelsPage() {
                     <div className="flex justify-between text-xs">
                       <span className="text-text-muted">RMSE</span>
                       <span className="font-mono text-text-primary">{model.rmse.toFixed(3)}</span>
+                    </div>
+                  )}
+                  {model.mape !== undefined && model.mape !== null && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-text-muted">MAPE</span>
+                      <span className="font-mono text-text-primary">{(model.mape * 100).toFixed(2)}%</span>
+                    </div>
+                  )}
+                  {model.explained_variance !== undefined && model.explained_variance !== null && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-text-muted">Explained Variance</span>
+                      <span className="font-mono text-text-primary">{model.explained_variance.toFixed(3)}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-xs">
@@ -396,22 +429,14 @@ export default function ModelsPage() {
                 <div className="text-sm font-semibold text-white mb-2">Global SHAP Impact (sample avg)</div>
                 {shapData?.error ? (
                   <p className="text-xs text-red-400">{shapData.error}</p>
-                ) : (shapData?.shap_values && shapData?.feature_names && Array.isArray(shapData.shap_values) ? (
+                ) : (shapData?.global_importance?.length ? (
                   <div className="space-y-1.5 text-xs">
-                    {shapData.feature_names.slice(0, 10).map((f, idx) => {
-                      const values = (shapData.shap_values as any[])
-                        .map((row: any) => Array.isArray(row) ? row[idx] : 0)
-                        .filter((v: any) => typeof v === "number");
-                      const meanAbs = values.length > 0
-                        ? values.reduce((a: number, b: number) => a + Math.abs(b), 0) / values.length
-                        : 0;
-                      return (
-                        <div key={f} className="flex justify-between">
-                          <span className="text-sigma-400 truncate pr-3">{f}</span>
-                          <span className="text-sigma-200 font-mono">{meanAbs.toFixed(4)}</span>
-                        </div>
-                      );
-                    })}
+                    {shapData.global_importance.slice(0, 10).map((item) => (
+                      <div key={item.feature} className="flex justify-between">
+                        <span className="text-sigma-400 truncate pr-3">{item.feature}</span>
+                        <span className="text-sigma-200 font-mono">{item.importance.toFixed(4)}</span>
+                      </div>
+                    ))}
                   </div>
                 ) : <p className="text-xs text-sigma-500">Load explanations to view SHAP summary.</p>)}
               </div>

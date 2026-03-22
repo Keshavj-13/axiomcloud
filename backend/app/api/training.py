@@ -1,5 +1,5 @@
 """
-SigmaCloud AI - Training API Router
+Axiom Cloud AI - Training API Router
 Launches AutoML training jobs (sync for simplicity, async with Celery in prod).
 """
 import uuid

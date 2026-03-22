@@ -1,5 +1,5 @@
 """
-SigmaCloud AI - Database Configuration
+Axiom Cloud AI - Database Configuration
 SQLAlchemy setup with SQLite (dev) / PostgreSQL (prod)
 """
 from sqlalchemy import create_engine

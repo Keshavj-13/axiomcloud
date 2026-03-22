@@ -1,5 +1,5 @@
 """
-SigmaCloud AI - Predictions API Router
+Axiom Cloud AI - Predictions API Router
 Run inference on deployed models.
 """
 import joblib

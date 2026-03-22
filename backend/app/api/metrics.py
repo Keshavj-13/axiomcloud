@@ -1,5 +1,5 @@
 """
-SigmaCloud AI - Metrics API Router
+Axiom Cloud AI - Metrics API Router
 Returns comparison metrics and visualization data.
 """
 import logging

@@ -31,7 +31,7 @@ export default function LandingPage() {
             <div className="w-8 h-8 rounded-lg bg-sigma-600 flex items-center justify-center">
               <Activity className="w-4 h-4 text-white" />
             </div>
-            <span className="font-display font-bold text-white tracking-tight">SigmaCloud AI</span>
+            <span className="font-display font-bold text-white tracking-tight">Axiom Cloud AI</span>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="btn-primary text-sm py-2">
@@ -61,7 +61,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-[#8b97b8] text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-            SigmaCloud AI is an AutoML platform that lets you upload datasets,
+            Axiom Cloud AI is an AutoML platform that lets you upload datasets,
             automatically train and compare models, visualize results, and
             deploy predictions — all from a single dashboard.
           </p>
@@ -149,7 +149,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-sigma-900/50 py-8 px-6 text-center text-sigma-600 text-sm font-mono">
-        SigmaCloud AI — Built with FastAPI + Next.js + scikit-learn + XGBoost + LightGBM
+        Axiom Cloud AI — Built with FastAPI + Next.js + scikit-learn + XGBoost + LightGBM
       </footer>
     </div>
   );

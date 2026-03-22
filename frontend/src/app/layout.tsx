@@ -3,7 +3,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
-  title: "SigmaCloud AI — AutoML Platform",
+  title: "Axiom Cloud AI — AutoML Platform",
   description: "Upload datasets, train models automatically, visualize results, and deploy predictions.",
   icons: { icon: "/favicon.ico" },
 };

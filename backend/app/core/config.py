@@ -1,5 +1,5 @@
 """
-SigmaCloud AI - Core Configuration
+Axiom Cloud AI - Core Configuration
 """
 from pydantic_settings import BaseSettings
 from typing import List
@@ -8,7 +8,7 @@ import os
 
 class Settings(BaseSettings):
     # App
-    APP_NAME: str = "SigmaCloud AI"
+    APP_NAME: str = "Axiom Cloud AI"
     VERSION: str = "1.0.0"
     DEBUG: bool = False
 

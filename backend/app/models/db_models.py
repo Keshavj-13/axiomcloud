@@ -1,5 +1,5 @@
 """
-SigmaCloud AI - SQLAlchemy Database Models
+Axiom Cloud AI - SQLAlchemy Database Models
 """
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, Text, JSON, ForeignKey
 from sqlalchemy.orm import relationship

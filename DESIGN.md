@@ -1,4 +1,4 @@
-# SigmaCloud UI Design Spec (Target)
+# Axiom Cloud UI Design Spec (Target)
 
 This document defines the **new visual system and page behavior** we will follow going forward.
 

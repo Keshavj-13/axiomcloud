@@ -1,5 +1,5 @@
 """
-SigmaCloud AI - Models API Router
+Axiom Cloud AI - Models API Router
 List, retrieve, deploy, and download trained models.
 """
 import os

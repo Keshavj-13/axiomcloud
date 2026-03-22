@@ -1,5 +1,5 @@
 """
-SigmaCloud AI - Pydantic Schemas for API validation
+Axiom Cloud AI - Pydantic Schemas for API validation
 """
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any

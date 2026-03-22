@@ -1,5 +1,5 @@
 """
-SigmaCloud AI - Example Dataset Loaders
+Axiom Cloud AI - Example Dataset Loaders
 Provides California Housing, Titanic, and Breast Cancer datasets.
 """
 import pandas as pd

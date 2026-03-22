@@ -1,5 +1,5 @@
 """
-SigmaCloud AI - AutoML Pipeline
+Axiom Cloud AI - AutoML Pipeline
 Automatically detects task type, preprocesses data, trains multiple models,
 evaluates performance, and saves results.
 """
@@ -35,8 +35,7 @@ from sklearn.metrics import (
     mean_squared_error, mean_absolute_error, r2_score,
     confusion_matrix, roc_curve, classification_report,
     precision_score, recall_score, balanced_accuracy_score,
-    explained_variance_score, median_absolute_error,
-    mean_absolute_percentage_error
+    explained_variance_score, median_absolute_error
 )
 
 from app.core.config import settings

@@ -1,4 +1,4 @@
-# 🚀 SigmaCloud AI — AutoML Platform
+# 🚀 Axiom Cloud AI — AutoML Platform
 
 > A production-grade, full-stack AutoML platform. Upload datasets, train ML models automatically, compare performance on an interactive leaderboard, and deploy models for live predictions.
 
@@ -6,7 +6,7 @@
 
 ## 📸 Platform Overview
 
-SigmaCloud AI mirrors the core workflow of Google Vertex AI and Kaggle AutoML:
+Axiom Cloud AI mirrors the core workflow of Google Vertex AI and Kaggle AutoML:
 
 | Feature | Details |
 |---|---|
@@ -38,7 +38,7 @@ We are focusing on these next-phase goals:
 ## 🏗️ Architecture
 
 ```
-sigmacloud/
+axiom-cloud-ai/
 ├── backend/                   # FastAPI + Python ML backend
 │   ├── app/
 │   │   ├── main.py            # FastAPI app entry point
@@ -98,8 +98,8 @@ sigmacloud/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/sigmacloud-ai.git
-cd sigmacloud-ai
+git clone https://github.com/yourusername/axiom-cloud-ai.git
+cd axiom-cloud-ai
 ```
 
 ### 2. Backend Setup
@@ -311,4 +311,4 @@ This project demonstrates:
 
 ## 📄 License
 
-MIT © SigmaCloud AI
+MIT © Axiom Cloud AI

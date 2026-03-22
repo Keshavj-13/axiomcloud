@@ -27,7 +27,7 @@ export default function Sidebar() {
             <Activity className="h-5 w-5 text-text-primary" />
           </div>
           <div>
-            <div className="font-display text-sm font-semibold tracking-wide text-text-primary">SigmaCloud</div>
+            <div className="font-display text-sm font-semibold tracking-wide text-text-primary">Axiom Cloud</div>
             <div className="text-[10px] uppercase tracking-[0.14em] text-text-muted">ML Control Plane</div>
           </div>
         </Link>
@@ -58,7 +58,7 @@ export default function Sidebar() {
       {/* Footer */}
       <div className="border-t border-outline/25 p-4">
         <div className="text-center font-mono text-xs text-text-muted">
-          sigma v1.0.0
+          axiom v1.0.0
         </div>
       </div>
     </aside>

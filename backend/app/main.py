@@ -1,5 +1,5 @@
 """
-SigmaCloud AI - FastAPI Backend
+Axiom Cloud AI - FastAPI Backend
 Production-grade AutoML Platform
 """
 
@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 
 # Initialize FastAPI
 app = FastAPI(
-    title="SigmaCloud AI",
+    title="Axiom Cloud AI",
     description="Production-grade AutoML Platform - Train, Compare, and Deploy ML Models",
     version="1.0.0",
     docs_url="/api/docs",
@@ -143,7 +143,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 async def startup_event():
     """Initialize database tables on startup."""
     Base.metadata.create_all(bind=engine)
-    logger.info("🚀 SigmaCloud AI started successfully")
+    logger.info("🚀 Axiom Cloud AI started successfully")
     logger.info(f"📊 Model storage: {settings.MODEL_STORAGE_PATH}")
     logger.info(f"📁 Dataset storage: {settings.DATASET_STORAGE_PATH}")
 
@@ -153,11 +153,11 @@ async def health_check():
     """Health check endpoint."""
     return {
         "status": "healthy",
-        "service": "SigmaCloud AI",
+        "service": "Axiom Cloud AI",
         "version": "1.0.0"
     }
 
 
 @app.get("/")
 async def root():
-    return {"message": "SigmaCloud AI API - Visit /api/docs for documentation"}
+    return {"message": "Axiom Cloud AI API - Visit /api/docs for documentation"}
