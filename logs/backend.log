@@ -414,3 +414,137 @@
 2026-03-22 17:30:39,618 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
 2026-03-22 17:30:39,618 - app.main - INFO - 📊 Model storage: ./storage/models
 2026-03-22 17:30:39,619 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:38:10,198 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:38:10,198 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:38:10,198 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:39:13,369 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:39:13,369 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:39:13,369 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:39:15,238 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:39:15,238 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:39:15,238 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:39:42,056 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:39:42,056 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:39:42,056 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:39:43,749 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:39:43,749 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:39:43,749 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:40:04,687 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:40:04,687 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:40:04,687 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:40:06,379 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:40:06,379 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:40:06,379 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:40:30,550 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:40:30,550 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:40:30,550 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:40:40,355 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:40:40,355 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:40:40,355 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:40:59,504 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:40:59,504 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:40:59,504 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:41:11,744 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:41:11,744 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:41:11,744 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:43:22,279 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:43:22,279 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:43:22,279 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:43:29,202 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:43:29,202 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:43:29,202 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:43:35,764 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:43:35,764 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:43:35,764 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:43:42,617 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:43:42,617 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:43:42,617 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:43:48,808 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:43:48,808 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:43:48,808 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:43:57,978 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:43:57,978 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:43:57,978 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:43:59,235 - app.main - INFO - Request completed | id=f7425b36 method=GET path=/api/models/5/lime status=405 duration_ms=0.64
+2026-03-22 17:43:59,246 - app.main - WARNING - HTTP exception | id=c252bfcd method=GET path=/api/models/5/shap status=404 detail={'error': {'code': 'TRAINING_DATA_NOT_FOUND', 'message': 'Training data not found for SHAP explanation'}}
+2026-03-22 17:43:59,247 - app.main - INFO - Request completed | id=c252bfcd method=GET path=/api/models/5/shap status=404 duration_ms=13.45
+2026-03-22 17:44:09,297 - app.main - INFO - Request completed | id=5050c6c8 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=83.45
+2026-03-22 17:44:14,083 - app.main - INFO - Request completed | id=0c0cf1a7 method=GET path=/api/metrics/1f09b413-27f0-410c-97c2-304253104abb status=200 duration_ms=52.43
+2026-03-22 17:44:29,442 - app.main - INFO - Request completed | id=cc4f5c73 method=GET path=/api/training-jobs status=200 duration_ms=5.90
+2026-03-22 17:44:29,447 - app.main - INFO - Request completed | id=eea02439 method=GET path=/api/datasets status=200 duration_ms=8.58
+2026-03-22 17:44:29,450 - app.main - INFO - Request completed | id=8edff8c2 method=GET path=/api/training-jobs status=200 duration_ms=5.55
+2026-03-22 17:44:29,456 - app.main - INFO - Request completed | id=2fbc763f method=GET path=/api/datasets status=200 duration_ms=5.20
+2026-03-22 17:44:29,595 - app.main - INFO - Request completed | id=b3a34bc9 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=85.92
+2026-03-22 17:44:32,582 - app.main - INFO - Request completed | id=bed9afb2 method=GET path=/api/metrics/5c86be77-25ea-4b9a-ad42-58d8d2a4f98a status=200 duration_ms=79.20
+2026-03-22 17:45:30,241 - app.main - INFO - Request completed | id=f0963398 method=GET path=/api/training-jobs status=200 duration_ms=4.50
+2026-03-22 17:45:30,246 - app.main - INFO - Request completed | id=0678b24f method=GET path=/api/datasets status=200 duration_ms=7.96
+2026-03-22 17:45:30,247 - app.main - INFO - Request completed | id=0f0b900a method=GET path=/api/training-jobs status=200 duration_ms=3.52
+2026-03-22 17:45:30,253 - app.main - INFO - Request completed | id=7619c09d method=GET path=/api/datasets status=200 duration_ms=5.27
+2026-03-22 17:45:30,380 - app.main - INFO - Request completed | id=7332f56a method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=84.78
+2026-03-22 17:46:46,598 - app.main - INFO - Request completed | id=8b74009d method=GET path=/api/training-jobs status=200 duration_ms=5.28
+2026-03-22 17:46:46,602 - app.main - INFO - Request completed | id=41f48ec7 method=GET path=/api/datasets status=200 duration_ms=8.86
+2026-03-22 17:46:46,606 - app.main - INFO - Request completed | id=9ded6590 method=GET path=/api/training-jobs status=200 duration_ms=5.36
+2026-03-22 17:46:46,612 - app.main - INFO - Request completed | id=42a676f5 method=GET path=/api/datasets status=200 duration_ms=6.87
+2026-03-22 17:46:46,740 - app.main - INFO - Request completed | id=43a2f697 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=89.14
+2026-03-22 17:47:08,405 - app.main - INFO - Request completed | id=b01d0dec method=GET path=/api/training-jobs status=200 duration_ms=4.10
+2026-03-22 17:47:08,410 - app.main - INFO - Request completed | id=93f750f7 method=GET path=/api/datasets status=200 duration_ms=7.44
+2026-03-22 17:47:08,413 - app.main - INFO - Request completed | id=74a13095 method=GET path=/api/training-jobs status=200 duration_ms=4.43
+2026-03-22 17:47:08,418 - app.main - INFO - Request completed | id=8cc27270 method=GET path=/api/datasets status=200 duration_ms=5.38
+2026-03-22 17:47:08,546 - app.main - INFO - Request completed | id=621376b6 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=86.44
+2026-03-22 17:47:12,132 - app.main - INFO - Request completed | id=e4324581 method=GET path=/api/training-jobs status=200 duration_ms=3.95
+2026-03-22 17:47:12,136 - app.main - INFO - Request completed | id=4b6368a8 method=GET path=/api/datasets status=200 duration_ms=7.73
+2026-03-22 17:47:12,140 - app.main - INFO - Request completed | id=b6f13079 method=GET path=/api/training-jobs status=200 duration_ms=5.26
+2026-03-22 17:47:12,147 - app.main - INFO - Request completed | id=20b815c8 method=GET path=/api/datasets status=200 duration_ms=7.73
+2026-03-22 17:47:12,284 - app.main - INFO - Request completed | id=60898371 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=86.93
+2026-03-22 17:47:46,679 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:47:46,679 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:47:46,679 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:47:59,343 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:47:59,344 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:47:59,344 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:48:00,900 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:48:00,900 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:48:00,900 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:48:00,920 - app.main - INFO - Request completed | id=feb12f7a method=GET path=/api/training-jobs status=200 duration_ms=17.04
+2026-03-22 17:48:00,920 - app.main - INFO - Request completed | id=2564b48f method=GET path=/api/datasets status=200 duration_ms=16.42
+2026-03-22 17:48:00,920 - app.main - INFO - Request completed | id=27ca08e9 method=GET path=/api/training-jobs status=200 duration_ms=18.00
+2026-03-22 17:48:00,922 - app.main - INFO - Request completed | id=ef082974 method=GET path=/api/datasets status=200 duration_ms=17.44
+2026-03-22 17:48:01,025 - app.main - INFO - Request completed | id=e79ec923 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=98.59
+2026-03-22 17:48:04,944 - app.main - INFO - Request completed | id=f4a3152c method=GET path=/api/training-jobs status=200 duration_ms=10.03
+2026-03-22 17:48:04,948 - app.main - INFO - Request completed | id=6be31a4a method=GET path=/api/dashboard/summary status=200 duration_ms=14.57
+2026-03-22 17:48:04,954 - app.main - INFO - Request completed | id=e4cab016 method=GET path=/api/training-jobs status=200 duration_ms=4.54
+2026-03-22 17:48:04,958 - app.main - INFO - Request completed | id=f215b671 method=GET path=/api/dashboard/summary status=200 duration_ms=6.96
+2026-03-22 17:48:07,575 - app.main - INFO - Request completed | id=0259cbfc method=GET path=/api/example-datasets status=200 duration_ms=1.01
+2026-03-22 17:48:07,580 - app.main - INFO - Request completed | id=b30ac806 method=GET path=/api/example-datasets status=200 duration_ms=1.82
+2026-03-22 17:48:07,582 - app.main - INFO - Request completed | id=e41b61bf method=GET path=/api/datasets status=200 duration_ms=8.30
+2026-03-22 17:48:07,587 - app.main - INFO - Request completed | id=4e87583b method=GET path=/api/datasets status=200 duration_ms=4.29
+2026-03-22 17:48:10,006 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:48:10,006 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:48:10,006 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:48:11,556 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:48:11,556 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:48:11,556 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:48:11,574 - app.main - INFO - Request completed | id=3770ec90 method=GET path=/api/datasets status=200 duration_ms=15.73
+2026-03-22 17:48:11,575 - app.main - INFO - Request completed | id=41fdb963 method=GET path=/api/training-jobs status=200 duration_ms=15.43
+2026-03-22 17:48:11,582 - app.main - INFO - Request completed | id=44fdaae4 method=GET path=/api/training-jobs status=200 duration_ms=4.84
+2026-03-22 17:48:11,589 - app.main - INFO - Request completed | id=078c0c89 method=GET path=/api/datasets status=200 duration_ms=12.19
+2026-03-22 17:48:11,598 - app.main - INFO - Request completed | id=51e27e27 method=GET path=/api/datasets status=200 duration_ms=5.59
+2026-03-22 17:48:11,606 - app.main - INFO - Request completed | id=fb1a7bcf method=GET path=/api/datasets status=200 duration_ms=5.72
+2026-03-22 17:48:11,680 - app.main - INFO - Request completed | id=87322bf4 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=99.35
+2026-03-22 17:48:18,359 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:48:18,359 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:48:18,359 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:48:19,921 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:48:19,921 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:48:19,921 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:50:06,271 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:50:06,271 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:50:06,271 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:50:08,100 - app.main - INFO - 🚀 Axiom Cloud AI started successfully
+2026-03-22 17:50:08,100 - app.main - INFO - 📊 Model storage: ./storage/models
+2026-03-22 17:50:08,100 - app.main - INFO - 📁 Dataset storage: ./storage/datasets
+2026-03-22 17:50:25,760 - app.main - INFO - Request completed | id=08fc4335 method=GET path=/api/training-jobs status=200 duration_ms=16.34
+2026-03-22 17:50:25,765 - app.main - INFO - Request completed | id=01b25daa method=GET path=/api/datasets status=200 duration_ms=9.72
+2026-03-22 17:50:25,768 - app.main - INFO - Request completed | id=a1962105 method=GET path=/api/training-jobs status=200 duration_ms=4.73
+2026-03-22 17:50:25,772 - app.main - INFO - Request completed | id=efa0cc7e method=GET path=/api/datasets status=200 duration_ms=4.91
+2026-03-22 17:50:25,899 - app.main - INFO - Request completed | id=da8dd4a4 method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=90.35

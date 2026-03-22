@@ -2,7 +2,7 @@
 Axiom Cloud AI - Pydantic Schemas for API validation
 """
 from pydantic import BaseModel, Field, ConfigDict
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Literal
 from datetime import datetime
 
 
@@ -119,3 +119,156 @@ class MetricsResponse(BaseModel):
     models: List[ModelResponse]
     best_model: Optional[ModelResponse]
     task_type: str
+
+
+# ─── Structured Error Schemas ────────────────────────────────────────────────
+
+class APIError(BaseModel):
+    code: str
+    message: str
+    details: Optional[Dict[str, Any]] = None
+
+
+class APIErrorResponse(BaseModel):
+    error: APIError
+
+
+# ─── Explainability Schemas ─────────────────────────────────────────────────
+
+class ExplainabilityMetadata(BaseModel):
+    model_id: int
+    model_name: str
+    model_type: str
+    task_type: Literal["classification", "regression", "unknown"]
+    job_id: str
+    artifact_hash: str
+    dataset_hash: str
+    cache_key: str
+    used_fallback: bool = False
+    explainer: str
+
+
+class ExplainabilitySamplePrediction(BaseModel):
+    sample_index: int
+    prediction: float | int | str
+    prediction_label: Optional[str] = None
+    confidence: Optional[float] = None
+    class_probabilities: Optional[Dict[str, float]] = None
+
+
+class FeatureContribution(BaseModel):
+    feature: str
+    value: float
+    abs_value: float
+    rank: int
+
+
+class ShapGlobalFeatureImportance(BaseModel):
+    feature: str
+    mean_abs_contribution: float
+    rank: int
+
+
+class ShapSummaryResponse(BaseModel):
+    metadata: ExplainabilityMetadata
+    feature_names: List[str]
+    expected_value: float | List[float] | None
+    global_importance: List[ShapGlobalFeatureImportance]
+    local_contributions: List[FeatureContribution]
+    sample_prediction: ExplainabilitySamplePrediction
+    chart: Dict[str, Any]
+    model_metadata: Dict[str, Any]
+
+
+class ShapExplainRequest(BaseModel):
+    sample_index: int = Field(default=0, ge=0)
+    nsamples: int = Field(default=200, ge=1, le=1000)
+
+
+class LimeContribution(BaseModel):
+    feature: str
+    weight: float
+    abs_weight: float
+    direction: Literal["positive", "negative"]
+    rank: int
+
+
+class LimeSummaryResponse(BaseModel):
+    metadata: ExplainabilityMetadata
+    feature_names: List[str]
+    sample_prediction: ExplainabilitySamplePrediction
+    weights: List[LimeContribution]
+    top_positive: List[LimeContribution]
+    top_negative: List[LimeContribution]
+    class_context: Dict[str, Any]
+    chart: Dict[str, Any]
+
+
+class LimeExplainRequest(BaseModel):
+    sample_index: int = Field(default=0, ge=0)
+    num_features: int = Field(default=12, ge=1, le=100)
+    custom_input: Optional[Dict[str, Any]] = None
+
+
+# ─── Metrics Payload Schemas ────────────────────────────────────────────────
+
+class ChartSeries(BaseModel):
+    labels: List[str]
+    series: Dict[str, List[float | int | None]]
+
+
+class ConfusionMatrixChart(BaseModel):
+    labels: List[str]
+    matrix: List[List[int]]
+    normalized_matrix: Optional[List[List[float]]] = None
+
+
+class RocCurveChart(BaseModel):
+    fpr: List[float]
+    tpr: List[float]
+    thresholds: Optional[List[float]] = None
+
+
+class ModelMetricsExtended(BaseModel):
+    id: int
+    model_name: str
+    model_type: str
+    task_type: str
+    training_time: Optional[float] = None
+    is_deployed: bool
+    metrics: Dict[str, Any] = Field(default_factory=dict)
+    cv_scores: Optional[List[float]] = None
+    per_fold: Optional[List[Dict[str, Any]]] = None
+    per_class: Optional[Dict[str, Any]] = None
+    feature_importance: Optional[Dict[str, float]] = None
+    confusion_matrix_chart: Optional[ConfusionMatrixChart] = None
+    roc_curve_chart: Optional[RocCurveChart] = None
+
+
+class DatasetProfileCompact(BaseModel):
+    dataset_id: int
+    dataset_name: str
+    total_rows: int
+    total_columns: int
+    memory_usage_mb: float
+    missing_total: int
+    missing_rate: float
+    duplicate_rows: int
+    columns: List[Dict[str, Any]]
+    summary_cards: List[Dict[str, Any]]
+    target_distribution: Optional[Dict[str, Any]] = None
+    correlation_heatmap: Optional[Dict[str, Any]] = None
+    missing_by_column: List[Dict[str, Any]]
+    histograms: List[Dict[str, Any]]
+
+
+class MetricsResponseV2(BaseModel):
+    job_id: str
+    task_type: str
+    status: str
+    metric_catalog: List[str]
+    models: List[ModelMetricsExtended]
+    best_model_id: Optional[int] = None
+    leaderboard: List[Dict[str, Any]]
+    chart_data: Dict[str, Any]
+    dataset_profile: Optional[DatasetProfileCompact] = None

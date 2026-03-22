@@ -13,8 +13,9 @@ from typing import Optional, List
 
 from app.core.database import get_db
 from app.models.db_models import Dataset
-from app.schemas.schemas import DatasetResponse
+from app.schemas.schemas import DatasetResponse, DatasetProfileCompact
 from app.ml.datasets import EXAMPLE_DATASETS
+from app.ml.dataset_profiling import build_dataset_profile
 from app.core.config import settings
 
 router = APIRouter()
@@ -47,6 +48,12 @@ def analyze_dataframe(df: pd.DataFrame) -> List[dict]:
 
         columns_info.append(info)
     return columns_info
+
+
+def _load_dataset_file(file_path: str) -> pd.DataFrame:
+    if file_path.endswith(".csv"):
+        return pd.read_csv(file_path)
+    return pd.read_excel(file_path)
 
 
 def build_quality_report(df: pd.DataFrame) -> dict:
@@ -234,10 +241,7 @@ async def upload_dataset(
 
     # Parse
     try:
-        if file.filename.endswith(".csv"):
-            df = pd.read_csv(file_path)
-        else:
-            df = pd.read_excel(file_path)
+        df = _load_dataset_file(file_path)
     except Exception as e:
         logger.exception(f"Failed to parse uploaded dataset '{file.filename}': {e}")
         os.remove(file_path)
@@ -337,10 +341,7 @@ def dataset_quality_report(dataset_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Dataset file not found on disk")
 
     try:
-        if dataset.filename.endswith(".csv"):
-            df = pd.read_csv(dataset.file_path)
-        else:
-            df = pd.read_excel(dataset.file_path)
+        df = _load_dataset_file(dataset.file_path)
     except Exception as e:
         logger.exception(f"Failed quality report for dataset {dataset_id}: {e}")
         raise HTTPException(status_code=422, detail=f"Could not parse dataset: {e}")
@@ -363,10 +364,7 @@ def dataset_clean_preview(dataset_id: int, preview_rows: int = 10, db: Session =
         raise HTTPException(status_code=404, detail="Dataset file not found on disk")
 
     try:
-        if dataset.filename.endswith(".csv"):
-            df = pd.read_csv(dataset.file_path)
-        else:
-            df = pd.read_excel(dataset.file_path)
+        df = _load_dataset_file(dataset.file_path)
     except Exception as e:
         logger.exception(f"Failed clean preview for dataset {dataset_id}: {e}")
         raise HTTPException(status_code=422, detail=f"Could not parse dataset: {e}")
@@ -393,10 +391,7 @@ def dataset_clean_and_save(
         raise HTTPException(status_code=404, detail="Dataset file not found on disk")
 
     try:
-        if dataset.filename.endswith(".csv"):
-            df = pd.read_csv(dataset.file_path)
-        else:
-            df = pd.read_excel(dataset.file_path)
+        df = _load_dataset_file(dataset.file_path)
     except Exception as e:
         logger.exception(f"Failed clean-and-save for dataset {dataset_id}: {e}")
         raise HTTPException(status_code=422, detail=f"Could not parse dataset: {e}")
@@ -457,6 +452,30 @@ def list_example_datasets():
         }
         for key, meta in EXAMPLE_DATASETS.items()
     ]
+
+
+@router.get("/datasets/{dataset_id}/profile", response_model=DatasetProfileCompact)
+def dataset_profile(dataset_id: int, db: Session = Depends(get_db)):
+    """Return compact dataset profiling payload for interactive visual analytics."""
+    dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+
+    if not os.path.exists(dataset.file_path):
+        raise HTTPException(status_code=404, detail="Dataset file not found on disk")
+
+    try:
+        df = _load_dataset_file(dataset.file_path)
+    except Exception as e:
+        logger.exception(f"Failed profiling for dataset {dataset_id}: {e}")
+        raise HTTPException(status_code=422, detail="Could not parse dataset")
+
+    return build_dataset_profile(
+        df,
+        dataset_id=dataset.id,
+        dataset_name=dataset.name,
+        target_column=dataset.target_column,
+    )
 
 
 @router.delete("/datasets/{dataset_id}")

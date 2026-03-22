@@ -3,8 +3,9 @@ import { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { datasetsAPI } from "@/lib/api";
 import { logToFile } from "@/lib/logger";
-import { Dataset, ExampleDataset, DatasetQualityReport, CleanPreview } from "@/types";
+import { Dataset, ExampleDataset, DatasetQualityReport, CleanPreview, DatasetProfile } from "@/types";
 import toast from "react-hot-toast";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import {
   Upload, Database, Trash2, Table, Info,
   CloudUpload, FileSpreadsheet, Loader2, Sparkles, ShieldCheck, Wand2
@@ -32,6 +33,8 @@ export default function DatasetsPage() {
   const [reportLoading, setReportLoading] = useState(false);
   const [cleaningLoading, setCleaningLoading] = useState(false);
   const [cleanAndSaveLoading, setCleanAndSaveLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profile, setProfile] = useState<DatasetProfile | null>(null);
 
   const fetchDatasets = async () => {
     try {
@@ -133,6 +136,20 @@ export default function DatasetsPage() {
       toast.error("Failed to create cleaned dataset copy");
     } finally {
       setCleanAndSaveLoading(false);
+    }
+  };
+
+  const runProfile = async () => {
+    if (!selectedDataset) return;
+    setProfileLoading(true);
+    try {
+      const res = await datasetsAPI.profile(selectedDataset.id);
+      setProfile(res.data);
+      toast.success("Dataset profile ready");
+    } catch {
+      toast.error("Failed to build dataset profile");
+    } finally {
+      setProfileLoading(false);
     }
   };
 
@@ -279,6 +296,9 @@ export default function DatasetsPage() {
             <button onClick={runCleanAndSave} disabled={cleanAndSaveLoading} className="btn-outline text-xs py-1.5 px-3">
               {cleanAndSaveLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3.5 h-3.5" />} Clean & Save Copy
             </button>
+            <button onClick={runProfile} disabled={profileLoading} className="btn-outline text-xs py-1.5 px-3">
+              {profileLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Table className="w-3.5 h-3.5" />} Build Profile
+            </button>
           </div>
 
           <div className="overflow-x-auto">
@@ -336,6 +356,56 @@ export default function DatasetsPage() {
                   </ul>
                 </div>
               )}
+            </div>
+          )}
+
+          {profile && (
+            <div className="mt-6 space-y-4">
+              <div className="grid md:grid-cols-3 gap-3">
+                {profile.summary_cards.map((card) => (
+                  <div key={card.label} className="rounded-lg border border-outline/20 bg-surface-variant/30 p-3 text-xs">
+                    <div className="text-text-muted">{card.label}</div>
+                    <div className="font-mono text-text-primary">{String(card.value)}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-4">
+                <div className="rounded-lg border border-outline/25 bg-surface-variant/30 p-4">
+                  <div className="text-sm font-semibold text-text-primary mb-2">Missing Values by Column</div>
+                  <ResponsiveContainer width="100%" height={220}>
+                    <BarChart data={profile.missing_by_column.slice(0, 12)}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(59,110,246,0.1)" />
+                      <XAxis dataKey="column" tick={{ fontSize: 10, fill: "#8a94ae" }} interval={0} angle={-20} textAnchor="end" height={45} />
+                      <YAxis tick={{ fontSize: 10, fill: "#8a94ae" }} />
+                      <Tooltip contentStyle={{ background: "#0d1526", border: "1px solid rgba(59,110,246,0.3)", borderRadius: "8px" }} />
+                      <Bar dataKey="missing" fill="#3b6ef6" radius={[3, 3, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="rounded-lg border border-outline/25 bg-surface-variant/30 p-4">
+                  <div className="text-sm font-semibold text-text-primary mb-2">Target Distribution</div>
+                  {profile.target_distribution?.labels?.length ? (
+                    <ResponsiveContainer width="100%" height={220}>
+                      <BarChart
+                        data={profile.target_distribution.labels.map((label, i) => ({
+                          label,
+                          count: profile.target_distribution!.counts[i],
+                        }))}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(59,110,246,0.1)" />
+                        <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#8a94ae" }} interval={0} angle={-20} textAnchor="end" height={45} />
+                        <YAxis tick={{ fontSize: 10, fill: "#8a94ae" }} />
+                        <Tooltip contentStyle={{ background: "#0d1526", border: "1px solid rgba(59,110,246,0.3)", borderRadius: "8px" }} />
+                        <Bar dataKey="count" fill="#00f5ff" radius={[3, 3, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <p className="text-xs text-text-muted">No target distribution available.</p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>

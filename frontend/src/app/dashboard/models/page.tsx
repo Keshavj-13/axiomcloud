@@ -30,6 +30,10 @@ export default function ModelsPage() {
   const [monitoring, setMonitoring] = useState<ModelMonitoring | null>(null);
   const [explainLoading, setExplainLoading] = useState(false);
   const [monitorLoading, setMonitorLoading] = useState(false);
+  const [explainTab, setExplainTab] = useState<"summary" | "shap" | "lime">("summary");
+  const [sampleIndex, setSampleIndex] = useState(0);
+  const [customInput, setCustomInput] = useState("{}");
+  const [explainError, setExplainError] = useState<string | null>(null);
 
   useEffect(() => {
     trainingAPI.listJobs().then(r => {
@@ -61,15 +65,19 @@ export default function ModelsPage() {
   const loadExplainability = async () => {
     if (!selectedModel) return;
     setExplainLoading(true);
+    setExplainError(null);
     try {
+      const parsedCustom = customInput.trim() ? JSON.parse(customInput) : undefined;
       const [shapRes, limeRes] = await Promise.all([
-        modelsAPI.shap(selectedModel.id, 80),
-        modelsAPI.lime(selectedModel.id, 3),
+        modelsAPI.shap(selectedModel.id, { nsamples: 220, sample_index: sampleIndex }),
+        modelsAPI.lime(selectedModel.id, { sample_index: sampleIndex, num_features: 12, custom_input: parsedCustom }),
       ]);
       setShapData(shapRes.data);
       setLimeData(limeRes.data);
-    } catch {
-      toast.error("Failed to load SHAP/LIME explanations");
+    } catch (e: any) {
+      const message = e?.response?.data?.detail?.error?.message || "Failed to load SHAP/LIME explanations";
+      setExplainError(message);
+      toast.error(message);
     } finally {
       setExplainLoading(false);
     }
@@ -424,45 +432,107 @@ export default function ModelsPage() {
               </button>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-4">
-              <div className="rounded-lg border border-sigma-800/50 bg-sigma-900/20 p-4">
-                <div className="text-sm font-semibold text-white mb-2">Global SHAP Impact (sample avg)</div>
-                {shapData?.error ? (
-                  <p className="text-xs text-red-400">{shapData.error}</p>
-                ) : (shapData?.global_importance?.length ? (
-                  <div className="space-y-1.5 text-xs">
-                    {shapData.global_importance.slice(0, 10).map((item) => (
-                      <div key={item.feature} className="flex justify-between">
-                        <span className="text-sigma-400 truncate pr-3">{item.feature}</span>
-                        <span className="text-sigma-200 font-mono">{item.importance.toFixed(4)}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : <p className="text-xs text-sigma-500">Load explanations to view SHAP summary.</p>)}
+            <div className="grid md:grid-cols-4 gap-3 mb-4">
+              <div>
+                <label className="text-xs text-sigma-500 mb-1 block">Sample Index</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={sampleIndex}
+                  onChange={(e) => setSampleIndex(Math.max(0, Number(e.target.value || 0)))}
+                  className="w-full bg-sigma-900/50 border border-sigma-700/50 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                />
               </div>
+              <div className="md:col-span-2">
+                <label className="text-xs text-sigma-500 mb-1 block">Custom Input JSON (optional)</label>
+                <input
+                  value={customInput}
+                  onChange={(e) => setCustomInput(e.target.value)}
+                  className="w-full bg-sigma-900/50 border border-sigma-700/50 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-sigma-500 mb-1 block">View</label>
+                <select
+                  value={explainTab}
+                  onChange={(e) => setExplainTab(e.target.value as "summary" | "shap" | "lime")}
+                  className="w-full bg-sigma-900/50 border border-sigma-700/50 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                >
+                  <option value="summary">Summary</option>
+                  <option value="shap">SHAP</option>
+                  <option value="lime">LIME</option>
+                </select>
+              </div>
+            </div>
 
-              <div className="rounded-lg border border-sigma-800/50 bg-sigma-900/20 p-4">
-                <div className="text-sm font-semibold text-white mb-2">Local LIME Explanations</div>
-                {limeData?.error ? (
-                  <p className="text-xs text-red-400">{limeData.error}</p>
-                ) : (limeData?.lime_explanations?.length ? (
-                  <div className="space-y-3 max-h-52 overflow-auto">
-                    {limeData.lime_explanations.map((exp) => (
-                      <div key={exp.instance} className="text-xs">
-                        <div className="text-sigma-500 mb-1">Instance #{exp.instance}</div>
-                        <div className="space-y-1">
-                          {exp.explanation.slice(0, 4).map(([label, score], i) => (
-                            <div key={i} className="flex justify-between">
-                              <span className="text-sigma-400 pr-2 truncate">{label}</span>
-                              <span className="font-mono text-sigma-200">{score.toFixed(4)}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : <p className="text-xs text-sigma-500">Load explanations to view LIME details.</p>)}
+            {explainError && (
+              <div className="mb-4 rounded-lg border border-red-700/50 bg-red-900/20 p-3 text-xs text-red-300">
+                {explainError}
               </div>
+            )}
+
+            <div className="grid lg:grid-cols-2 gap-4">
+              {explainTab === "summary" && (
+                <>
+                  <div className="rounded-lg border border-sigma-800/50 bg-sigma-900/20 p-4 text-xs space-y-1.5">
+                    <div className="text-sm font-semibold text-white mb-2">SHAP Summary</div>
+                    <div className="flex justify-between"><span className="text-sigma-500">Expected Value</span><span className="font-mono text-sigma-200">{String(shapData?.expected_value ?? "—")}</span></div>
+                    <div className="flex justify-between"><span className="text-sigma-500">Prediction</span><span className="font-mono text-sigma-200">{String(shapData?.sample_prediction?.prediction ?? "—")}</span></div>
+                    <div className="flex justify-between"><span className="text-sigma-500">Confidence</span><span className="font-mono text-sigma-200">{shapData?.sample_prediction?.confidence !== undefined ? `${(shapData.sample_prediction.confidence * 100).toFixed(2)}%` : "—"}</span></div>
+                    <div className="flex justify-between"><span className="text-sigma-500">Explainer</span><span className="font-mono text-sigma-200">{shapData?.metadata?.explainer ?? "—"}</span></div>
+                  </div>
+                  <div className="rounded-lg border border-sigma-800/50 bg-sigma-900/20 p-4 text-xs space-y-1.5">
+                    <div className="text-sm font-semibold text-white mb-2">LIME Summary</div>
+                    <div className="flex justify-between"><span className="text-sigma-500">Prediction</span><span className="font-mono text-sigma-200">{String(limeData?.sample_prediction?.prediction ?? "—")}</span></div>
+                    <div className="flex justify-between"><span className="text-sigma-500">Top Positive</span><span className="font-mono text-sigma-200">{limeData?.top_positive?.[0]?.feature ?? "—"}</span></div>
+                    <div className="flex justify-between"><span className="text-sigma-500">Top Negative</span><span className="font-mono text-sigma-200">{limeData?.top_negative?.[0]?.feature ?? "—"}</span></div>
+                    <div className="flex justify-between"><span className="text-sigma-500">Explainer</span><span className="font-mono text-sigma-200">{limeData?.metadata?.explainer ?? "—"}</span></div>
+                  </div>
+                </>
+              )}
+
+              {explainTab === "shap" && (
+                <div className="rounded-lg border border-sigma-800/50 bg-sigma-900/20 p-4 lg:col-span-2">
+                  <div className="text-sm font-semibold text-white mb-2">Global SHAP Impact</div>
+                  {shapData?.global_importance?.length ? (
+                    <div className="grid lg:grid-cols-2 gap-4">
+                      <div className="space-y-1.5 text-xs max-h-60 overflow-auto">
+                        {shapData.global_importance.slice(0, 16).map((item) => (
+                          <div key={item.feature} className="flex justify-between">
+                            <span className="text-sigma-400 truncate pr-3">{item.feature}</span>
+                            <span className="text-sigma-200 font-mono">{item.mean_abs_contribution.toFixed(4)}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="space-y-1.5 text-xs max-h-60 overflow-auto">
+                        <div className="text-sm font-semibold text-white mb-1">Local SHAP Contributions</div>
+                        {shapData.local_contributions?.slice(0, 16).map((item) => (
+                          <div key={item.feature} className="flex justify-between">
+                            <span className="text-sigma-400 truncate pr-3">{item.feature}</span>
+                            <span className="text-sigma-200 font-mono">{item.value.toFixed(4)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : <p className="text-xs text-sigma-500">Load explanations to view SHAP summary.</p>}
+                </div>
+              )}
+
+              {explainTab === "lime" && (
+                <div className="rounded-lg border border-sigma-800/50 bg-sigma-900/20 p-4 lg:col-span-2">
+                  <div className="text-sm font-semibold text-white mb-2">LIME Feature Weights</div>
+                  {limeData?.weights?.length ? (
+                    <div className="space-y-1.5 text-xs max-h-60 overflow-auto">
+                      {limeData.weights.slice(0, 18).map((item) => (
+                        <div key={`${item.feature}-${item.rank}`} className="flex justify-between">
+                          <span className="text-sigma-400 truncate pr-3">{item.feature}</span>
+                          <span className={`font-mono ${item.weight >= 0 ? "text-emerald-300" : "text-red-300"}`}>{item.weight.toFixed(4)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : <p className="text-xs text-sigma-500">Load explanations to view LIME details.</p>}
+                </div>
+              )}
             </div>
           </div>
 

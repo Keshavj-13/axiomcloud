@@ -4,7 +4,7 @@ List, retrieve, deploy, and download trained models.
 """
 import os
 import logging
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query, Body
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import List
@@ -12,11 +12,16 @@ import numpy as np
 
 from app.core.database import get_db
 from app.models.db_models import TrainedModel, TrainingJob, Dataset
-from app.schemas.schemas import ModelResponse
+from app.schemas.schemas import (
+    ModelResponse,
+    APIErrorResponse,
+    ShapSummaryResponse,
+    LimeSummaryResponse,
+    LimeExplainRequest,
+)
 
 import pandas as pd
-import joblib
-from app.ml.pipeline import AutoMLPipeline
+from app.ml.explainability import explainability_service, ExplainabilityError
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -50,60 +55,124 @@ def get_model(model_id: int, db: Session = Depends(get_db)):
 
 
 # --- Explainability Endpoints ---
-@router.get("/models/{model_id}/shap")
-def get_model_shap(model_id: int, nsamples: int = 100, db: Session = Depends(get_db)):
-    """Return SHAP values for a model (sampled from training data)."""
+@router.get(
+    "/models/{model_id}/shap",
+    response_model=ShapSummaryResponse,
+    responses={400: {"model": APIErrorResponse}, 404: {"model": APIErrorResponse}, 500: {"model": APIErrorResponse}},
+)
+def get_model_shap(
+    model_id: int,
+    sample_index: int = Query(default=0, ge=0),
+    nsamples: int = Query(default=200, ge=1, le=1000),
+    db: Session = Depends(get_db),
+):
+    """Return chart-ready SHAP global/local explanations for a selected sample."""
     model_obj = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
     if not model_obj or not model_obj.file_path or not os.path.exists(model_obj.file_path):
-        raise HTTPException(status_code=404, detail="Model not found or file missing")
-    # Try to get training data from job
+        raise HTTPException(
+            status_code=404,
+            detail={"error": {"code": "MODEL_NOT_FOUND", "message": "Model not found or file missing"}},
+        )
+
     job = db.query(TrainingJob).filter(TrainingJob.job_id == model_obj.job_id).first()
     if not job or not job.config or not job.config.get("dataset_path"):
-        raise HTTPException(status_code=404, detail="Training data not found for SHAP explanation")
+        raise HTTPException(
+            status_code=404,
+            detail={"error": {"code": "TRAINING_DATA_NOT_FOUND", "message": "Training data not found for SHAP explanation"}},
+        )
+
     try:
         dataset_path = job.config.get("dataset_path")
-        if not dataset_path or not os.path.exists(dataset_path):
-            raise HTTPException(status_code=404, detail="Training dataset file not found")
-        df = _load_dataset_frame(dataset_path)
-        target = job.target_column
-        X = df.drop(columns=[target])
-        loaded = joblib.load(model_obj.file_path)
-        pipeline = loaded["pipeline"]
-        task_type = model_obj.task_type
-        explainer = AutoMLPipeline("explain")
-        result = explainer.get_shap_explanation(pipeline, X, task_type, nsamples=nsamples)
-        return result
-    except Exception as e:
-        logger.exception(f"SHAP explanation failed: {e}")
-        raise HTTPException(status_code=500, detail=f"SHAP explanation failed: {e}")
+        return explainability_service.build_shap(
+            model=model_obj,
+            dataset_path=dataset_path,
+            target_column=job.target_column,
+            sample_index=sample_index,
+            nsamples=nsamples,
+        )
+    except ExplainabilityError as exc:
+        status = 400
+        if exc.code in {"MODEL_FILE_MISSING", "DATASET_FILE_MISSING", "TARGET_COLUMN_MISSING"}:
+            status = 404
+        logger.warning("SHAP request failed | model_id=%s code=%s msg=%s", model_id, exc.code, exc.message)
+        raise HTTPException(
+            status_code=status,
+            detail={"error": {"code": exc.code, "message": exc.message, "details": exc.details}},
+        ) from exc
+    except Exception:
+        logger.exception("SHAP explanation failed unexpectedly")
+        raise HTTPException(
+            status_code=500,
+            detail={"error": {"code": "SHAP_INTERNAL_ERROR", "message": "SHAP explanation failed"}},
+        )
 
 
-@router.get("/models/{model_id}/lime")
-def get_model_lime(model_id: int, nsamples: int = 5, db: Session = Depends(get_db)):
-    """Return LIME explanations for a model (sampled from training data)."""
+@router.post(
+    "/models/{model_id}/lime",
+    response_model=LimeSummaryResponse,
+    responses={400: {"model": APIErrorResponse}, 404: {"model": APIErrorResponse}, 500: {"model": APIErrorResponse}},
+)
+def get_model_lime(
+    model_id: int,
+    payload: LimeExplainRequest = Body(default_factory=LimeExplainRequest),
+    db: Session = Depends(get_db),
+):
+    """Return chart-ready LIME local explanations for a selected sample or custom input."""
     model_obj = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
     if not model_obj or not model_obj.file_path or not os.path.exists(model_obj.file_path):
-        raise HTTPException(status_code=404, detail="Model not found or file missing")
+        raise HTTPException(
+            status_code=404,
+            detail={"error": {"code": "MODEL_NOT_FOUND", "message": "Model not found or file missing"}},
+        )
+
     job = db.query(TrainingJob).filter(TrainingJob.job_id == model_obj.job_id).first()
     if not job or not job.config or not job.config.get("dataset_path"):
-        raise HTTPException(status_code=404, detail="Training data not found for LIME explanation")
+        raise HTTPException(
+            status_code=404,
+            detail={"error": {"code": "TRAINING_DATA_NOT_FOUND", "message": "Training data not found for LIME explanation"}},
+        )
+
     try:
         dataset_path = job.config.get("dataset_path")
-        if not dataset_path or not os.path.exists(dataset_path):
-            raise HTTPException(status_code=404, detail="Training dataset file not found")
-        df = _load_dataset_frame(dataset_path)
-        target = job.target_column
-        X = df.drop(columns=[target])
-        y = df[target]
-        loaded = joblib.load(model_obj.file_path)
-        pipeline = loaded["pipeline"]
-        task_type = model_obj.task_type
-        explainer = AutoMLPipeline("explain")
-        result = explainer.get_lime_explanation(pipeline, X, y, task_type, nsamples=nsamples)
-        return result
-    except Exception as e:
-        logger.exception(f"LIME explanation failed: {e}")
-        raise HTTPException(status_code=500, detail=f"LIME explanation failed: {e}")
+        return explainability_service.build_lime(
+            model=model_obj,
+            dataset_path=dataset_path,
+            target_column=job.target_column,
+            sample_index=payload.sample_index,
+            num_features=payload.num_features,
+            custom_input=payload.custom_input,
+        )
+    except ExplainabilityError as exc:
+        status = 400
+        if exc.code in {"MODEL_FILE_MISSING", "DATASET_FILE_MISSING", "TARGET_COLUMN_MISSING"}:
+            status = 404
+        logger.warning("LIME request failed | model_id=%s code=%s msg=%s", model_id, exc.code, exc.message)
+        raise HTTPException(
+            status_code=status,
+            detail={"error": {"code": exc.code, "message": exc.message, "details": exc.details}},
+        ) from exc
+    except Exception:
+        logger.exception("LIME explanation failed unexpectedly")
+        raise HTTPException(
+            status_code=500,
+            detail={"error": {"code": "LIME_INTERNAL_ERROR", "message": "LIME explanation failed"}},
+        )
+
+
+@router.get(
+    "/models/{model_id}/lime",
+    response_model=LimeSummaryResponse,
+    responses={400: {"model": APIErrorResponse}, 404: {"model": APIErrorResponse}, 500: {"model": APIErrorResponse}},
+)
+def get_model_lime_compat(
+    model_id: int,
+    sample_index: int = Query(default=0, ge=0),
+    num_features: int = Query(default=12, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    """Backward-compatible GET endpoint for LIME explanations."""
+    payload = LimeExplainRequest(sample_index=sample_index, num_features=num_features, custom_input=None)
+    return get_model_lime(model_id=model_id, payload=payload, db=db)
 
 
 @router.get("/models/{model_id}/monitoring")

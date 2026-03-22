@@ -5,16 +5,20 @@ Returns comparison metrics and visualization data.
 import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+import os
+import pandas as pd
 
 from app.core.database import get_db
-from app.models.db_models import TrainedModel, TrainingJob
+from app.models.db_models import TrainedModel, TrainingJob, Dataset
+from app.schemas.schemas import MetricsResponseV2
+from app.ml.metrics_payload import build_metrics_payload
+from app.ml.dataset_profiling import build_dataset_profile
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.get("/metrics/{job_id}")
+@router.get("/metrics/{job_id}", response_model=MetricsResponseV2)
 def get_metrics(job_id: str, db: Session = Depends(get_db)):
     """Get all model metrics for a training job — for leaderboard & charts."""
     job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
@@ -22,72 +26,29 @@ def get_metrics(job_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Training job not found")
 
     models = db.query(TrainedModel).filter(TrainedModel.job_id == job_id).all()
-    if not models:
-        return {"job_id": job_id, "status": job.status, "models": []}
+    task_type = job.task_type or (models[0].task_type if len(models) > 0 else "unknown")
 
-    task_type = job.task_type or (models[0].task_type if models else "unknown")
+    dataset_profile = None
+    dataset = db.query(Dataset).filter(Dataset.id == job.dataset_id).first()
+    if dataset and dataset.file_path and os.path.exists(dataset.file_path):
+        try:
+            df = pd.read_csv(dataset.file_path) if dataset.file_path.endswith(".csv") else pd.read_excel(dataset.file_path)
+            dataset_profile = build_dataset_profile(
+                df,
+                dataset_id=dataset.id,
+                dataset_name=dataset.name,
+                target_column=job.target_column,
+            )
+        except Exception as exc:
+            logger.warning("Could not build dataset profile for metrics payload | job=%s reason=%s", job_id, exc)
 
-    model_data = []
-    for m in models:
-        data = {
-            "id": m.id,
-            "model_name": m.model_name,
-            "model_type": m.model_type,
-            "task_type": m.task_type,
-            "training_time": m.training_time,
-            "is_deployed": m.is_deployed,
-            "cv_scores": m.cv_scores,
-            "metrics": m.metrics,
-        }
-        if task_type == "classification":
-            data.update({
-                "accuracy": m.accuracy,
-                "f1_score": m.f1_score,
-                "roc_auc": m.roc_auc,
-                "precision": (m.metrics or {}).get("precision") if m.metrics else None,
-                "recall": (m.metrics or {}).get("recall") if m.metrics else None,
-                "balanced_accuracy": (m.metrics or {}).get("balanced_accuracy") if m.metrics else None,
-                "confusion_matrix": m.confusion_matrix,
-                "roc_curve_data": m.roc_curve_data,
-            })
-        else:
-            data.update({
-                "rmse": m.rmse,
-                "mae": m.mae,
-                "r2_score": m.r2_score,
-                "mape": (m.metrics or {}).get("mape") if m.metrics else None,
-                "explained_variance": (m.metrics or {}).get("explained_variance") if m.metrics else None,
-                "median_ae": (m.metrics or {}).get("median_ae") if m.metrics else None,
-            })
-
-        data["feature_importance"] = m.feature_importance
-        model_data.append(data)
-
-    # Sort by best metric
-    if task_type == "classification":
-        model_data.sort(key=lambda x: x.get("accuracy") or 0, reverse=True)
-        best_model = model_data[0] if model_data else None
-    else:
-        model_data.sort(key=lambda x: x.get("r2_score") or -999, reverse=True)
-        best_model = model_data[0] if model_data else None
-
-    return {
-        "job_id": job_id,
-        "task_type": task_type,
-        "status": job.status,
-        "models": model_data,
-        "best_model": best_model,
-        "leaderboard": [
-            {
-                "rank": i + 1,
-                "model_name": m["model_name"],
-                "primary_metric": m.get("accuracy") or m.get("r2_score"),
-                "metric_name": "accuracy" if task_type == "classification" else "r2_score",
-                "training_time": m.get("training_time"),
-            }
-            for i, m in enumerate(model_data)
-        ],
-    }
+    return build_metrics_payload(
+        job_id=job_id,
+        task_type=task_type,
+        status=job.status,
+        models=models,
+        dataset_profile=dataset_profile,
+    )
 
 
 @router.get("/dashboard/summary")

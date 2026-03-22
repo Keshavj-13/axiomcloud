@@ -35,6 +35,7 @@ export const datasetsAPI = {
   qualityReport: (id: number) => api.get(`/datasets/${id}/quality-report`),
   cleanPreview: (id: number, previewRows: number = 10) =>
     api.get(`/datasets/${id}/clean-preview`, { params: { preview_rows: previewRows } }),
+  profile: (id: number) => api.get(`/datasets/${id}/profile`),
   cleanAndSave: (id: number, nameSuffix: string = "cleaned") =>
     api.post(`/datasets/${id}/clean-and-save`, null, { params: { name_suffix: nameSuffix } }),
   delete: (id: number) => api.delete(`/datasets/${id}`),
@@ -59,8 +60,17 @@ export const trainingAPI = {
 export const modelsAPI = {
   list: (jobId?: string) => api.get("/models", { params: jobId ? { job_id: jobId } : {} }),
   get: (id: number) => api.get(`/models/${id}`),
-  shap: (id: number, nsamples: number = 100) => api.get(`/models/${id}/shap`, { params: { nsamples } }),
-  lime: (id: number, nsamples: number = 5) => api.get(`/models/${id}/lime`, { params: { nsamples } }),
+  shap: (id: number, params?: { nsamples?: number; sample_index?: number }) =>
+    api.get(`/models/${id}/shap`, { params: { nsamples: params?.nsamples ?? 200, sample_index: params?.sample_index ?? 0 } }),
+  lime: (
+    id: number,
+    payload?: { sample_index?: number; num_features?: number; custom_input?: Record<string, unknown> }
+  ) =>
+    api.post(`/models/${id}/lime`, {
+      sample_index: payload?.sample_index ?? 0,
+      num_features: payload?.num_features ?? 12,
+      custom_input: payload?.custom_input,
+    }),
   monitoring: (id: number, compareDatasetId?: number) =>
     api.get(`/models/${id}/monitoring`, { params: compareDatasetId ? { compare_dataset_id: compareDatasetId } : {} }),
   deploy: (id: number) => api.post(`/models/${id}/deploy`),

@@ -14,7 +14,10 @@ from datetime import datetime
 
 # Explainability
 import shap
-from lime.lime_tabular import LimeTabularExplainer
+try:
+    from lime.lime_tabular import LimeTabularExplainer
+except Exception:  # pragma: no cover
+    LimeTabularExplainer = None
 
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, KFold
 from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
@@ -254,6 +257,8 @@ class AutoMLPipeline:
 
     def get_lime_explanation(self, pipeline, X_sample, y_sample, task_type: str = "classification", nsamples: int = 5):
         """Return LIME explanations for a few samples."""
+        if LimeTabularExplainer is None:
+            return {"error": "LIME dependency is not installed. Install 'lime' package."}
         try:
             estimator = pipeline.named_steps.get("classifier") or pipeline.named_steps.get("regressor")
             if estimator is None:
@@ -315,10 +320,11 @@ class AutoMLPipeline:
             if n_classes == 2:
                 y_prob = pipeline.predict_proba(X_test)[:, 1]
                 metrics["roc_auc"] = float(roc_auc_score(y_test, y_prob))
-                fpr, tpr, _ = roc_curve(y_test, y_prob)
+                fpr, tpr, thresholds = roc_curve(y_test, y_prob)
                 metrics["roc_curve"] = {
                     "fpr": fpr.tolist(),
                     "tpr": tpr.tolist(),
+                    "thresholds": thresholds.tolist(),
                 }
             else:
                 y_prob = pipeline.predict_proba(X_test)
@@ -343,6 +349,9 @@ class AutoMLPipeline:
         metrics["cv_scores"] = cv_scores.tolist()
         metrics["cv_mean"] = float(cv_scores.mean())
         metrics["cv_std"] = float(cv_scores.std())
+        metrics["per_fold"] = [
+            {"fold": int(i + 1), "score": float(v)} for i, v in enumerate(cv_scores.tolist())
+        ]
 
         return metrics
 
@@ -379,6 +388,9 @@ class AutoMLPipeline:
         metrics["cv_scores"] = cv_scores.tolist()
         metrics["cv_mean"] = float(cv_scores.mean())
         metrics["cv_std"] = float(cv_scores.std())
+        metrics["per_fold"] = [
+            {"fold": int(i + 1), "score": float(v)} for i, v in enumerate(cv_scores.tolist())
+        ]
 
         return metrics
 
