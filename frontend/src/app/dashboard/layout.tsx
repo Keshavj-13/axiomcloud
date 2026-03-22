@@ -2,7 +2,7 @@
 
 import Sidebar from "@/components/layout/Sidebar";
 import Link from "next/link";
-import { Bell, CircleUserRound, Command, Search, LogOut } from "lucide-react";
+import { Bell, Command, Search, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";

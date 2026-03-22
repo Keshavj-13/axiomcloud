@@ -23,7 +23,7 @@ api.interceptors.request.use(
         const token = await auth.currentUser.getIdToken();
         config.headers.Authorization = `Bearer ${token}`;
       }
-    } catch (error) {
+    } catch {
       // Firebase not configured or user not authenticated - skip token injection
       if (typeof window !== "undefined") {
         console.debug("Token injection skipped (not authenticated or Firebase not configured)");
