@@ -93,10 +93,10 @@ def run_training(job_id: str, dataset_path: str, config: dict, db_url: str):
         job.completed_at = datetime.utcnow()
         job.progress = 100
         db.commit()
-        logger.info(f"✅ Training job {job_id} completed")
+        logger.info(f"Training job {job_id} completed")
 
     except Exception as e:
-        logger.exception(f"❌ Training job {job_id} failed: {e}")
+        logger.exception(f"Training job {job_id} failed: {e}")
         job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
         if job:
             job.status = "failed"
@@ -159,7 +159,7 @@ async def train_model(
         db_url=settings.DATABASE_URL,
     )
 
-    logger.info(f"🚀 Training job {job_id} queued")
+    logger.info(f"Training job {job_id} queued")
     return job
 
 

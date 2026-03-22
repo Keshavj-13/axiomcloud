@@ -48,17 +48,37 @@ export default function ModelsPage() {
     if (!jobId) return;
     setLoading(true);
     metricsAPI.getJobMetrics(jobId).then(r => {
-      setMetrics(r.data);
-      setSelectedModel(r.data.best_model || null);
+      const payload = r.data;
+      setMetrics(payload);
+      const fallbackBest = payload?.models?.find((m: TrainedModel) => m.id === payload?.best_model_id)
+        || payload?.best_model
+        || payload?.models?.[0]
+        || null;
+      setSelectedModel(fallbackBest);
     }).catch(() => toast.error("Could not load metrics"))
     .finally(() => setLoading(false));
   }, [jobId]);
+
+  const bestModel = metrics?.models?.find((m) => m.id === metrics?.best_model_id)
+    || metrics?.best_model
+    || metrics?.models?.[0]
+    || null;
 
   const deployModel = async (id: number) => {
     try {
       await modelsAPI.deploy(id);
       toast.success("Model deployed!");
-      if (jobId) metricsAPI.getJobMetrics(jobId).then(r => setMetrics(r.data));
+      if (jobId) {
+        metricsAPI.getJobMetrics(jobId).then(r => {
+          const payload = r.data;
+          setMetrics(payload);
+          const fallbackBest = payload?.models?.find((m: TrainedModel) => m.id === payload?.best_model_id)
+            || payload?.best_model
+            || payload?.models?.[0]
+            || null;
+          if (fallbackBest) setSelectedModel(fallbackBest);
+        });
+      }
     } catch { toast.error("Deploy failed"); }
   };
 
@@ -157,7 +177,7 @@ export default function ModelsPage() {
       {metrics && !loading && (
         <>
           {/* Best model banner */}
-          {metrics.best_model && (
+          {bestModel && (
             <div className="panel-glass glow-blue mb-6 p-6">
               <div className="flex items-center gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15">
@@ -165,35 +185,35 @@ export default function ModelsPage() {
                 </div>
                 <div className="flex-1">
                     <div className="mb-0.5 text-xs text-text-muted">Best Model</div>
-                    <div className="font-display text-xl font-semibold text-text-primary">{metrics.best_model.model_name}</div>
+                    <div className="font-display text-xl font-semibold text-text-primary">{bestModel.model_name}</div>
                   <div className="flex flex-wrap gap-3 mt-1">
-                    {metrics.best_model.accuracy && (
-                      <span className="metric-badge bg-blue-900/40 text-blue-300">Accuracy: {(metrics.best_model.accuracy * 100).toFixed(1)}%</span>
+                    {bestModel.accuracy !== undefined && bestModel.accuracy !== null && (
+                      <span className="metric-badge bg-blue-900/40 text-blue-300">Accuracy: {(bestModel.accuracy * 100).toFixed(1)}%</span>
                     )}
-                    {metrics.best_model.precision !== undefined && metrics.best_model.precision !== null && (
-                      <span className="metric-badge bg-fuchsia-900/40 text-fuchsia-300">Precision: {(metrics.best_model.precision * 100).toFixed(1)}%</span>
+                    {bestModel.precision !== undefined && bestModel.precision !== null && (
+                      <span className="metric-badge bg-fuchsia-900/40 text-fuchsia-300">Precision: {(bestModel.precision * 100).toFixed(1)}%</span>
                     )}
-                    {metrics.best_model.recall !== undefined && metrics.best_model.recall !== null && (
-                      <span className="metric-badge bg-indigo-900/40 text-indigo-300">Recall: {(metrics.best_model.recall * 100).toFixed(1)}%</span>
+                    {bestModel.recall !== undefined && bestModel.recall !== null && (
+                      <span className="metric-badge bg-indigo-900/40 text-indigo-300">Recall: {(bestModel.recall * 100).toFixed(1)}%</span>
                     )}
-                    {metrics.best_model.f1_score && (
-                      <span className="metric-badge bg-cyan-900/40 text-cyan-300">F1: {(metrics.best_model.f1_score * 100).toFixed(1)}%</span>
+                    {bestModel.f1_score !== undefined && bestModel.f1_score !== null && (
+                      <span className="metric-badge bg-cyan-900/40 text-cyan-300">F1: {(bestModel.f1_score * 100).toFixed(1)}%</span>
                     )}
-                    {metrics.best_model.roc_auc && (
-                      <span className="metric-badge bg-purple-900/40 text-purple-300">AUC: {(metrics.best_model.roc_auc * 100).toFixed(1)}%</span>
+                    {bestModel.roc_auc !== undefined && bestModel.roc_auc !== null && (
+                      <span className="metric-badge bg-purple-900/40 text-purple-300">AUC: {(bestModel.roc_auc * 100).toFixed(1)}%</span>
                     )}
-                    {metrics.best_model.r2_score && (
-                      <span className="metric-badge bg-green-900/40 text-green-300">R²: {metrics.best_model.r2_score.toFixed(3)}</span>
+                    {bestModel.r2_score !== undefined && bestModel.r2_score !== null && (
+                      <span className="metric-badge bg-green-900/40 text-green-300">R²: {bestModel.r2_score.toFixed(3)}</span>
                     )}
-                    {metrics.best_model.rmse && (
-                      <span className="metric-badge bg-red-900/40 text-red-300">RMSE: {metrics.best_model.rmse.toFixed(3)}</span>
+                    {bestModel.rmse !== undefined && bestModel.rmse !== null && (
+                      <span className="metric-badge bg-red-900/40 text-red-300">RMSE: {bestModel.rmse.toFixed(3)}</span>
                     )}
-                    {metrics.best_model.mape !== undefined && metrics.best_model.mape !== null && (
-                      <span className="metric-badge bg-orange-900/40 text-orange-300">MAPE: {(metrics.best_model.mape * 100).toFixed(2)}%</span>
+                    {bestModel.mape !== undefined && bestModel.mape !== null && (
+                      <span className="metric-badge bg-orange-900/40 text-orange-300">MAPE: {(bestModel.mape * 100).toFixed(2)}%</span>
                     )}
                   </div>
                 </div>
-                <button onClick={() => deployModel(metrics.best_model!.id)} className="btn-primary">
+                <button onClick={() => deployModel(bestModel.id)} className="btn-primary">
                   <Rocket className="w-4 h-4" /> Deploy
                 </button>
               </div>
@@ -216,7 +236,7 @@ export default function ModelsPage() {
                   {model.is_deployed && (
                     <StatusBadge label="deployed" tone="healthy" />
                   )}
-                  {metrics.best_model?.id === model.id && (
+                  {(bestModel?.id === model.id) && (
                     <Trophy className="w-4 h-4 text-neon-amber" />
                   )}
                 </div>

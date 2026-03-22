@@ -265,7 +265,7 @@ async def upload_dataset(
     db.add(dataset)
     db.commit()
     db.refresh(dataset)
-    logger.info(f"📁 Dataset uploaded: {dataset.name} ({len(df)} rows)")
+    logger.info(f"Dataset uploaded: {dataset.name} ({len(df)} rows)")
     return dataset
 
 
@@ -311,7 +311,7 @@ async def load_example_dataset(
     db.add(dataset)
     db.commit()
     db.refresh(dataset)
-    logger.info(f"📊 Example dataset loaded: {meta['name']}")
+    logger.info(f"Example dataset loaded: {meta['name']}")
     return dataset
 
 
@@ -431,7 +431,7 @@ def dataset_clean_and_save(
     db.refresh(cleaned_dataset)
 
     logger.info(
-        "🧹 Created cleaned dataset copy %s from dataset %s with %d fixes",
+        "Created cleaned dataset copy %s from dataset %s with %d fixes",
         cleaned_dataset.id,
         dataset_id,
         len(applied_fixes),

@@ -143,9 +143,9 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 async def startup_event():
     """Initialize database tables on startup."""
     Base.metadata.create_all(bind=engine)
-    logger.info("🚀 Axiom Cloud AI started successfully")
-    logger.info(f"📊 Model storage: {settings.MODEL_STORAGE_PATH}")
-    logger.info(f"📁 Dataset storage: {settings.DATASET_STORAGE_PATH}")
+    logger.info("Axiom Cloud AI started successfully")
+    logger.info(f"Model storage: {settings.MODEL_STORAGE_PATH}")
+    logger.info(f"Dataset storage: {settings.DATASET_STORAGE_PATH}")
 
 
 @app.get("/api/health")

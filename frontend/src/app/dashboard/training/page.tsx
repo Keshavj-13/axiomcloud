@@ -32,7 +32,7 @@ export default function TrainingPage() {
           clearInterval(pollRef.current!);
           setTraining(false);
           if (res.data.status === "completed") {
-            toast.success("🎉 Training completed!");
+            toast.success("Training completed!");
           } else {
             toast.error("Training failed: " + res.data.error_message);
           }
@@ -141,9 +141,9 @@ export default function TrainingPage() {
               onChange={e => setTaskType(e.target.value)}
               className="w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary/50"
             >
-              <option value="auto">🤖 Auto-detect</option>
-              <option value="classification">📊 Classification</option>
-              <option value="regression">📈 Regression</option>
+              <option value="auto">Auto-detect</option>
+              <option value="classification">Classification</option>
+              <option value="regression">Regression</option>
             </select>
           </div>
 

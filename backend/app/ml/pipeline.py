@@ -486,10 +486,10 @@ class AutoMLPipeline:
                     "cv_scores": metrics.get("cv_scores"),
                 })
 
-                logger.info(f"✅ {model_name} trained in {training_time:.2f}s")
+                logger.info(f"{model_name} trained in {training_time:.2f}s")
 
             except Exception as e:
-                logger.exception(f"❌ Failed to train {model_name}: {e}")
+                logger.exception(f"Failed to train {model_name}: {e}")
                 results.append({
                     "model_name": model_name,
                     "model_type": type(estimator).__name__,

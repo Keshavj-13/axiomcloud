@@ -1,10 +1,10 @@
-# 🚀 Axiom Cloud AI — AutoML Platform
+# Axiom Cloud AI — AutoML Platform
 
 > A production-grade, full-stack AutoML platform. Upload datasets, train ML models automatically, compare performance on an interactive leaderboard, and deploy models for live predictions.
 
 ---
 
-## 📸 Platform Overview
+## Platform Overview
 
 Axiom Cloud AI mirrors the core workflow of Google Vertex AI and Kaggle AutoML:
 
@@ -20,22 +20,22 @@ Axiom Cloud AI mirrors the core workflow of Google Vertex AI and Kaggle AutoML:
 
 ---
 
-## 🎯 Current Project Goals
+## Current Project Goals
 
 We are focusing on these next-phase goals:
 
-1. **Explainable AI dashboard**
+1. [x] **Explainable AI dashboard**
   - Add SHAP/LIME-based model explanation views and APIs.
-2. **Advanced interactive visualizations**
+2. [x] **Advanced interactive visualizations**
   - Improve model/dataset visualization with richer, more interactive charts.
-3. **Auto data cleaning pipeline**
+3. [ ] **Auto data cleaning pipeline**
   - Add automated data quality checks and preprocessing recommendations/fixes.
-4. **Model monitoring and drift tracking**
+4. [ ] **Model monitoring and drift tracking**
   - Add post-training monitoring signals (performance drift, data drift, alerts).
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 axiom-cloud-ai/
@@ -89,7 +89,7 @@ axiom-cloud-ai/
 
 ---
 
-## ⚡ Quick Start (Local Dev — No Docker)
+## Quick Start (Local Dev — No Docker)
 
 ### Prerequisites
 - Python 3.10 (recommended for pinned ML dependencies)
@@ -173,7 +173,7 @@ Detailed steps: see [`DEPLOYMENT.md`](DEPLOYMENT.md)
 
 ---
 
-## 🔬 AutoML Pipeline
+## AutoML Pipeline
 
 The pipeline in `backend/app/ml/pipeline.py` performs:
 
@@ -220,7 +220,7 @@ The pipeline in `backend/app/ml/pipeline.py` performs:
 
 ---
 
-## 🌐 API Reference
+## API Reference
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -268,7 +268,7 @@ curl -X POST http://localhost:8000/api/predict \
 
 ---
 
-## 📊 Dashboard Pages
+## Dashboard Pages
 
 | Page | Route | Description |
 |---|---|---|
@@ -297,7 +297,7 @@ curl -X POST http://localhost:8000/api/predict \
 
 ---
 
-## 🎯 Resume Highlights
+## Resume Highlights
 
 This project demonstrates:
 - **Full-stack ML system design** — API → training pipeline → frontend in production architecture
@@ -309,6 +309,6 @@ This project demonstrates:
 
 ---
 
-## 📄 License
+## License
 
 MIT © Axiom Cloud AI

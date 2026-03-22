@@ -62,7 +62,7 @@ export default function DatasetsPage() {
     logToFile(`Upload attempt: ${file.name} (target_column=${targetColumn})`,'info');
     try {
       await datasetsAPI.upload(formData);
-      toast.success(`✅ "${file.name}" uploaded successfully`);
+      toast.success(`"${file.name}" uploaded successfully`);
       logToFile(`Upload success: ${file.name}`,'info');
       fetchDatasets();
     } catch (e: any) {

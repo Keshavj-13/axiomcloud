@@ -243,6 +243,21 @@ class ModelMetricsExtended(BaseModel):
     feature_importance: Optional[Dict[str, float]] = None
     confusion_matrix_chart: Optional[ConfusionMatrixChart] = None
     roc_curve_chart: Optional[RocCurveChart] = None
+    # Backward-compatible flattened metrics
+    accuracy: Optional[float] = None
+    f1_score: Optional[float] = None
+    roc_auc: Optional[float] = None
+    precision: Optional[float] = None
+    recall: Optional[float] = None
+    balanced_accuracy: Optional[float] = None
+    rmse: Optional[float] = None
+    mae: Optional[float] = None
+    r2_score: Optional[float] = None
+    mape: Optional[float] = None
+    explained_variance: Optional[float] = None
+    median_ae: Optional[float] = None
+    confusion_matrix: Optional[List[List[int]]] = None
+    roc_curve_data: Optional[Dict[str, Any]] = None
 
 
 class DatasetProfileCompact(BaseModel):
@@ -269,6 +284,7 @@ class MetricsResponseV2(BaseModel):
     metric_catalog: List[str]
     models: List[ModelMetricsExtended]
     best_model_id: Optional[int] = None
+    best_model: Optional[ModelMetricsExtended] = None
     leaderboard: List[Dict[str, Any]]
     chart_data: Dict[str, Any]
     dataset_profile: Optional[DatasetProfileCompact] = None

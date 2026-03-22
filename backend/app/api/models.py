@@ -289,7 +289,7 @@ def deploy_model(model_id: int, db: Session = Depends(get_db)):
 
     model.is_deployed = True
     db.commit()
-    logger.info(f"🚀 Model {model_id} ({model.model_name}) deployed")
+    logger.info(f"Model {model_id} ({model.model_name}) deployed")
     return {"message": f"Model '{model.model_name}' deployed successfully", "model_id": model_id}
 
 
