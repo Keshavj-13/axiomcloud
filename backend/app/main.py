@@ -161,6 +161,16 @@ def health():
     return {"status": "ok"}
 
 
+@app.get("/api/debug/routes")
+def debug_routes():
+    """List all registered routes (debug endpoint)."""
+    routes = []
+    for route in app.routes:
+        if hasattr(route, 'path'):
+            routes.append(route.path)
+    return {"routes": sorted(routes)}
+
+
 @app.get("/")
 async def root():
     return {"message": "Axiom Cloud AI API - Visit /api/docs for documentation"}
