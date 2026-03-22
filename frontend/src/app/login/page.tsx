@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   signInWithEmailAndPassword,
@@ -8,15 +8,23 @@ import {
   GoogleAuthProvider,
 } from "firebase/auth";
 import { auth, firebaseConfigured } from "@/lib/firebase";
+import { useAuth } from "@/lib/auth-context";
 import toast from "react-hot-toast";
 import { Mail, Lock, LogIn, UserPlus, Chrome } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignup, setIsSignup] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace("/dashboard");
+    }
+  }, [authLoading, user, router]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +46,7 @@ export default function LoginPage() {
         await signInWithEmailAndPassword(auth, email, password);
         toast.success("Logged in! Redirecting...");
       }
-      router.push("/dashboard");
+      router.replace("/dashboard");
     } catch (error: any) {
       const msg = error.code === "auth/email-already-in-use"
         ? "Email already in use"
@@ -67,7 +75,7 @@ export default function LoginPage() {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       toast.success("Signed in with Google! Redirecting...");
-      router.push("/dashboard");
+      router.replace("/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Google sign-in failed");
     } finally {
@@ -109,7 +117,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   className="w-full pl-10 pr-4 py-2 border border-outline rounded-lg bg-surface text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  disabled={loading || !firebaseConfigured}
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -127,7 +135,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full pl-10 pr-4 py-2 border border-outline rounded-lg bg-surface text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  disabled={loading || !firebaseConfigured}
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -135,7 +143,7 @@ export default function LoginPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading || !firebaseConfigured}
+              disabled={loading}
               className="w-full bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg transition flex items-center justify-center gap-2"
             >
               {loading ? (
@@ -170,7 +178,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            disabled={loading || !firebaseConfigured}
+            disabled={loading}
             className="w-full border border-outline hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed text-text-primary font-semibold py-2 rounded-lg transition flex items-center justify-center gap-2"
           >
             <Chrome className="w-5 h-5" />

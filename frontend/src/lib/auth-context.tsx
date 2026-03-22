@@ -26,23 +26,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    // Seed auth state immediately (important right after sign-in redirects).
+    const immediateUser = auth.currentUser;
+    if (immediateUser) {
+      setUser(immediateUser);
+      setLoading(false);
+    }
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      setLoading(false);
+
       if (currentUser?.uid && currentUser?.email) {
-        try {
-          await authAPI.syncUser({
+        void authAPI
+          .syncUser({
             firebase_uid: currentUser.uid,
             email: currentUser.email,
             display_name: currentUser.displayName || undefined,
+          })
+          .catch(() => {
+            // Non-blocking: user can still use app if sync fails.
           });
-        } catch {
-          // Non-blocking: user can still use app if sync fails.
-        }
       }
-      setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const logout = async () => {
