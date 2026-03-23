@@ -1,26 +1,85 @@
 # Axiom Cloud AI — AutoML Platform
 
-> A production-grade, full-stack AutoML platform. Upload datasets, train ML models automatically, compare performance on an interactive leaderboard, and deploy models for live predictions.
+> A production-grade, full-stack AutoML platform for dataset diagnostics, controlled model training (server or local GPU), explainability, deployment, and live inference.
 
 ---
 
 ## Platform Overview
 
-Axiom Cloud AI mirrors the core workflow of Google Vertex AI and Kaggle AutoML:
+Axiom Cloud AI mirrors a practical Vertex/Kaggle-style workflow with stronger diagnostics and controlled execution.
 
-| Feature | Details |
-|---|---|
-| **AutoML Engine** | Trains 5 models automatically with cross-validation |
-| **Task Detection** | Auto-detects classification vs. regression from target column |
-| **Model Comparison** | Interactive leaderboard with charts, confusion matrices, ROC curves |
-| **Feature Importance** | Visual bar chart of top features per model |
-| **Predictions** | REST endpoint for inference on deployed models |
-| **Model Export** | Download any model as `.joblib` |
-| **Example Datasets** | California Housing, Titanic, Breast Cancer, Iris — all built-in |
-| **Adaptive Tuning (New)** | Optional Optuna-based hyperparameter tuning with trial/time budgets |
-| **Experiment Registry (New)** | Stores run config, status, best model, and summary metrics per training run |
-| **Workspace Search (New)** | Unified dashboard search page across jobs, datasets, and models |
-| **EDA Report (New)** | Structured exploratory analysis with correlations, leakage warnings, typing intelligence, and recommendations |
+### Shipped Features (Current)
+
+#### 1) Data onboarding and profiling
+- Upload CSV/Excel datasets.
+- Built-in example datasets for instant trials.
+- Dataset quality report (missingness, duplicates, outliers, score + recommendations).
+- EDA report with chart artifacts and metadata.
+- Leakage risk analysis per feature.
+- Drift baseline snapshot generation for later monitoring.
+- Clean preview and clean-and-save workflow.
+
+#### 2) AutoML training and experiment control
+- Auto-detect task type (`classification` / `regression`) when not explicitly set.
+- Task-aware model catalog and recommendation flow.
+- Hard safety limits enforced in UI + backend:
+  - max **5 models** per run,
+  - max **5 CV folds**.
+- Adaptive hyperparameter tuning with Optuna (trial and time budgets).
+- Dataset-aware starting hyperparameters (sensible defaults before tuning).
+- Expert mode with optional per-model hyperparameter overrides.
+- Experiment registry with run configs, status, best model, and summary metrics.
+
+#### 3) Execution modes
+- **Remote mode**: server-side training queue/execution.
+- **Local mode**: prepares local job spec, trains on your machine (GPU if available), then syncs results back.
+- Local agent download from UI with authenticated request.
+- Offline local sync payload support and later re-sync.
+
+#### 4) Model evaluation and explainability
+- Leaderboard comparison across trained models.
+- Classification visuals: confusion matrix, ROC, CV folds, key metrics.
+- Regression visuals: residual/error diagnostics and metric comparisons.
+- SHAP and LIME endpoints for model explainability.
+- Feature importance extraction for supported estimators.
+
+#### 5) Deployment and inference
+- Deploy/undeploy model lifecycle controls.
+- Inference sandbox with generated feature template.
+- Randomized defaults sampled from training data profile.
+- Integer-like numeric fields now produce integer defaults (not float-only noise).
+- REST prediction endpoint for programmatic inference.
+- Model artifact download (`.joblib`).
+
+#### 6) Security and UX
+- Firebase-authenticated API access.
+- Responsive dashboard pages for datasets, training, models, predict, deploy, and search.
+- Authenticated local-agent command generation for local runs.
+
+---
+
+## Website Use Cases
+
+### 1) Fast baseline AutoML (analyst/data scientist)
+Upload a dataset, select target, use auto recommendations, train up to 5 models, and compare results quickly.
+
+### 2) Safe dataset validation before training (ML engineer)
+Run quality + leakage + EDA checks first, then decide feature/target readiness before expensive runs.
+
+### 3) Controlled experimentation (team workflows)
+Use CV/tuning budgets, store experiment runs, track best model and summary outcomes over time.
+
+### 4) Local compute / GPU-assisted training (hybrid workflow)
+Prepare a local job from the web UI, run training on a local machine, and sync metrics/artifacts back to the platform.
+
+### 5) Model review and explainability (stakeholder handoff)
+Use leaderboard metrics plus SHAP/LIME outputs to justify model behavior.
+
+### 6) Deployment + inference sandbox (productization)
+Deploy selected models, validate inputs in sandbox, and call prediction APIs from external applications.
+
+### 7) Demo/education workflow
+Use built-in example datasets to demonstrate complete ML lifecycle without external data prep.
 
 ---
 
@@ -339,11 +398,16 @@ The pipeline in `backend/app/ml/pipeline.py` performs:
 | `GET` | `/api/datasets/{id}/leakage-report` | Target leakage risk report |
 | `GET` | `/api/datasets/{id}/drift-baseline` | Baseline distribution snapshot for drift monitoring |
 | `GET` | `/api/datasets/{id}/clean-preview` | Non-destructive auto-clean preview |
+| `GET` | `/api/datasets/{id}/analytics-report` | Combined analytics report (EDA + model evaluation charts) |
 | `POST` | `/api/datasets/{id}/clean-and-save` | Create and store cleaned dataset copy |
 | `POST` | `/api/load-example/{key}` | Load example dataset |
 | `POST` | `/api/train-model` | Start AutoML training job |
 | `GET` | `/api/training-status/{job_id}` | Poll training progress |
 | `GET` | `/api/training-jobs` | List training jobs |
+| `GET` | `/api/training/model-catalog` | Task-aware model catalog + model metadata |
+| `GET` | `/api/training/local-job-spec/{job_id}` | Fetch local training spec for local execution mode |
+| `POST` | `/api/training/local-sync` | Sync local training results to backend |
+| `GET` | `/api/training/local-agent/download` | Download `local_agent.py` |
 | `GET` | `/api/experiments` | List experiment runs |
 | `GET` | `/api/experiments/{run_id}` | Get single experiment run |
 | `GET` | `/api/models` | List trained models |
@@ -388,12 +452,12 @@ curl -X POST http://localhost:8000/api/predict \
 |---|---|---|
 | Landing | `/` | Marketing page with platform overview |
 | Dashboard | `/dashboard` | Stats, recent jobs, quick actions |
-| Datasets | `/dashboard/datasets` | Upload, explore, delete datasets |
-| Training | `/dashboard/training` | Configure and launch AutoML jobs |
-| Leaderboard | `/dashboard/models` | Compare models, charts, confusion matrix |
+| Datasets | `/dashboard/datasets` | Upload, clean, profile, leakage/EDA/analytics exploration |
+| Training | `/dashboard/training` | Configure remote/local runs, expert mode, tuning, local-agent flow |
+| Leaderboard | `/dashboard/models` | Compare models, evaluation visuals, diagnostics, explainability hooks |
 | Search | `/dashboard/search` | Cross-entity search for jobs, datasets, and models |
-| Predict | `/dashboard/predict` | Run predictions via form UI |
-| Deploy | `/dashboard/deploy` | Manage deployed models |
+| Predict | `/dashboard/predict` | Inference sandbox with dataset-derived feature defaults |
+| Deploy | `/dashboard/deploy` | Deploy lifecycle and endpoint-style inference testing |
 
 ---
 

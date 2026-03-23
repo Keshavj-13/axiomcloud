@@ -13917,3 +13917,45 @@ TypeError: numpy boolean subtract, the `-` operator, is not supported, use the b
 2026-03-23 18:09:20,541 - app.main - INFO - Axiom Cloud AI started successfully
 2026-03-23 18:09:20,541 - app.main - INFO - Model storage: ./storage/models
 2026-03-23 18:09:20,542 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-23 18:09:34,926 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-23 18:09:34,926 - app.main - INFO - Model storage: ./storage/models
+2026-03-23 18:09:34,926 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-23 18:11:28,209 - app.core.firebase - INFO - Firebase Admin SDK initialized successfully
+2026-03-23 18:11:28,555 - app.api.predictions - INFO - Model 40 loaded into cache
+2026-03-23 18:11:28,561 - app.main - INFO - Request completed | id=652c4d09 method=POST path=/api/predict status=200 duration_ms=386.63
+2026-03-23 18:11:32,596 - app.main - INFO - Request completed | id=ea25348c method=GET path=/api/training-jobs status=200 duration_ms=16.78
+2026-03-23 18:11:32,600 - app.main - INFO - Request completed | id=e28010a4 method=GET path=/api/datasets status=200 duration_ms=17.63
+2026-03-23 18:11:32,615 - app.main - INFO - Request completed | id=6180231f method=GET path=/api/datasets status=200 duration_ms=11.28
+2026-03-23 18:11:32,616 - app.main - INFO - Request completed | id=5ad65542 method=GET path=/api/training-jobs status=200 duration_ms=16.00
+2026-03-23 18:11:32,819 - app.main - INFO - Request completed | id=b2de42c0 method=GET path=/api/datasets/8/quality-report status=200 duration_ms=140.08
+2026-03-23 18:11:32,866 - app.main - INFO - Request completed | id=89152e98 method=GET path=/api/datasets/8/clean-preview status=200 duration_ms=186.86
+2026-03-23 18:11:33,086 - app.main - INFO - Request completed | id=992a0b11 method=GET path=/api/datasets/8/eda-report status=200 duration_ms=403.90
+2026-03-23 18:11:33,129 - app.main - INFO - Request completed | id=c16a9be9 method=GET path=/api/datasets/8/leakage-report status=200 duration_ms=450.43
+2026-03-23 18:11:33,149 - app.main - INFO - Request completed | id=42ff49bd method=GET path=/api/metrics/9a47ed7f-add0-4da2-bae8-0c5bf175b223 status=200 duration_ms=472.01
+2026-03-23 18:11:33,232 - app.api.datasets - WARNING - Could not generate predictions for analytics report | model_id=56 reason=persistent IDs in protocol 0 must be ASCII strings
+2026-03-23 18:11:33,347 - app.main - INFO - Request completed | id=acbafd33 method=GET path=/api/datasets/8/analytics-report status=200 duration_ms=123.01
+2026-03-23 18:11:39,836 - app.main - INFO - Request completed | id=ddd437a8 method=OPTIONS path=/api/metrics/43b89d2e-e62b-4f11-bb7d-733369d5eb32 status=200 duration_ms=1.40
+2026-03-23 18:11:39,837 - app.main - INFO - Request completed | id=eebc6098 method=OPTIONS path=/api/datasets/7/quality-report status=200 duration_ms=1.59
+2026-03-23 18:11:39,837 - app.main - INFO - Request completed | id=fbc71de8 method=OPTIONS path=/api/datasets/7/clean-preview status=200 duration_ms=1.91
+2026-03-23 18:11:39,837 - app.main - INFO - Request completed | id=cd36532b method=OPTIONS path=/api/datasets/7/leakage-report status=200 duration_ms=2.16
+2026-03-23 18:11:39,837 - app.main - INFO - Request completed | id=ad24b5e8 method=OPTIONS path=/api/datasets/7/eda-report status=200 duration_ms=2.36
+2026-03-23 18:11:39,838 - app.main - INFO - Request completed | id=545079f7 method=OPTIONS path=/api/datasets/7/analytics-report status=200 duration_ms=2.33
+2026-03-23 18:11:39,877 - app.api.datasets - WARNING - Could not generate predictions for analytics report | model_id=56 reason=persistent IDs in protocol 0 must be ASCII strings
+2026-03-23 18:11:39,894 - app.main - INFO - Request completed | id=e72768ea method=GET path=/api/datasets/7/quality-report status=200 duration_ms=52.48
+2026-03-23 18:11:39,927 - app.main - INFO - Request completed | id=5fedfc94 method=GET path=/api/datasets/7/clean-preview status=200 duration_ms=86.74
+2026-03-23 18:11:40,059 - app.main - INFO - Request completed | id=cb31357d method=GET path=/api/datasets/7/leakage-report status=200 duration_ms=217.70
+2026-03-23 18:11:40,097 - app.main - INFO - Request completed | id=dc7ea825 method=GET path=/api/datasets/7/eda-report status=200 duration_ms=255.79
+2026-03-23 18:11:40,126 - app.main - INFO - Request completed | id=c4c2365a method=GET path=/api/metrics/43b89d2e-e62b-4f11-bb7d-733369d5eb32 status=200 duration_ms=286.45
+2026-03-23 18:11:40,238 - app.main - INFO - Request completed | id=de9a6f9a method=OPTIONS path=/api/datasets/7/analytics-report status=200 duration_ms=0.26
+2026-03-23 18:11:40,407 - app.main - INFO - Request completed | id=4ba87faf method=GET path=/api/datasets/7/analytics-report status=200 duration_ms=565.53
+2026-03-23 18:11:40,573 - app.main - INFO - Request completed | id=d8397e28 method=GET path=/api/datasets/7/analytics-report status=200 duration_ms=333.71
+2026-03-23 18:11:48,333 - app.main - INFO - Request completed | id=c53b2a0e method=GET path=/api/training/model-catalog status=200 duration_ms=6.51
+2026-03-23 18:11:48,345 - app.main - INFO - Request completed | id=df0c417b method=GET path=/api/training/model-catalog status=200 duration_ms=7.45
+2026-03-23 18:11:48,349 - app.main - INFO - Request completed | id=665d4477 method=GET path=/api/experiments status=200 duration_ms=22.48
+2026-03-23 18:11:48,350 - app.main - INFO - Request completed | id=c5b29d77 method=GET path=/api/datasets status=200 duration_ms=23.96
+2026-03-23 18:11:48,361 - app.main - INFO - Request completed | id=8a6932d7 method=GET path=/api/datasets status=200 duration_ms=9.19
+2026-03-23 18:11:48,363 - app.main - INFO - Request completed | id=f71879fc method=GET path=/api/experiments status=200 duration_ms=9.97
+2026-03-23 18:12:02,764 - app.main - INFO - Request completed | id=8229a871 method=GET path=/api/datasets/8/clean-preview status=200 duration_ms=138.33
+2026-03-23 18:12:02,766 - app.main - INFO - Request completed | id=e755fea9 method=GET path=/api/datasets/8/quality-report status=200 duration_ms=139.88
+2026-03-23 18:12:02,947 - app.main - INFO - Request completed | id=551dbca4 method=GET path=/api/datasets/8/eda-report status=200 duration_ms=320.66
+2026-03-23 18:12:02,954 - app.main - INFO - Request completed | id=4ae84e97 method=GET path=/api/datasets/8/leakage-report status=200 duration_ms=327.39
