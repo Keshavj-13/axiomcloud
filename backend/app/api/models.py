@@ -25,10 +25,15 @@ from app.schemas.schemas import (
 )
 
 import pandas as pd
-from app.ml.explainability import explainability_service, ExplainabilityError
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+
+def _get_explainability_components():
+    from app.ml.explainability import explainability_service, ExplainabilityError
+
+    return explainability_service, ExplainabilityError
 
 
 def _load_dataset_frame(path: str) -> pd.DataFrame:
@@ -46,14 +51,31 @@ def _random_default_from_series(series: pd.Series) -> tuple[str, dict, object]:
     if pd.api.types.is_numeric_dtype(series):
         min_v = float(s.min())
         max_v = float(s.max())
-        default_v = float(np.random.uniform(min_v, max_v)) if min_v != max_v else min_v
+
+        numeric_vals = pd.to_numeric(s, errors="coerce").dropna().to_numpy(dtype=float)
+        integer_like = bool(
+            len(numeric_vals) > 0
+            and np.all(np.isfinite(numeric_vals))
+            and np.all(np.isclose(numeric_vals, np.round(numeric_vals), atol=1e-9))
+        )
+
+        if integer_like:
+            min_i = int(np.floor(min_v))
+            max_i = int(np.ceil(max_v))
+            default_v = int(np.random.randint(min_i, max_i + 1)) if min_i != max_i else min_i
+        else:
+            default_v = float(np.random.uniform(min_v, max_v)) if min_v != max_v else min_v
+
         stats = {
             "min": min_v,
             "max": max_v,
             "mean": float(s.mean()),
             "std": float(s.std()) if len(s) > 1 else 0.0,
+            "integer_like": integer_like,
         }
-        return "number", stats, round(default_v, 6)
+        if integer_like:
+            return "number", stats, int(default_v)
+        return "number", stats, round(float(default_v), 6)
 
     values = [str(v) for v in s.astype(str).value_counts().head(20).index.tolist()]
     default_v = random.choice(values) if values else ""
@@ -181,7 +203,10 @@ def get_model_inference_template(
         if name in df.columns:
             input_type, meta, default_value = _random_default_from_series(df[name])
             if not randomize and input_type == "number" and isinstance(meta, dict):
-                default_value = round(float(meta.get("mean", 0.0)), 6)
+                if bool(meta.get("integer_like", False)):
+                    default_value = int(round(float(meta.get("mean", 0.0))))
+                else:
+                    default_value = round(float(meta.get("mean", 0.0)), 6)
             features.append(
                 {
                     "name": name,
@@ -229,6 +254,8 @@ def get_model_shap(
     db: Session = Depends(get_db),
 ):
     """Return chart-ready SHAP global/local explanations for a selected sample."""
+    explainability_service, ExplainabilityError = _get_explainability_components()
+
     model_obj = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
     if not model_obj or not model_obj.file_path or not os.path.exists(model_obj.file_path):
         raise HTTPException(
@@ -280,6 +307,8 @@ def get_model_lime(
     db: Session = Depends(get_db),
 ):
     """Return chart-ready LIME local explanations for a selected sample or custom input."""
+    explainability_service, ExplainabilityError = _get_explainability_components()
+
     model_obj = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
     if not model_obj or not model_obj.file_path or not os.path.exists(model_obj.file_path):
         raise HTTPException(

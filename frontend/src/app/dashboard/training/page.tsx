@@ -4,6 +4,8 @@ import { datasetsAPI, trainingAPI, experimentsAPI } from "@/lib/api";
 import {
   Dataset,
   TrainingJob,
+  TrainingLaunchResponse,
+  LocalTrainingJobSpec,
   ExperimentRun,
   TrainingModelCatalog,
   DatasetQualityReport,
@@ -18,6 +20,9 @@ import PanelHeader from "@/components/ui/PanelHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
 
 export default function TrainingPage() {
+  const MAX_MODELS_PER_RUN = 5;
+  const MAX_CV_FOLDS = 5;
+
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [selectedDataset, setSelectedDataset] = useState<Dataset | null>(null);
   const [targetColumn, setTargetColumn] = useState("");
@@ -30,10 +35,16 @@ export default function TrainingPage() {
   const [trainingDepth, setTrainingDepth] = useState<"quick" | "balanced" | "deep">("balanced");
   const [modelCatalog, setModelCatalog] = useState<TrainingModelCatalog>({ classification: [], regression: [], all: [] });
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
+  const [expertMode, setExpertMode] = useState(false);
+  const [modelHyperparams, setModelHyperparams] = useState<Record<string, Record<string, string | number | boolean>>>({});
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisReasons, setAnalysisReasons] = useState<string[]>([]);
   const [analysisWarning, setAnalysisWarning] = useState<string | null>(null);
   const [currentJob, setCurrentJob] = useState<TrainingJob | null>(null);
+  const [executionMode, setExecutionMode] = useState<"remote" | "local">("remote");
+  const [localApiPort, setLocalApiPort] = useState("8000");
+  const [localJobSpec, setLocalJobSpec] = useState<LocalTrainingJobSpec | null>(null);
+  const [localAgentLogs, setLocalAgentLogs] = useState<string[]>([]);
   const [experiments, setExperiments] = useState<ExperimentRun[]>([]);
   const [training, setTraining] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -55,7 +66,7 @@ export default function TrainingPage() {
       return;
     }
     if (trainingDepth === "deep") {
-      setCvFolds(7);
+      setCvFolds(5);
       setEnableTuning(true);
       setTuningTrials(40);
       setTuningBudgetSec(480);
@@ -77,9 +88,32 @@ export default function TrainingPage() {
     if (!visibleModelOptions.length) return;
     setSelectedModels(prev => {
       const filtered = prev.filter(m => visibleModelOptions.includes(m));
-      return filtered;
+      return filtered.slice(0, MAX_MODELS_PER_RUN);
     });
   }, [taskType, modelCatalog.classification, modelCatalog.regression, modelCatalog.all]);
+
+  const toggleModelSelection = (name: string, checked: boolean) => {
+    setSelectedModels(prev => {
+      if (checked) {
+        return prev.filter(m => m !== name);
+      }
+      if (prev.length >= MAX_MODELS_PER_RUN) {
+        toast.error(`Select at most ${MAX_MODELS_PER_RUN} models per run`);
+        return prev;
+      }
+      return [...prev, name];
+    });
+  };
+
+  const updateModelHyperparam = (modelName: string, paramName: string, value: string | number | boolean) => {
+    setModelHyperparams(prev => ({
+      ...prev,
+      [modelName]: {
+        ...(prev[modelName] || {}),
+        [paramName]: value,
+      },
+    }));
+  };
 
   const recommendModelsFromAnalysis = (
     options: string[],
@@ -153,47 +187,116 @@ export default function TrainingPage() {
     return { recommended: Array.from(picked), reasons, maxLeak };
   };
 
-  const pollStatus = (jobId: string) => {
+  const pollStatus = (jobId: string, mode: "remote" | "local" = "remote") => {
     pollRef.current = setInterval(async () => {
       try {
         const res = await trainingAPI.getStatus(jobId);
         setCurrentJob(res.data);
+        const logs = (res.data?.config as Record<string, unknown> | undefined)?.local_sync as Record<string, unknown> | undefined;
+        const syncedLogs = logs?.logs as string[] | undefined;
+        if (syncedLogs && syncedLogs.length > 0) {
+          setLocalAgentLogs(syncedLogs.slice(-200));
+        }
+
         if (res.data.status === "completed" || res.data.status === "failed") {
           clearInterval(pollRef.current!);
           setTraining(false);
           experimentsAPI.list().then(r => setExperiments(r.data)).catch(() => {});
           if (res.data.status === "completed") {
-            toast.success("Training completed!");
+            toast.success(mode === "local" ? "Local training synced successfully!" : "Training completed!");
           } else {
             toast.error("Training failed: " + res.data.error_message);
           }
         }
       } catch { clearInterval(pollRef.current!); setTraining(false); }
-    }, 1500);
+    }, mode === "local" ? 4000 : 1500);
+  };
+
+  const downloadLocalAgentFile = async () => {
+    try {
+      const res = await trainingAPI.downloadLocalAgent();
+      const blob = new Blob([res.data], { type: "text/x-python" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "local_agent.py";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("local_agent.py downloaded");
+    } catch {
+      toast.error("Could not download local_agent.py from backend");
+    }
+  };
+
+  const copyLocalRunCommand = async () => {
+    if (!localJobSpec?.job_id) {
+      toast.error("Prepare Local Training Job first");
+      return;
+    }
+    try {
+      const { getAuth } = await import("firebase/auth");
+      const auth = getAuth();
+      const token = await auth.currentUser?.getIdToken(true);
+      if (!token) {
+        toast.error("No Firebase session token found. Please sign in again.");
+        return;
+      }
+      const cmd = `python local_agent.py --connect ${localJobSpec.job_id} --api-host localhost --api-port ${localApiPort} --token "${token}"`;
+      await navigator.clipboard.writeText(cmd);
+      toast.success("Copied local run command with your current Firebase token.");
+    } catch {
+      toast.error("Could not generate command automatically");
+    }
   };
 
   const startTraining = async () => {
     if (!selectedDataset) return toast.error("Select a dataset");
     if (!targetColumn) return toast.error("Enter target column");
     if (selectedModels.length === 0) return toast.error("Select at least one model");
+    if (selectedModels.length > MAX_MODELS_PER_RUN) return toast.error(`Select at most ${MAX_MODELS_PER_RUN} models per run`);
     setTraining(true);
     setCurrentJob(null);
+    setLocalJobSpec(null);
+    setLocalAgentLogs([]);
     try {
       const res = await trainingAPI.train({
         dataset_id: selectedDataset.id,
         target_column: targetColumn,
+        execution_mode: executionMode,
         task_type: taskType === "auto" ? undefined : taskType,
         test_size: testSize,
         cv_folds: cvFolds,
         models_to_train: selectedModels,
+        model_hyperparams: selectedModels.reduce((acc, name) => {
+          const overrides = modelHyperparams[name];
+          if (overrides && Object.keys(overrides).length > 0) {
+            const cleaned = Object.fromEntries(
+              Object.entries(overrides).filter(([, value]) => value !== "" && value !== null && value !== undefined)
+            );
+            if (Object.keys(cleaned).length > 0) {
+              acc[name] = cleaned;
+            }
+          }
+          return acc;
+        }, {} as Record<string, Record<string, string | number | boolean>>),
         enable_tuning: enableTuning,
         tuning_trials: tuningTrials,
         tuning_time_budget_sec: tuningBudgetSec,
       });
-      const job: TrainingJob = res.data;
+      const payload: TrainingLaunchResponse = res.data;
+      const job: TrainingJob = payload;
       setCurrentJob(job);
-      toast.success("Training started!");
-      pollStatus(job.job_id);
+      if (payload.execution_mode === "local") {
+        setLocalJobSpec(payload.local_job_spec || null);
+        setTraining(false);
+        toast.success("Local job spec generated. Run the local agent on your machine.");
+        pollStatus(job.job_id, "local");
+      } else {
+        toast.success("Training started!");
+        pollStatus(job.job_id, "remote");
+      }
     } catch (e: any) {
       toast.error(e.response?.data?.detail || "Failed to start training");
       setTraining(false);
@@ -238,7 +341,7 @@ export default function TrainingPage() {
         edaRes.data,
       );
 
-      setSelectedModels(recommendation.recommended);
+      setSelectedModels(recommendation.recommended.slice(0, MAX_MODELS_PER_RUN));
       setAnalysisReasons(recommendation.reasons);
       if (recommendation.maxLeak >= 0.8) {
         setAnalysisWarning("High leakage risk detected. Validate feature set before long/deep training.");
@@ -351,10 +454,75 @@ export default function TrainingPage() {
             </div>
             <div>
               <label className="mb-1.5 block text-xs text-text-muted">CV Folds: {cvFolds}</label>
-              <input type="range" min="2" max="10" step="1" value={cvFolds}
+              <input type="range" min="2" max={MAX_CV_FOLDS} step="1" value={cvFolds}
                 onChange={e => setCvFolds(Number(e.target.value))}
                 className="w-full accent-sigma-500" />
             </div>
+          </div>
+
+          <div className="mb-6 rounded-lg border border-outline/25 bg-surface-variant/25 p-3">
+            <div className="mb-2 text-xs text-text-muted">Execution Mode</div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setExecutionMode("remote")}
+                className={`rounded px-2 py-1.5 text-xs ${executionMode === "remote" ? "bg-primary/20 text-primary border border-primary/30" : "bg-surface text-text-muted border border-outline/20"}`}
+              >
+                Run on server
+              </button>
+              <button
+                type="button"
+                onClick={() => setExecutionMode("local")}
+                className={`rounded px-2 py-1.5 text-xs ${executionMode === "local" ? "bg-primary/20 text-primary border border-primary/30" : "bg-surface text-text-muted border border-outline/20"}`}
+              >
+                Run on my machine (use my GPU)
+              </button>
+            </div>
+            <p className="mt-2 text-[11px] text-text-muted">
+              Local mode does not consume server compute. The backend creates a local job spec and waits for sync.
+            </p>
+
+            {executionMode === "local" && (
+              <div className="mt-3 rounded border border-outline/20 bg-surface/30 p-3 text-xs">
+                <div className="mb-2 font-semibold text-text-primary">Local Agent Setup</div>
+                <div className="mb-2 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={downloadLocalAgentFile}
+                    className="btn-outline px-2.5 py-1 text-xs"
+                  >
+                    Download local_agent.py
+                  </button>
+                  <button
+                    type="button"
+                    onClick={copyLocalRunCommand}
+                    className="btn-outline px-2.5 py-1 text-xs"
+                  >
+                    Copy run command (auto token)
+                  </button>
+                </div>
+                <div className="mb-2">
+                  <label className="mb-1 block text-[11px] text-text-muted">Backend Port</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="65535"
+                    value={localApiPort}
+                    onChange={(e) => setLocalApiPort(e.target.value || "8000")}
+                    className="w-32 rounded border border-outline/25 bg-surface px-2 py-1 text-xs text-text-primary"
+                  />
+                </div>
+                <ol className="list-decimal space-y-1 pl-4 text-text-muted">
+                  <li>Install dependencies: <span className="font-mono text-text-primary">pip install torch pandas scikit-learn requests joblib</span></li>
+                  <li>Click <span className="font-mono text-text-primary">Prepare Local Training Job</span>.</li>
+                  <li>Click <span className="font-mono text-text-primary">Copy run command (auto token)</span> to auto-insert your current Firebase token.</li>
+                  <li>Paste and run in terminal.</li>
+                </ol>
+                <div className="mt-2 text-[11px] text-text-muted">
+                  GPU is selected automatically if available; CPU fallback is automatic.
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="mb-6 rounded-lg border border-outline/25 bg-surface-variant/25 p-3">
@@ -423,13 +591,30 @@ export default function TrainingPage() {
             className="btn-primary w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {training ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-            {training ? "Training..." : "Start AutoML Training"}
+            {training ? "Training..." : executionMode === "local" ? "Prepare Local Training Job" : "Start AutoML Training"}
           </button>
           {!selectedDataset || !targetColumn ? (
             <p className="mt-2 text-xs text-amber-300">
               Select a dataset and target column to start training.
             </p>
           ) : null}
+
+          {executionMode === "local" && localJobSpec && (
+            <div className="mt-4 rounded-lg border border-outline/20 bg-surface-variant/25 p-3 text-xs">
+              <div className="mb-1 font-semibold text-text-primary">Local Job Prepared</div>
+              <div className="text-text-muted">Job ID: <span className="font-mono text-text-primary">{localJobSpec.job_id}</span></div>
+              <div className="text-text-muted">Dataset: <span className="font-mono text-text-primary">{localJobSpec.dataset_name}</span></div>
+            </div>
+          )}
+
+          {executionMode === "local" && localAgentLogs.length > 0 && (
+            <div className="mt-4 rounded-lg border border-outline/20 bg-surface-variant/25 p-3 text-xs">
+              <div className="mb-2 font-semibold text-text-primary">Local Agent Logs (synced)</div>
+              <pre className="max-h-40 overflow-auto whitespace-pre-wrap rounded border border-outline/20 bg-surface/40 p-2 text-[11px] text-text-muted">
+                {localAgentLogs.join("\n")}
+              </pre>
+            </div>
+          )}
         </div>
 
         {/* Models to train */}
@@ -453,20 +638,20 @@ export default function TrainingPage() {
           <div className="mb-3 flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => setSelectedModels([...visibleModelOptions])}
-              className="btn-ghost px-2.5 py-1 text-xs"
-            >
-              Select visible
-            </button>
-            <button
-              type="button"
               onClick={() => setSelectedModels([])}
               className="btn-ghost px-2.5 py-1 text-xs"
             >
               Clear
             </button>
+            <button
+              type="button"
+              onClick={() => setExpertMode(v => !v)}
+              className={`btn-ghost px-2.5 py-1 text-xs ${expertMode ? "border border-primary/40 text-primary" : ""}`}
+            >
+              {expertMode ? "Expert mode: on" : "Expert mode"}
+            </button>
             <div className="rounded border border-outline/20 px-2.5 py-1 text-xs text-text-muted">
-              {selectedModels.length} selected
+              {selectedModels.length}/{MAX_MODELS_PER_RUN} selected
             </div>
           </div>
           <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
@@ -479,7 +664,7 @@ export default function TrainingPage() {
                   <input
                     type="checkbox"
                     checked={checked}
-                    onChange={() => setSelectedModels(prev => checked ? prev.filter(m => m !== name) : [...prev, name])}
+                    onChange={() => toggleModelSelection(name, checked)}
                     className="accent-sigma-500"
                   />
                   <span className="flex-1 text-sm text-text-primary">
@@ -492,6 +677,75 @@ export default function TrainingPage() {
               );
             })}
           </div>
+          {expertMode && selectedModels.length > 0 && (
+            <div className="mt-4 space-y-3 rounded-lg border border-outline/25 bg-surface-variant/25 p-3">
+              <div className="text-xs text-text-muted">Expert Hyperparameters (optional overrides)</div>
+              {selectedModels.map((name) => {
+                const spec = modelCatalog.details?.[name]?.hyperparameters;
+                if (!spec || Object.keys(spec).length === 0) {
+                  return (
+                    <div key={name} className="rounded border border-outline/20 bg-surface/30 p-2 text-xs text-text-muted">
+                      <span className="text-text-primary">{name}</span>: no exposed expert controls.
+                    </div>
+                  );
+                }
+                return (
+                  <div key={name} className="rounded border border-outline/20 bg-surface/30 p-2">
+                    <div className="mb-2 text-xs text-text-primary">{name}</div>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {Object.entries(spec).map(([paramName, meta]) => {
+                        const controlType = meta?.type || "number";
+                        const current = modelHyperparams[name]?.[paramName] ?? meta?.default ?? "";
+                        return (
+                          <label key={`${name}-${paramName}`} className="text-[11px] text-text-muted">
+                            <div className="mb-1">{paramName}</div>
+                            {controlType === "boolean" ? (
+                              <select
+                                value={String(current)}
+                                onChange={(e) => updateModelHyperparam(name, paramName, e.target.value === "true")}
+                                className="w-full rounded border border-outline/25 bg-surface px-2 py-1 text-xs text-text-primary"
+                              >
+                                <option value="true">true</option>
+                                <option value="false">false</option>
+                              </select>
+                            ) : controlType === "select" && Array.isArray(meta?.options) ? (
+                              <select
+                                value={String(current)}
+                                onChange={(e) => updateModelHyperparam(name, paramName, e.target.value)}
+                                className="w-full rounded border border-outline/25 bg-surface px-2 py-1 text-xs text-text-primary"
+                              >
+                                {meta.options.map((opt) => (
+                                  <option key={`${name}-${paramName}-${String(opt)}`} value={String(opt)}>{String(opt)}</option>
+                                ))}
+                              </select>
+                            ) : (
+                              <input
+                                type="number"
+                                value={String(current)}
+                                min={meta?.min}
+                                max={meta?.max}
+                                step={meta?.step || (controlType === "integer" ? 1 : 0.01)}
+                                onChange={(e) => {
+                                  const raw = e.target.value;
+                                  if (raw === "") {
+                                    updateModelHyperparam(name, paramName, "");
+                                    return;
+                                  }
+                                  const num = controlType === "integer" ? parseInt(raw, 10) : Number(raw);
+                                  updateModelHyperparam(name, paramName, Number.isNaN(num) ? raw : num);
+                                }}
+                                className="w-full rounded border border-outline/25 bg-surface px-2 py-1 text-xs text-text-primary"
+                              />
+                            )}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
           {heavySelected.length > 0 && (
             <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200">
               Heavy models selected ({heavySelected.length}): {heavySelected.join(", ")}. Training can take significantly longer.

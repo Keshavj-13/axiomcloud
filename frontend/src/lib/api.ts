@@ -62,6 +62,8 @@ export const datasetsAPI = {
   cleanPreview: (id: number, previewRows: number = 10) =>
     api.get(`/datasets/${id}/clean-preview`, { params: { preview_rows: previewRows } }),
   profile: (id: number) => api.get(`/datasets/${id}/profile`),
+  analyticsReport: (id: number, params?: { target_column?: string; model_type?: string; model_id?: number }) =>
+    api.get(`/datasets/${id}/analytics-report`, { params: params || {} }),
   cleanAndSave: (id: number, nameSuffix: string = "cleaned") =>
     api.post(`/datasets/${id}/clean-and-save`, null, { params: { name_suffix: nameSuffix } }),
   delete: (id: number) => api.delete(`/datasets/${id}`),
@@ -74,15 +76,20 @@ export const trainingAPI = {
   train: (config: {
     dataset_id: number;
     target_column: string;
+    execution_mode?: "remote" | "local";
     task_type?: string;
     test_size?: number;
     cv_folds?: number;
     models_to_train?: string[];
+    model_hyperparams?: Record<string, Record<string, string | number | boolean>>;
     enable_tuning?: boolean;
     tuning_trials?: number;
     tuning_time_budget_sec?: number;
   }) => api.post("/train-model", config),
   getStatus: (jobId: string) => api.get(`/training-status/${jobId}`),
+  getLocalJobSpec: (jobId: string) => api.get(`/training/local-job-spec/${jobId}`),
+  localSync: (payload: Record<string, unknown>) => api.post("/training/local-sync", payload),
+  downloadLocalAgent: () => api.get("/training/local-agent/download", { responseType: "blob" }),
   listJobs: () => api.get("/training-jobs"),
   modelCatalog: () => api.get("/training/model-catalog"),
 };

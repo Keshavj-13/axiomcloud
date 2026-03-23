@@ -46,10 +46,12 @@ class DatasetResponse(DatasetBase):
 class TrainingConfig(BaseModel):
     dataset_id: int
     target_column: str
+    execution_mode: Literal["remote", "local"] = "remote"
     task_type: Optional[str] = None  # auto-detect if None
     models_to_train: Optional[List[str]] = None  # train all if None
+    model_hyperparams: Optional[Dict[str, Dict[str, Any]]] = None
     test_size: float = Field(default=0.2, ge=0.1, le=0.4)
-    cv_folds: int = Field(default=5, ge=2, le=10)
+    cv_folds: int = Field(default=5, ge=2, le=5)
     enable_tuning: bool = False
     tuning_trials: int = Field(default=12, ge=3, le=200)
     tuning_time_budget_sec: int = Field(default=180, ge=30, le=3600)
@@ -68,6 +70,48 @@ class TrainingJobResponse(BaseModel):
     error_message: Optional[str]
     created_at: datetime
     completed_at: Optional[datetime]
+
+
+class LocalTrainingJobSpec(BaseModel):
+    job_id: str
+    run_id: str
+    dataset_id: int
+    dataset_name: str
+    dataset_path: str
+    target_column: str
+    task_type: Optional[str] = None
+    model_settings: Dict[str, Any] = Field(default_factory=dict, alias="model_config")
+    hyperparameters: Dict[str, Any] = Field(default_factory=dict)
+    output_dir: Optional[str] = None
+
+
+class TrainingLaunchResponse(TrainingJobResponse):
+    execution_mode: Literal["remote", "local"] = "remote"
+    local_job_spec: Optional[LocalTrainingJobSpec] = None
+    message: Optional[str] = None
+
+
+class LocalModelSync(BaseModel):
+    model_name: str
+    model_type: str = "local_torch"
+    task_type: Optional[str] = None
+    metrics: Dict[str, Any] = Field(default_factory=dict)
+    feature_importance: Optional[Dict[str, float]] = None
+    confusion_matrix: Optional[List[List[int]]] = None
+    roc_curve_data: Optional[Dict[str, Any]] = None
+    cv_scores: Optional[List[float]] = None
+    training_time: Optional[float] = None
+    artifact_ref: Optional[Dict[str, Any]] = None
+
+
+class LocalTrainingSyncPayload(BaseModel):
+    job_id: str
+    status: Literal["completed", "failed"] = "completed"
+    task_type: Optional[str] = None
+    error_message: Optional[str] = None
+    execution_env: Optional[Dict[str, Any]] = None
+    logs: Optional[List[str]] = None
+    models: List[LocalModelSync] = Field(default_factory=list)
 
 
 class ExperimentRunResponse(BaseModel):

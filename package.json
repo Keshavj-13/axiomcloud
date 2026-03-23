@@ -1,0 +1,13 @@
+{
+  "name": "sigmacloud-dev-workspace",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail -n BACKEND,FRONTEND -c green,blue \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "node scripts/dev-backend.js",
+    "dev:frontend": "node scripts/dev-frontend.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

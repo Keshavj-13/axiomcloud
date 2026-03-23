@@ -3,9 +3,9 @@ import { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { datasetsAPI } from "@/lib/api";
 import { logToFile } from "@/lib/logger";
-import { Dataset, ExampleDataset, DatasetQualityReport, CleanPreview, DatasetProfile, EDAReport } from "@/types";
+import { Dataset, ExampleDataset, DatasetQualityReport, CleanPreview, DatasetProfile, EDAReport, AnalyticsReport, AnalyticsChart } from "@/types";
 import toast from "react-hot-toast";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, ScatterChart, Scatter } from "recharts";
 import {
   Upload, Database, Trash2, Table, Info,
   CloudUpload, FileSpreadsheet, Loader2, Sparkles, ShieldCheck, Wand2
@@ -19,6 +19,96 @@ function formatBytes(bytes?: number) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / 1048576).toFixed(1)} MB`;
+}
+
+function HeatCell({ value }: { value: number }) {
+  const clamped = Math.max(-1, Math.min(1, Number.isFinite(value) ? value : 0));
+  const alpha = Math.abs(clamped);
+  const bg = clamped >= 0
+    ? `rgba(110, 59, 215, ${0.2 + alpha * 0.5})`
+    : `rgba(239, 68, 68, ${0.2 + alpha * 0.5})`;
+  return <div className="h-7 w-7 rounded" style={{ background: bg }} title={clamped.toFixed(3)} />;
+}
+
+function AnalyticsChartCard({ chart }: { chart: AnalyticsChart }) {
+  const spec = (chart.spec || {}) as Record<string, unknown>;
+  const rows = (spec.rows as Record<string, unknown>[] | undefined) || [];
+  const xKey = (spec.xKey as string | undefined) || "label";
+  const yKey = (spec.yKey as string | undefined) || "value";
+  const series = (spec.series as Array<{ key: string; name: string; color?: string }> | undefined) || [];
+
+  return (
+    <div className="rounded-lg border border-outline/25 bg-surface-variant/30 p-4">
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <div>
+          <div className="text-sm font-semibold text-text-primary">{chart.title}</div>
+          <div className="text-xs text-text-muted">{chart.purpose}</div>
+        </div>
+        {chart.fallback_used ? <StatusBadge label="fallback" tone="idle" /> : null}
+      </div>
+
+      {chart.chart_type === "bar" && rows.length > 0 ? (
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={rows}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(71,71,77,0.25)" />
+            <XAxis dataKey={xKey} tick={{ fontSize: 10, fill: "#acaab1" }} interval={0} angle={-20} textAnchor="end" height={48} />
+            <YAxis tick={{ fontSize: 10, fill: "#acaab1" }} />
+            <Tooltip contentStyle={{ background: "#19191d", border: "1px solid rgba(71,71,77,0.6)", borderRadius: "8px" }} />
+            {(series.length ? series : [{ key: "value", name: "Value", color: "#d0bcff" }]).map((s) => (
+              <Bar key={s.key} dataKey={s.key} name={s.name} fill={s.color || "#d0bcff"} radius={[3, 3, 0, 0]} />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
+      ) : chart.chart_type === "line" && rows.length > 0 ? (
+        <ResponsiveContainer width="100%" height={220}>
+          <LineChart data={rows}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(71,71,77,0.25)" />
+            <XAxis dataKey={xKey} tick={{ fontSize: 10, fill: "#acaab1" }} />
+            <YAxis tick={{ fontSize: 10, fill: "#acaab1" }} />
+            <Tooltip contentStyle={{ background: "#19191d", border: "1px solid rgba(71,71,77,0.6)", borderRadius: "8px" }} />
+            {(series.length ? series : [{ key: "value", name: "Value", color: "#d0bcff" }]).map((s) => (
+              <Line key={s.key} dataKey={s.key} name={s.name} stroke={s.color || "#d0bcff"} dot={false} />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      ) : chart.chart_type === "scatter" && rows.length > 0 ? (
+        <ResponsiveContainer width="100%" height={220}>
+          <ScatterChart>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(71,71,77,0.25)" />
+            <XAxis dataKey={xKey} name={xKey} tick={{ fontSize: 10, fill: "#acaab1" }} />
+            <YAxis dataKey={yKey} name={yKey} tick={{ fontSize: 10, fill: "#acaab1" }} />
+            <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={{ background: "#19191d", border: "1px solid rgba(71,71,77,0.6)", borderRadius: "8px" }} />
+            <Scatter data={rows} fill="#d0bcff" />
+          </ScatterChart>
+        </ResponsiveContainer>
+      ) : chart.chart_type === "heatmap" ? (
+        <div className="overflow-auto">
+          <div className="inline-flex flex-col gap-1">
+            {(((spec.matrix as number[][] | undefined) || [])).slice(0, 10).map((row, r) => (
+              <div key={r} className="flex gap-1">
+                {row.slice(0, 10).map((v, c) => <HeatCell key={`${r}-${c}`} value={v} />)}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="max-h-48 overflow-auto rounded border border-outline/20 bg-surface/40 p-2 text-xs">
+          {rows.length > 0 ? (
+            <ul className="space-y-1 text-text-muted">
+              {rows.slice(0, 12).map((r, idx) => (
+                <li key={idx} className="font-mono text-[11px]">{JSON.stringify(r)}</li>
+              ))}
+            </ul>
+          ) : (
+            <div className="text-text-muted">No chart rows available.</div>
+          )}
+        </div>
+      )}
+
+      <div className="mt-2 text-[11px] text-text-muted">Insight: {chart.insight}</div>
+      <div className="mt-1 text-[10px] font-mono text-text-muted/80">artifact: {(chart.artifact_ref?.relative_path || chart.artifact_ref?.url || "n/a")}</div>
+    </div>
+  );
 }
 
 export default function DatasetsPage() {
@@ -37,6 +127,8 @@ export default function DatasetsPage() {
   const [profile, setProfile] = useState<DatasetProfile | null>(null);
   const [edaLoading, setEdaLoading] = useState(false);
   const [edaReport, setEdaReport] = useState<EDAReport | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [analyticsReport, setAnalyticsReport] = useState<AnalyticsReport | null>(null);
 
   const fetchDatasets = async () => {
     try {
@@ -166,6 +258,22 @@ export default function DatasetsPage() {
       toast.error("Failed to build EDA report");
     } finally {
       setEdaLoading(false);
+    }
+  };
+
+  const runAnalyticsReport = async () => {
+    if (!selectedDataset) return;
+    setAnalyticsLoading(true);
+    try {
+      const res = await datasetsAPI.analyticsReport(selectedDataset.id, {
+        target_column: selectedDataset.target_column,
+      });
+      setAnalyticsReport(res.data);
+      toast.success(`Analytics report ready (${res.data.chart_count} charts)`);
+    } catch {
+      toast.error("Failed to generate analytics report");
+    } finally {
+      setAnalyticsLoading(false);
     }
   };
 
@@ -317,6 +425,9 @@ export default function DatasetsPage() {
             </button>
             <button onClick={runEDA} disabled={edaLoading} className="btn-outline text-xs py-1.5 px-3">
               {edaLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <ShieldCheck className="w-3.5 h-3.5" />} EDA Report
+            </button>
+            <button onClick={runAnalyticsReport} disabled={analyticsLoading} className="btn-outline text-xs py-1.5 px-3">
+              {analyticsLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />} Full Analytics
             </button>
           </div>
 
@@ -524,6 +635,38 @@ export default function DatasetsPage() {
                     {(edaReport.recommendations || []).map((r, i) => <li key={i}>{r}</li>)}
                   </ul>
                   <div className="mt-3 text-xs font-semibold text-text-primary">Leakage Risks: {(edaReport.leakage_risks || []).length}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {analyticsReport && (
+            <div className="mt-6 space-y-4 rounded-lg border border-outline/25 bg-surface-variant/30 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div className="text-sm font-semibold text-text-primary">AutoML Analytics & Diagnostics</div>
+                  <div className="text-xs text-text-muted">
+                    Task: {analyticsReport.task_type} • Charts: {analyticsReport.chart_count} (min {analyticsReport.minimum_required_charts})
+                  </div>
+                </div>
+                <StatusBadge label={`evaluation: ${analyticsReport.evaluation_status}`} tone={analyticsReport.evaluation_status === "ready" ? "healthy" : "idle"} />
+              </div>
+
+              <div>
+                <div className="mb-2 text-xs uppercase tracking-[0.12em] text-text-muted">1) Exploratory data analysis</div>
+                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                  {analyticsReport.exploratory_charts.map((chart) => (
+                    <AnalyticsChartCard key={chart.id} chart={chart} />
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-2 text-xs uppercase tracking-[0.12em] text-text-muted">2) Model evaluation</div>
+                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                  {analyticsReport.evaluation_charts.map((chart) => (
+                    <AnalyticsChartCard key={chart.id} chart={chart} />
+                  ))}
                 </div>
               </div>
             </div>

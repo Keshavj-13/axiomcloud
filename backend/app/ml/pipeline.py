@@ -134,6 +134,76 @@ class AutoMLPipeline:
     def _score_metric(self, task_type: str) -> str:
         return "accuracy" if task_type == "classification" else "r2"
 
+    def _auto_starting_params(
+        self,
+        model_name: str,
+        task_type: str,
+        n_rows: int,
+        n_features: int,
+    ) -> Dict[str, Any]:
+        rows = max(int(n_rows), 1)
+        feats = max(int(n_features), 1)
+
+        if model_name == "Random Forest":
+            return {
+                "n_estimators": int(min(320, max(120, rows // 120 + feats * 4))),
+                "max_depth": int(min(22, max(6, int(np.log2(rows)) + 3))),
+                "min_samples_split": 2 if rows > 1500 else 4,
+                "min_samples_leaf": 1 if rows > 3000 else 2,
+            }
+        if model_name == "Extra Trees":
+            return {
+                "n_estimators": int(min(360, max(140, rows // 110 + feats * 5))),
+                "max_depth": int(min(24, max(7, int(np.log2(rows)) + 4))),
+            }
+        if model_name == "Gradient Boosting":
+            return {
+                "n_estimators": int(min(260, max(120, rows // 200 + feats * 2))),
+                "learning_rate": 0.05 if rows > 3000 else 0.08,
+                "max_depth": int(min(6, max(2, int(np.log2(feats + 1))))),
+                "subsample": 0.9,
+            }
+        if model_name == "XGBoost":
+            return {
+                "n_estimators": int(min(320, max(140, rows // 140 + feats * 3))),
+                "max_depth": int(min(12, max(4, int(np.log2(feats + 2)) + 2))),
+                "learning_rate": 0.05 if rows > 4000 else 0.08,
+                "subsample": 0.85,
+                "colsample_bytree": 0.85,
+            }
+        if model_name == "LightGBM":
+            return {
+                "n_estimators": int(min(320, max(140, rows // 140 + feats * 3))),
+                "num_leaves": int(min(96, max(31, 16 + int(np.sqrt(feats)) * 6))),
+                "learning_rate": 0.05 if rows > 4000 else 0.08,
+                "subsample": 0.9,
+                "colsample_bytree": 0.9,
+            }
+        if model_name in {"Logistic Regression", "Linear Regression"}:
+            return {"C": 1.0} if model_name == "Logistic Regression" else {"alpha": 1.0}
+        if model_name == "KNN":
+            return {"n_neighbors": int(min(31, max(5, int(np.sqrt(rows) // 2 * 2 + 1))))}
+        if model_name in {"Linear SVM", "Linear SVR"}:
+            return {"C": 1.0}
+        if model_name in {"RBF SVM", "RBF SVR"}:
+            gamma = max(0.001, min(1.0, 1.0 / max(feats, 1)))
+            return {"C": 1.0, "gamma": float(gamma)}
+        if model_name == "MLP Neural Net":
+            return {"alpha": 0.0005 if rows > 5000 else 0.0001, "max_iter": 320}
+        if model_name == "Deep MLP Neural Net":
+            return {"alpha": 0.001 if rows > 5000 else 0.0003, "max_iter": 420}
+        return {}
+
+    def _sanitize_model_overrides(self, estimator, overrides: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+        if not overrides:
+            return {}
+        allowed = set(estimator.get_params().keys())
+        cleaned: Dict[str, Any] = {}
+        for k, v in overrides.items():
+            if k in allowed:
+                cleaned[k] = v
+        return cleaned
+
     def tune_estimator(
         self,
         model_name: str,
@@ -558,6 +628,7 @@ class AutoMLPipeline:
         test_size: float = 0.2,
         cv_folds: int = 5,
         models_to_train: Optional[List[str]] = None,
+        model_hyperparams: Optional[Dict[str, Dict[str, Any]]] = None,
         enable_tuning: bool = False,
         tuning_trials: int = 12,
         tuning_time_budget_sec: int = 180,
@@ -593,6 +664,9 @@ class AutoMLPipeline:
 
         results = []
         n_models = len(model_catalog)
+        n_rows = len(df)
+        n_features = len(feature_names)
+        model_hyperparams = model_hyperparams or {}
 
         for i, (model_name, estimator) in enumerate(model_catalog.items()):
             progress = 10 + int((i / n_models) * 80)
@@ -600,6 +674,15 @@ class AutoMLPipeline:
 
             try:
                 start = time.time()
+
+                auto_starting = self._auto_starting_params(model_name, task_type, n_rows, n_features)
+                user_override_raw = model_hyperparams.get(model_name) if isinstance(model_hyperparams, dict) else None
+                user_overrides = self._sanitize_model_overrides(estimator, user_override_raw)
+
+                if auto_starting:
+                    estimator.set_params(**auto_starting)
+                if user_overrides:
+                    estimator.set_params(**user_overrides)
 
                 # Build full pipeline
                 tuning_info = {"enabled": False}
@@ -652,7 +735,11 @@ class AutoMLPipeline:
                     "task_type": task_type,
                     "file_path": model_path,
                     "metrics": metrics,
-                    "tuning": tuning_info,
+                    "tuning": {
+                        **tuning_info,
+                        "starting_params": auto_starting,
+                        "manual_overrides": user_overrides,
+                    },
                     "feature_importance": feature_importance,
                     "training_time": training_time,
                     # Flatten key metrics

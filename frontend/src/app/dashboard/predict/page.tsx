@@ -225,7 +225,7 @@ export default function PredictPage() {
                       onChange={e => setFeatures(prev => ({ ...prev, [spec.name]: e.target.value }))}
                       min={spec.min}
                       max={spec.max}
-                      step={spec.input_type === "number" ? "any" : undefined}
+                      step={spec.input_type === "number" ? (spec.integer_like ? 1 : "any") : undefined}
                       placeholder={spec.input_type === "number"
                         ? `Range ${spec.min ?? "?"} to ${spec.max ?? "?"}`
                         : "Enter value..."}

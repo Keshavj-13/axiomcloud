@@ -30,12 +30,31 @@ export interface TrainingJob {
   dataset_id: number;
   task_type?: string;
   target_column: string;
-  status: "pending" | "running" | "completed" | "failed";
+  status: "pending" | "running" | "completed" | "failed" | "local_pending" | "local_running" | string;
   progress: number;
   error_message?: string;
   config?: Record<string, unknown>;
   created_at: string;
   completed_at?: string;
+}
+
+export interface LocalTrainingJobSpec {
+  job_id: string;
+  run_id: string;
+  dataset_id: number;
+  dataset_name: string;
+  dataset_path: string;
+  target_column: string;
+  task_type?: string;
+  model_config: Record<string, unknown>;
+  hyperparameters: Record<string, unknown>;
+  output_dir?: string;
+}
+
+export interface TrainingLaunchResponse extends TrainingJob {
+  execution_mode: "remote" | "local";
+  local_job_spec?: LocalTrainingJobSpec | null;
+  message?: string;
 }
 
 export interface TrainingModelCatalog {
@@ -47,6 +66,14 @@ export interface TrainingModelCatalog {
     cost_tier?: "low" | "medium" | "high";
     warning?: string | null;
     experimental?: boolean;
+    hyperparameters?: Record<string, {
+      type?: "number" | "integer" | "boolean" | "select" | "text";
+      min?: number;
+      max?: number;
+      step?: number;
+      default?: number | string | boolean;
+      options?: Array<string | number>;
+    }>;
   }>;
 }
 
@@ -166,6 +193,7 @@ export interface InferenceFeatureTemplate {
   max?: number;
   mean?: number;
   std?: number;
+  integer_like?: boolean;
   options?: string[];
 }
 
@@ -247,6 +275,47 @@ export interface EDAReport {
     reasons: string[];
   }>;
   recommendations: string[];
+}
+
+export interface AnalyticsChart {
+  id: string;
+  section: "exploratory" | "model_evaluation";
+  title: string;
+  description: string;
+  purpose: string;
+  insight: string;
+  chart_type: "bar" | "line" | "scatter" | "heatmap" | "table" | string;
+  fallback_used: boolean;
+  output_reference: {
+    path: string;
+    relative_path: string;
+    url: string;
+  };
+  artifact_ref: {
+    path: string;
+    relative_path: string;
+    url: string;
+  };
+  spec: Record<string, unknown>;
+}
+
+export interface AnalyticsReport {
+  dataset_id: number;
+  dataset_name: string;
+  target_column: string;
+  task_type: "classification" | "regression" | string;
+  detected_task_type: "classification" | "regression" | string;
+  minimum_required_charts: number;
+  chart_count: number;
+  report_id: string;
+  created_at: string;
+  exploratory_charts: AnalyticsChart[];
+  evaluation_charts: AnalyticsChart[];
+  evaluation_status: "ready" | "pending" | string;
+  evaluation_metrics: Record<string, number | string | null>;
+  model_id?: number | null;
+  model_type?: string | null;
+  predictions_available?: boolean;
 }
 
 export interface ShapResult {

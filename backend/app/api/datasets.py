@@ -5,6 +5,7 @@ Handles dataset upload, listing, and example datasets.
 import os
 import uuid
 import logging
+import joblib
 import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from fastapi.responses import JSONResponse
@@ -12,14 +13,16 @@ from sqlalchemy.orm import Session
 from typing import Optional, List
 
 from app.core.database import get_db
-from app.models.db_models import Dataset
+from app.models.db_models import Dataset, TrainedModel
 from app.schemas.schemas import DatasetResponse, DatasetProfileCompact
 from app.ml.datasets import EXAMPLE_DATASETS
 from app.ml.dataset_profiling import build_dataset_profile, build_drift_baseline_snapshot, build_eda_report
+from app.ml.analytics_service import AnalyticsReportService, build_predictions_from_model_bundle
 from app.core.config import settings
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+analytics_service = AnalyticsReportService()
 
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
 
@@ -549,6 +552,82 @@ def dataset_eda_report(dataset_id: int, db: Session = Depends(get_db)):
         "dataset_id": dataset.id,
         **build_eda_report(df, dataset_name=dataset.name, target_column=dataset.target_column),
     }
+
+
+@router.get("/datasets/{dataset_id}/analytics-report")
+def dataset_analytics_report(
+    dataset_id: int,
+    target_column: Optional[str] = None,
+    model_type: Optional[str] = None,
+    model_id: Optional[int] = None,
+    db: Session = Depends(get_db),
+):
+    """Return unified analytics report with >=10 charts and artifact metadata.
+
+    Report is split into:
+    1) Exploratory charts
+    2) Model evaluation charts
+
+    If model_id is provided, predictions are computed from the saved model artifact and
+    evaluation charts are generated; otherwise evaluation is marked pending.
+    """
+    dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    if not os.path.exists(dataset.file_path):
+        raise HTTPException(status_code=404, detail="Dataset file not found on disk")
+
+    try:
+        df = _load_dataset_file(dataset.file_path)
+    except Exception as e:
+        logger.exception("Failed analytics report for dataset %s: %s", dataset_id, e)
+        raise HTTPException(status_code=422, detail="Could not parse dataset")
+
+    resolved_target = target_column or dataset.target_column
+    if not resolved_target:
+        raise HTTPException(status_code=400, detail="target_column is required when dataset has no default target")
+    if resolved_target not in df.columns:
+        raise HTTPException(status_code=400, detail=f"Target column '{resolved_target}' not found in dataset")
+
+    predictions = None
+    resolved_model_type = model_type
+
+    if model_id is not None:
+        model = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
+        if not model:
+            raise HTTPException(status_code=404, detail="Model not found")
+        if not model.file_path or not os.path.exists(model.file_path):
+            raise HTTPException(status_code=404, detail="Model artifact not found")
+
+        try:
+            bundle = joblib.load(model.file_path)
+            predictions = build_predictions_from_model_bundle(
+                df,
+                target_column=resolved_target,
+                model_bundle=bundle,
+            )
+            resolved_model_type = resolved_model_type or model.task_type
+        except Exception as exc:
+            logger.warning("Could not generate predictions for analytics report | model_id=%s reason=%s", model_id, exc)
+            predictions = None
+
+    report = analytics_service.generate_report(
+        dataset_id=dataset.id,
+        dataset_name=dataset.name,
+        df=df,
+        target_column=resolved_target,
+        model_type=resolved_model_type,
+        predictions=predictions,
+    )
+
+    report.update(
+        {
+            "model_id": model_id,
+            "model_type": resolved_model_type,
+            "predictions_available": bool(predictions is not None),
+        }
+    )
+    return report
 
 
 @router.delete("/datasets/{dataset_id}")

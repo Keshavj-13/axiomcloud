@@ -14,11 +14,13 @@ import {
   LeakageReport,
   EDAReport,
   TrainingJob,
+  AnalyticsReport,
+  AnalyticsChart,
 } from "@/types";
 import toast from "react-hot-toast";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line
+  LineChart, Line, ScatterChart, Scatter
 } from "recharts";
 import { Trophy, Download, Rocket, BarChart3, Loader2, Brain, Activity } from "lucide-react";
 import PanelHeader from "@/components/ui/PanelHeader";
@@ -27,6 +29,95 @@ import StatusBadge from "@/components/ui/StatusBadge";
 export const dynamic = "force-dynamic";
 
 const COLORS = ["#3b6ef6", "#00f5ff", "#00ff94", "#ffb700", "#7b2fff"];
+
+function HeatCell({ value }: { value: number }) {
+  const clamped = Math.max(-1, Math.min(1, Number.isFinite(value) ? value : 0));
+  const alpha = Math.abs(clamped);
+  const bg = clamped >= 0
+    ? `rgba(110, 59, 215, ${0.2 + alpha * 0.5})`
+    : `rgba(239, 68, 68, ${0.2 + alpha * 0.5})`;
+  return <div className="h-6 w-6 rounded" style={{ background: bg }} title={clamped.toFixed(3)} />;
+}
+
+function EmptyPlotState({ message }: { message: string }) {
+  return (
+    <div className="flex h-[150px] items-center justify-center rounded border border-outline/20 bg-surface/40 p-3 text-center text-[11px] text-text-muted">
+      {message}
+    </div>
+  );
+}
+
+function AnalyticsChartCard({ chart }: { chart: AnalyticsChart }) {
+  const spec = (chart.spec || {}) as Record<string, unknown>;
+  const rows = (spec.rows as Record<string, unknown>[] | undefined) || [];
+  const xKey = (spec.xKey as string | undefined) || "label";
+  const yKey = (spec.yKey as string | undefined) || "value";
+  const series = (spec.series as Array<{ key: string; name: string; color?: string }> | undefined) || [];
+
+  return (
+    <div className="rounded-lg border border-outline/20 bg-surface-variant/30 p-3">
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <div>
+          <div className="text-xs font-semibold text-text-primary">{chart.title}</div>
+          <div className="text-[11px] text-text-muted">{chart.purpose}</div>
+        </div>
+        {chart.fallback_used ? <StatusBadge label="fallback" tone="idle" /> : null}
+      </div>
+
+      {chart.chart_type === "bar" && rows.length > 0 ? (
+        <ResponsiveContainer width="100%" height={190}>
+          <BarChart data={rows}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(117,117,123,0.2)" />
+            <XAxis dataKey={xKey} tick={{ fontSize: 10, fill: "#acaab1" }} interval="preserveStartEnd" angle={-20} textAnchor="end" height={44} minTickGap={24} />
+            <YAxis tick={{ fontSize: 10, fill: "#acaab1" }} />
+            <Tooltip contentStyle={{ background: "#19191d", border: "1px solid rgba(117,117,123,0.35)", borderRadius: "8px" }} />
+            {(series.length ? series : [{ key: "value", name: "Value", color: "#d0bcff" }]).map((s) => (
+              <Bar key={s.key} dataKey={s.key} name={s.name} fill={s.color || "#d0bcff"} radius={[3, 3, 0, 0]} />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
+      ) : chart.chart_type === "line" && rows.length > 0 ? (
+        <ResponsiveContainer width="100%" height={190}>
+          <LineChart data={rows}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(117,117,123,0.2)" />
+            <XAxis dataKey={xKey} tick={{ fontSize: 10, fill: "#acaab1" }} />
+            <YAxis tick={{ fontSize: 10, fill: "#acaab1" }} />
+            <Tooltip contentStyle={{ background: "#19191d", border: "1px solid rgba(117,117,123,0.35)", borderRadius: "8px" }} />
+            {(series.length ? series : [{ key: "value", name: "Value", color: "#d0bcff" }]).map((s) => (
+              <Line key={s.key} dataKey={s.key} name={s.name} stroke={s.color || "#d0bcff"} dot={false} />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      ) : chart.chart_type === "scatter" && rows.length > 0 ? (
+        <ResponsiveContainer width="100%" height={190}>
+          <ScatterChart>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(117,117,123,0.2)" />
+            <XAxis dataKey={xKey} name={xKey} tick={{ fontSize: 10, fill: "#acaab1" }} />
+            <YAxis dataKey={yKey} name={yKey} tick={{ fontSize: 10, fill: "#acaab1" }} />
+            <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={{ background: "#19191d", border: "1px solid rgba(117,117,123,0.35)", borderRadius: "8px" }} />
+            <Scatter data={rows} fill="#d0bcff" shape={<circle r={1.8} />} />
+          </ScatterChart>
+        </ResponsiveContainer>
+      ) : chart.chart_type === "heatmap" ? (
+        <div className="overflow-auto">
+          <div className="inline-flex flex-col gap-1">
+            {(((spec.matrix as number[][] | undefined) || [])).slice(0, 10).map((row, r) => (
+              <div key={r} className="flex gap-1">
+                {row.slice(0, 10).map((v, c) => <HeatCell key={`${r}-${c}`} value={v} />)}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="max-h-40 overflow-auto rounded border border-outline/20 bg-surface/40 p-2 text-[11px] text-text-muted">
+          {rows.length > 0 ? rows.slice(0, 10).map((r, idx) => <div key={idx}>{JSON.stringify(r)}</div>) : (chart.insight || "No chart rows available.")}
+        </div>
+      )}
+
+      <div className="mt-2 text-[11px] text-text-muted">Insight: {chart.insight}</div>
+    </div>
+  );
+}
 
 export default function ModelsPage() {
   const searchParams = useSearchParams();
@@ -51,6 +142,8 @@ export default function ModelsPage() {
   const [leakageReport, setLeakageReport] = useState<LeakageReport | null>(null);
   const [edaReport, setEdaReport] = useState<EDAReport | null>(null);
   const [qualityLoading, setQualityLoading] = useState(false);
+  const [analyticsReport, setAnalyticsReport] = useState<AnalyticsReport | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   useEffect(() => {
     trainingAPI.listJobs().then(r => {
@@ -99,6 +192,27 @@ export default function ModelsPage() {
       setEdaReport(null);
     }).finally(() => setQualityLoading(false));
   }, [jobId, jobs]);
+
+  useEffect(() => {
+    const activeJob = jobs.find((j) => j.job_id === jobId);
+    if (!activeJob?.dataset_id || !selectedModel?.id) {
+      setAnalyticsReport(null);
+      return;
+    }
+
+    setAnalyticsLoading(true);
+    datasetsAPI.analyticsReport(activeJob.dataset_id, {
+      target_column: activeJob.target_column,
+      model_type: activeJob.task_type,
+      model_id: selectedModel.id,
+    }).then((res) => {
+      setAnalyticsReport(res.data);
+    }).catch(() => {
+      setAnalyticsReport(null);
+    }).finally(() => {
+      setAnalyticsLoading(false);
+    });
+  }, [jobId, jobs, selectedModel?.id]);
 
   const selectedJob = jobs.find((j) => j.job_id === jobId) || null;
   const droppedRows = cleanPreview && qualityReport ? Math.max(0, qualityReport.rows - cleanPreview.rows_after_cleaning) : 0;
@@ -187,11 +301,40 @@ export default function ModelsPage() {
   })) || [];
 
   const isClassification = metrics?.task_type === "classification";
+  const missingByColumnData = qualityReport
+    ? Object.entries(qualityReport.missing_by_column || {})
+        .map(([column, missing]) => ({ column, missing }))
+        .filter((r) => Number(r.missing) > 0)
+        .sort((a, b) => Number(b.missing) - Number(a.missing))
+        .slice(0, 6)
+    : [];
+  const outlierByColumnData = qualityReport
+    ? Object.entries(qualityReport.outliers_by_column || {})
+        .map(([column, outliers]) => ({ column, outliers }))
+        .filter((r) => Number(r.outliers) > 0)
+        .sort((a, b) => Number(b.outliers) - Number(a.outliers))
+        .slice(0, 6)
+    : [];
+  const leakageRiskData = (leakageReport?.leakage_risks || [])
+    .map((r) => ({
+      feature: r.feature.length > 18 ? `${r.feature.slice(0, 18)}…` : r.feature,
+      risk_pct: +(r.risk_score * 100).toFixed(2),
+    }))
+    .filter((r) => r.risk_pct > 0)
+    .sort((a, b) => b.risk_pct - a.risk_pct)
+    .slice(0, 6);
   const metricEntries = selectedModel?.metrics
     ? Object.entries(selectedModel.metrics)
         .filter(([, value]) => ["number", "string", "boolean"].includes(typeof value) || value === null)
         .map(([key, value]) => ({ key, value: value === null ? "null" : String(value) }))
     : [];
+
+  const modelOriginLabel = (model?: TrainedModel | null): "local" | "server" => {
+    const origin = String((model?.metrics as Record<string, unknown> | undefined)?.storage_origin || "").toLowerCase();
+    if (origin === "local") return "local";
+    if ((model?.model_type || "").toLowerCase().includes("local")) return "local";
+    return "server";
+  };
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -227,7 +370,61 @@ export default function ModelsPage() {
             <Loader2 className="h-4 w-4 animate-spin" /> Loading dataset diagnostics...
           </div>
         ) : qualityReport ? (
-          <div className="grid lg:grid-cols-3 gap-4 text-xs">
+          <div className="space-y-4">
+            <div className="grid lg:grid-cols-3 gap-4">
+              <div className="rounded-lg border border-outline/20 bg-surface-variant/30 p-3">
+                <div className="mb-2 text-xs font-semibold text-text-primary">Missingness by column</div>
+                {missingByColumnData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={150}>
+                    <BarChart data={missingByColumnData} margin={{ top: 6, right: 8, left: 0, bottom: 8 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(117,117,123,0.15)" />
+                      <XAxis dataKey="column" tick={{ fill: "#acaab1", fontSize: 10 }} interval="preserveStartEnd" angle={-20} textAnchor="end" height={42} minTickGap={24} />
+                      <YAxis tick={{ fill: "#acaab1", fontSize: 10 }} />
+                      <Tooltip contentStyle={{ background: "#19191d", border: "1px solid rgba(117,117,123,0.35)", borderRadius: "8px" }} />
+                      <Bar dataKey="missing" fill="#d0bcff" radius={[3, 3, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <EmptyPlotState message="No missing-value signal found. All columns currently have zero missing entries." />
+                )}
+              </div>
+
+              <div className="rounded-lg border border-outline/20 bg-surface-variant/30 p-3">
+                <div className="mb-2 text-xs font-semibold text-text-primary">Outliers by column</div>
+                {outlierByColumnData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={150}>
+                    <BarChart data={outlierByColumnData} margin={{ top: 6, right: 8, left: 0, bottom: 8 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(117,117,123,0.15)" />
+                      <XAxis dataKey="column" tick={{ fill: "#acaab1", fontSize: 10 }} interval="preserveStartEnd" angle={-20} textAnchor="end" height={42} minTickGap={24} />
+                      <YAxis tick={{ fill: "#acaab1", fontSize: 10 }} />
+                      <Tooltip contentStyle={{ background: "#19191d", border: "1px solid rgba(117,117,123,0.35)", borderRadius: "8px" }} />
+                      <Bar dataKey="outliers" fill="#6e3bd7" radius={[3, 3, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <EmptyPlotState message="No outlier counts were detected for the profiled columns." />
+                )}
+              </div>
+
+              <div className="rounded-lg border border-outline/20 bg-surface-variant/30 p-3">
+                <div className="mb-2 text-xs font-semibold text-text-primary">Leakage risk by feature</div>
+                {leakageRiskData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={150}>
+                    <BarChart data={leakageRiskData} margin={{ top: 6, right: 8, left: 0, bottom: 8 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(117,117,123,0.15)" />
+                      <XAxis dataKey="feature" tick={{ fill: "#acaab1", fontSize: 10 }} interval="preserveStartEnd" angle={-20} textAnchor="end" height={42} minTickGap={24} />
+                      <YAxis tick={{ fill: "#acaab1", fontSize: 10 }} unit="%" />
+                      <Tooltip contentStyle={{ background: "#19191d", border: "1px solid rgba(117,117,123,0.35)", borderRadius: "8px" }} />
+                      <Bar dataKey="risk_pct" fill="#ef4444" radius={[3, 3, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <EmptyPlotState message="No leakage-risk values were produced. This typically means no feature crossed the leakage heuristics threshold for the selected dataset and target." />
+                )}
+              </div>
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-4 text-xs">
             <div className="rounded-lg border border-outline/20 bg-surface-variant/30 p-4 space-y-2">
               <div className="text-sm font-semibold text-text-primary">Level 1 • Raw Quality</div>
               <div className="flex justify-between"><span className="text-text-muted">Dataset</span><span className="font-mono text-text-primary">{qualityReport.dataset_name}</span></div>
@@ -271,6 +468,7 @@ export default function ModelsPage() {
                 </ul>
               </div>
             </div>
+            </div>
           </div>
         ) : (
           <p className="text-xs text-text-muted">Select a completed job to load quality, cleaning impact, and validity diagnostics.</p>
@@ -296,6 +494,9 @@ export default function ModelsPage() {
                     <div className="mb-0.5 text-xs text-text-muted">Best Model</div>
                     <div className="font-display text-xl font-semibold text-text-primary">{bestModel.model_name}</div>
                   <div className="flex flex-wrap gap-3 mt-1">
+                    <span className={`metric-badge ${modelOriginLabel(bestModel) === "local" ? "bg-emerald-900/40 text-emerald-300" : "bg-slate-800/60 text-slate-200"}`}>
+                      Origin: {modelOriginLabel(bestModel)}
+                    </span>
                     {bestModel.accuracy !== undefined && bestModel.accuracy !== null && (
                       <span className="metric-badge bg-blue-900/40 text-blue-300">Accuracy: {(bestModel.accuracy * 100).toFixed(1)}%</span>
                     )}
@@ -342,6 +543,7 @@ export default function ModelsPage() {
                     <div className="w-2 h-2 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
                     <span className="text-sm font-semibold text-text-primary">{model.model_name}</span>
                   </div>
+                  <StatusBadge label={modelOriginLabel(model)} tone={modelOriginLabel(model) === "local" ? "healthy" : "idle"} />
                   {model.is_deployed && (
                     <StatusBadge label="deployed" tone="healthy" />
                   )}
@@ -464,6 +666,49 @@ export default function ModelsPage() {
                   </LineChart>
                 </ResponsiveContainer>
               </div>
+            )}
+          </div>
+
+          <div className="panel mb-6 rounded-xl p-6">
+            <PanelHeader
+              title="AutoML Analytics & Diagnostics"
+              subtitle="Rendered directly after cross-validation scores with full-data evaluation plots and task-specific equivalents."
+              className="mb-4"
+            />
+            {analyticsLoading ? (
+              <div className="flex items-center gap-2 text-xs text-text-muted">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading analytics charts...
+              </div>
+            ) : analyticsReport ? (
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-text-muted">
+                  <span>Task: {analyticsReport.task_type}</span>
+                  <span>•</span>
+                  <span>Charts: {analyticsReport.chart_count}</span>
+                  <span>•</span>
+                  <StatusBadge label={`evaluation: ${analyticsReport.evaluation_status}`} tone={analyticsReport.evaluation_status === "ready" ? "healthy" : "idle"} />
+                </div>
+
+                <div>
+                  <div className="mb-2 text-xs uppercase tracking-[0.12em] text-text-muted">1) Exploratory data analysis</div>
+                  <div className="grid gap-3 md:grid-cols-1 xl:grid-cols-2">
+                    {analyticsReport.exploratory_charts.map((chart) => (
+                      <AnalyticsChartCard key={chart.id} chart={chart} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="mb-2 text-xs uppercase tracking-[0.12em] text-text-muted">2) Model evaluation</div>
+                  <div className="grid gap-3 md:grid-cols-1 xl:grid-cols-2">
+                    {analyticsReport.evaluation_charts.map((chart) => (
+                      <AnalyticsChartCard key={chart.id} chart={chart} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-text-muted">Analytics report is not available for the selected job/model pair.</p>
             )}
           </div>
 

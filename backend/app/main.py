@@ -68,7 +68,10 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 # Mount static files for model downloads
 os.makedirs(settings.MODEL_STORAGE_PATH, exist_ok=True)
 os.makedirs(settings.DATASET_STORAGE_PATH, exist_ok=True)
+reports_storage_path = os.path.abspath(os.path.join(settings.BASE_STORAGE_PATH, "reports"))
+os.makedirs(reports_storage_path, exist_ok=True)
 app.mount("/static/models", StaticFiles(directory=settings.MODEL_STORAGE_PATH), name="models")
+app.mount("/static/reports", StaticFiles(directory=reports_storage_path), name="reports")
 
 # Include routers
 app.include_router(datasets.router, prefix="/api", tags=["Datasets"], dependencies=[Depends(get_current_user)])

@@ -187,6 +187,21 @@ axiom-cloud-ai/
 - Node.js 18+
 - pip
 
+### 0. One-command local workflow (recommended)
+
+From the project root:
+
+```bash
+npm install
+npm run dev
+```
+
+This starts both services concurrently with labeled logs:
+- `BACKEND` → FastAPI on `http://localhost:8000` with reload
+- `FRONTEND` → Next.js on `http://localhost:3000` with hot reload
+
+If either service exits, the combined dev session stops immediately and the failure is visible in labeled logs.
+
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/keshavj-13/axiom-cloud-ai.git
@@ -216,6 +231,8 @@ cp .env.example .env
 # Start the API server (uses the same interpreter/environment)
 python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+> After the backend environment is set up once, return to project root and use `npm run dev` for daily development.
 
 The API is now running at **http://localhost:8000**
 Swagger docs at **http://localhost:8000/api/docs**
