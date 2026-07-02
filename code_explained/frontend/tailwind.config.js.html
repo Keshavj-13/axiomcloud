@@ -1,0 +1,203 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>tailwind.config.js</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>frontend/tailwind.config.js</span></div>
+        <h1 style="margin:10px 0 6px">tailwind.config.js</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="src.html">Previous</a><a href="tsconfig.json.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: frontend/tailwind.config.js</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>frontend/tailwind.config.js</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-javascript">/** @type {import(&#x27;tailwindcss&#x27;).Config} */
+module.exports = {
+  darkMode: [&quot;class&quot;],
+  content: [
+    &quot;./src/pages/**/*.{js,ts,jsx,tsx,mdx}&quot;,
+    &quot;./src/components/**/*.{js,ts,jsx,tsx,mdx}&quot;,
+    &quot;./src/app/**/*.{js,ts,jsx,tsx,mdx}&quot;,
+  ],
+  theme: {
+    extend: {
+      colors: {
+        bg: &quot;#0e0e10&quot;,
+        surface: &quot;#19191d&quot;,
+        &quot;surface-variant&quot;: &quot;#25252b&quot;,
+        primary: &quot;#d0bcff&quot;,
+        &quot;primary-deep&quot;: &quot;#6e3bd7&quot;,
+        &quot;text-primary&quot;: &quot;#e7e4ec&quot;,
+        &quot;text-muted&quot;: &quot;#acaab1&quot;,
+        outline: &quot;#47474d&quot;,
+        sigma: {
+          50:  &quot;#f6f4fb&quot;,
+          100: &quot;#eae5f3&quot;,
+          200: &quot;#d8cee9&quot;,
+          300: &quot;#c3b4dd&quot;,
+          400: &quot;#a99ac9&quot;,
+          500: &quot;#8b7cae&quot;,
+          600: &quot;#6e3bd7&quot;,
+          700: &quot;#552c9f&quot;,
+          800: &quot;#3d2e58&quot;,
+          900: &quot;#25252b&quot;,
+          950: &quot;#0e0e10&quot;,
+        },
+        neon: {
+          cyan:   &quot;#d0bcff&quot;,
+          violet: &quot;#6e3bd7&quot;,
+          green:  &quot;#8ddcc2&quot;,
+          amber:  &quot;#ecb96f&quot;,
+        },
+      },
+      fontFamily: {
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-javascript">/** @type {import(&#x27;tailwindcss&#x27;).Config} */
+module.exports = {
+  darkMode: [&quot;class&quot;],
+  content: [
+    &quot;./src/pages/**/*.{js,ts,jsx,tsx,mdx}&quot;,
+    &quot;./src/components/**/*.{js,ts,jsx,tsx,mdx}&quot;,
+    &quot;./src/app/**/*.{js,ts,jsx,tsx,mdx}&quot;,
+  ],
+  theme: {
+    extend: {
+      colors: {
+        bg: &quot;#0e0e10&quot;,
+        surface: &quot;#19191d&quot;,
+        &quot;surface-variant&quot;: &quot;#25252b&quot;,
+        primary: &quot;#d0bcff&quot;,
+        &quot;primary-deep&quot;: &quot;#6e3bd7&quot;,
+        &quot;text-primary&quot;: &quot;#e7e4ec&quot;,
+        &quot;text-muted&quot;: &quot;#acaab1&quot;,
+        outline: &quot;#47474d&quot;,
+        sigma: {
+          50:  &quot;#f6f4fb&quot;,
+          100: &quot;#eae5f3&quot;,
+          200: &quot;#d8cee9&quot;,
+          300: &quot;#c3b4dd&quot;,
+          400: &quot;#a99ac9&quot;,
+          500: &quot;#8b7cae&quot;,
+          600: &quot;#6e3bd7&quot;,
+          700: &quot;#552c9f&quot;,
+          800: &quot;#3d2e58&quot;,
+          900: &quot;#25252b&quot;,
+          950: &quot;#0e0e10&quot;,
+        },
+        neon: {
+          cyan:   &quot;#d0bcff&quot;,
+          violet: &quot;#6e3bd7&quot;,
+          green:  &quot;#8ddcc2&quot;,
+          amber:  &quot;#ecb96f&quot;,
+        },
+      },
+      fontFamily: {
+        display: [&quot;&#x27;Inter&#x27;&quot;, &quot;sans-serif&quot;],
+        mono:    [&quot;&#x27;JetBrains Mono&#x27;&quot;, &quot;monospace&quot;],
+        body:    [&quot;&#x27;Inter&#x27;&quot;, &quot;sans-serif&quot;],
+      },
+      backgroundImage: {
+        &quot;grid-pattern&quot;: &quot;linear-gradient(rgba(59,110,246,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(59,110,246,.06) 1px, transparent 1px)&quot;,
+        &quot;hero-gradient&quot;: &quot;radial-gradient(ellipse 80% 60% at 50% -10%, rgba(59,110,246,0.25), transparent)&quot;,
+        &quot;card-gradient&quot;: &quot;linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)&quot;,
+      },
+      backgroundSize: {
+        &quot;grid-size&quot;: &quot;40px 40px&quot;,
+      },
+      animation: {
+        &quot;float&quot;: &quot;float 6s ease-in-out infinite&quot;,
+        &quot;pulse-slow&quot;: &quot;pulse 4s ease-in-out infinite&quot;,
+        &quot;shimmer&quot;: &quot;shimmer 2s linear infinite&quot;,
+        &quot;spin-slow&quot;: &quot;spin 8s linear infinite&quot;,
+      },
+      keyframes: {
+        float: {
+          &quot;0%, 100%&quot;: { transform: &quot;translateY(0px)&quot; },
+          &quot;50%&quot;: { transform: &quot;translateY(-10px)&quot; },
+        },
+        shimmer: {
+          &quot;0%&quot;: { backgroundPosition: &quot;-200% 0&quot; },
+          &quot;100%&quot;: { backgroundPosition: &quot;200% 0&quot; },
+        },
+      },
+    },
+  },
+  plugins: [],
+};
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>Config</strong>: No official citation linked here.</li><li><strong>Inter</strong>: No official citation linked here.</li><li><strong>JetBrains</strong>: No official citation linked here.</li><li><strong>Mono</strong>: No official citation linked here.</li><li><strong>a99ac9</strong>: No official citation linked here.</li><li><strong>acaab1</strong>: No official citation linked here.</li><li><strong>amber</strong>: No official citation linked here.</li><li><strong>animation</strong>: No official citation linked here.</li><li><strong>app</strong>: No official citation linked here.</li><li><strong>at</strong>: No official citation linked here.</li><li><strong>b7cae</strong>: No official citation linked here.</li><li><strong>backgroundImage</strong>: No official citation linked here.</li><li><strong>backgroundPosition</strong>: No official citation linked here.</li><li><strong>backgroundSize</strong>: No official citation linked here.</li><li><strong>bg</strong>: No official citation linked here.</li><li><strong>body</strong>: No official citation linked here.</li><li><strong>c3b4dd</strong>: No official citation linked here.</li><li><strong>c9f</strong>: No official citation linked here.</li><li><strong>card</strong>: No official citation linked here.</li><li><strong>class</strong>: No official citation linked here.</li><li><strong>colors</strong>: No official citation linked here.</li><li><strong>components</strong>: No official citation linked here.</li><li><strong>content</strong>: No official citation linked here.</li><li><strong>cyan</strong>: No official citation linked here.</li><li><strong>d0bcff</strong>: No official citation linked here.</li><li><strong>d2e58</strong>: No official citation linked here.</li><li><strong>d8cee9</strong>: No official citation linked here.</li><li><strong>darkMode</strong>: No official citation linked here.</li><li><strong>ddcc2</strong>: No official citation linked here.</li><li><strong>deep</strong>: No official citation linked here.</li><li><strong>deg</strong>: No official citation linked here.</li><li><strong>display</strong>: No official citation linked here.</li><li><strong>e0e10</strong>: No official citation linked here.</li><li><strong>e3bd7</strong>: No official citation linked here.</li><li><strong>e7e4ec</strong>: No official citation linked here.</li><li><strong>eae5f3</strong>: No official citation linked here.</li><li><strong>ease</strong>: No official citation linked here.</li><li><strong>ecb96f</strong>: No official citation linked here.</li><li><strong>ellipse</strong>: No official citation linked here.</li><li><strong>exports</strong>: No official citation linked here.</li><li><strong>extend</strong>: No official citation linked here.</li><li><strong>f6f4fb</strong>: No official citation linked here.</li><li><strong>float</strong>: No official citation linked here.</li><li><strong>fontFamily</strong>: No official citation linked here.</li><li><strong>gradient</strong>: No official citation linked here.</li><li><strong>green</strong>: No official citation linked here.</li><li><strong>grid</strong>: No official citation linked here.</li><li><strong>hero</strong>: No official citation linked here.</li><li><strong>import</strong>: No official citation linked here.</li><li><strong>in</strong>: No official citation linked here.</li><li><strong>infinite</strong>: No official citation linked here.</li><li><strong>js</strong>: No official citation linked here.</li><li><strong>jsx</strong>: No official citation linked here.</li><li><strong>keyframes</strong>: No official citation linked here.</li><li><strong>linear</strong>: No official citation linked here.</li><li><strong>mdx</strong>: No official citation linked here.</li><li><strong>module</strong>: No official citation linked here.</li><li><strong>mono</strong>: No official citation linked here.</li><li><strong>monospace</strong>: No official citation linked here.</li><li><strong>muted</strong>: No official citation linked here.</li><li><strong>neon</strong>: No official citation linked here.</li><li><strong>out</strong>: No official citation linked here.</li><li><strong>outline</strong>: No official citation linked here.</li><li><strong>pages</strong>: No official citation linked here.</li><li><strong>pattern</strong>: No official citation linked here.</li><li><strong>plugins</strong>: No official citation linked here.</li><li><strong>primary</strong>: No official citation linked here.</li><li><strong>pulse</strong>: No official citation linked here.</li><li><strong>px</strong>: No official citation linked here.</li><li><strong>radial</strong>: No official citation linked here.</li><li><strong>rgba</strong>: No official citation linked here.</li><li><strong>sans</strong>: No official citation linked here.</li><li><strong>serif</strong>: No official citation linked here.</li><li><strong>shimmer</strong>: No official citation linked here.</li><li><strong>sigma</strong>: No official citation linked here.</li><li><strong>size</strong>: No official citation linked here.</li><li><strong>slow</strong>: No official citation linked here.</li><li><strong>spin</strong>: No official citation linked here.</li><li><strong>src</strong>: No official citation linked here.</li><li><strong>surface</strong>: No official citation linked here.</li><li><strong>tailwindcss</strong>: No official citation linked here.</li><li><strong>text</strong>: No official citation linked here.</li><li><strong>theme</strong>: No official citation linked here.</li><li><strong>transform</strong>: No official citation linked here.</li><li><strong>translateY</strong>: No official citation linked here.</li><li><strong>transparent</strong>: No official citation linked here.</li><li><strong>ts</strong>: No official citation linked here.</li><li><strong>tsx</strong>: No official citation linked here.</li><li><strong>type</strong>: No official citation linked here.</li><li><strong>variant</strong>: No official citation linked here.</li><li><strong>violet</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

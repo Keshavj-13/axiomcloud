@@ -1,0 +1,384 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DESIGN.md</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>DESIGN.md</span></div>
+        <h1 style="margin:10px 0 6px">DESIGN.md</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href=".gitignore.html">Previous</a><a href="README.md.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: DESIGN.md</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>DESIGN.md</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-markdown"># Axiom Cloud UI Design Spec (Target)
+
+This document defines the **new visual system and page behavior** we will follow going forward.
+
+---
+
+## 1) Design Direction
+
+**Theme:** Axiom Obsidian (dark, technical, premium)
+
+**Goals:**
+- High information density without visual clutter
+- &quot;Control-room&quot; feel for ML workflows
+- Fast scanability using compact typography + strong contrast hierarchy
+- Consistent interaction language across datasets, training, leaderboard, deployments
+
+**Mood keywords:** operational, precise, cinematic, enterprise, low-noise
+
+---
+
+## 2) Visual Foundations
+
+### 2.1 Color System
+
+Use dark surfaces with violet primary accents.
+
+- Background: `#0e0e10`
+- Base surface: `#19191d`
+- Surface variant: `#25252b`
+- Primary: `#d0bcff`
+- Primary accent/deep: `#6e3bd7`
+- Text primary: `#e7e4ec`
+- Text muted: `#acaab1`
+- Border/outline: `#47474d`
+
+Usage rules:
+- Primary color is for active states, key metrics, and CTA emphasis only.
+- Avoid bright gradients except subtle tonal overlays.
+- Keep most surfaces matte, with occasional glass treatment for focus cards.
+
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-markdown"># Axiom Cloud UI Design Spec (Target)
+
+This document defines the **new visual system and page behavior** we will follow going forward.
+
+---
+
+## 1) Design Direction
+
+**Theme:** Axiom Obsidian (dark, technical, premium)
+
+**Goals:**
+- High information density without visual clutter
+- &quot;Control-room&quot; feel for ML workflows
+- Fast scanability using compact typography + strong contrast hierarchy
+- Consistent interaction language across datasets, training, leaderboard, deployments
+
+**Mood keywords:** operational, precise, cinematic, enterprise, low-noise
+
+---
+
+## 2) Visual Foundations
+
+### 2.1 Color System
+
+Use dark surfaces with violet primary accents.
+
+- Background: `#0e0e10`
+- Base surface: `#19191d`
+- Surface variant: `#25252b`
+- Primary: `#d0bcff`
+- Primary accent/deep: `#6e3bd7`
+- Text primary: `#e7e4ec`
+- Text muted: `#acaab1`
+- Border/outline: `#47474d`
+
+Usage rules:
+- Primary color is for active states, key metrics, and CTA emphasis only.
+- Avoid bright gradients except subtle tonal overlays.
+- Keep most surfaces matte, with occasional glass treatment for focus cards.
+
+### 2.2 Typography
+
+Font family: **Inter**
+
+- Page title: 28–36px, semibold/bold
+- Section title: 12–14px uppercase tracking
+- Body: 13–14px
+- Dense labels/meta: 9–11px uppercase, wide tracking
+- Numeric metrics: monospace-style look preferred where possible
+
+### 2.3 Shape, Borders, Depth
+
+- Radius: 8px default (`rounded-lg`), 12px large (`rounded-xl`)
+- Border: thin, low-contrast (`border-outline-variant/10~20`)
+- Shadows: deep but soft (`void-shadow` style), avoid hard drop shadows
+- Blur/glass: use on primary panels only (not every card)
+
+### 2.4 Icons
+
+- Material Symbols Outlined or Lucide (consistent per page)
+- Icon size: 16–20 for nav/actions, 24–32 for hero/feature cards
+
+---
+
+## 3) Layout System
+
+### 3.1 Shell
+
+Persistent app frame:
+- **Top bar** (fixed): app brand, global actions, account
+- **Left sidebar** (fixed): project context + section nav
+- **Main canvas**: content area with page-specific grids
+
+### 3.2 Spacing
+
+- Global page padding: 32–48px
+- Section gaps: 24–32px
+- Card internal padding: 20–32px
+- Dense table cell Y padding: 12–20px
+
+### 3.3 Responsiveness
+
+- Desktop-first, but preserve hierarchy on tablet/mobile
+- Sidebar collapses/overlays on smaller screens
+- Data tables become horizontal scroll blocks
+
+---
+
+## 4) Component Standards
+
+### 4.1 Navigation
+
+- Active sidebar item uses left border + tinted background + primary text
+- Inactive items are muted with hover brighten
+
+### 4.2 Cards
+
+Types:
+1. Standard surface card
+2. Glass panel (focus/critical module)
+3. Metric card (large value + tiny label)
+
+### 4.3 Tables
+
+- Header row with compact uppercase labels
+- Alternating hover highlight (not zebra striping)
+- Right-align numeric columns
+- Status as tiny pill/badge
+
+### 4.4 Buttons
+
+- Primary CTA: violet background, high contrast text
+- Secondary: surface-high with border
+- Tertiary/icon-only for utility actions
+
+### 4.5 Status Tokens
+
+- Active/Healthy: primary or emerald accent
+- Processing/Warming: amber/violet pulse
+- Idle/Hibernating: muted gray
+- Error: soft red, never neon
+
+### 4.6 Charts + Data Viz
+
+- Thin lines, minimal chartjunk
+- Muted grids, highlighted primary series
+- Small legends with compact labels
+
+---
+
+## 5) Page Blueprints
+
+## 5.1 Datasets
+
+**Purpose:** ingest + registry overview
+
+Sections:
+1. Header (title + subtitle)
+2. Upload/Ingestion panel (drag/drop + CTA)
+3. Storage utilization card
+4. Registry table
+5. Context cards (auto-labeling, encryption, pipeline sync)
+
+Behavior:
+- Upload area supports CSV/XLSX now; UI can reference future formats only if actually supported.
+- Table actions are icon-first; detail appears in row/meta panels.
+
+## 5.2 Model Training
+
+**Purpose:** live training cockpit
+
+Sections:
+1. Session header with uptime + stop action
+2. Left rail: dataset source + hyperparameters + hardware stats
+3. Right main: chart + live logs terminal
+4. Bottom metrics strip (epoch, ETA, accuracy, cost)
+
+Behavior:
+- Training state should feel “live” (animated pulse indicators, rolling logs)
+- Controls are editable but grouped and safe (apply/confirm changes)
+
+## 5.3 Leaderboard
+
+**Purpose:** compare models + validate quality
+
+Sections:
+1. Header with filter/export controls
+2. Main ranked model table
+3. Side insights (average accuracy + ROC panel)
+4. Secondary diagnostics (confusion matrix + compute logistics)
+
+Behavior:
+- Rank and score readability is top priority
+- Most important model should be obvious in &lt;2 seconds
+
+## 5.4 Deployments
+
+**Purpose:** runtime endpoint operations
+
+Sections:
+1. Header with scale/new deployment actions
+2. Endpoints table (status/latency/uptime)
+3. Inference sandbox panel
+4. Resource metrics and API control
+5. Traffic log stream
+
+Behavior:
+- Operational safety + transparency over decorative visuals
+- High-risk actions should be visually separated and confirmed
+
+---
+
+## 6) Motion &amp; Interaction
+
+- Microtransitions: 120–200ms
+- Hover: subtle opacity/background shifts
+- Active press: slight scale-down (`~0.95`)
+- Pulsing only for truly live states (streaming/training)
+- Avoid flashy entrance animations
+
+---
+
+## 7) Implementation Rules (Next.js + Tailwind)
+
+1. Keep all design tokens in Tailwind theme extensions.
+2. Reuse existing layout shell (`top nav + sidebar + content`) instead of page-by-page reinvention.
+3. Standardize reusable components for:
+  - `MetricCard`
+  - `StatusBadge`
+  - `DataTable`
+  - `PanelHeader`
+4. Prefer semantic utility groupings over one-off inline styling.
+5. Maintain accessibility:
+  - visible focus states
+  - sufficient contrast
+  - keyboard-operable controls
+
+---
+
+## 8) Content Voice
+
+UI copy style:
+- concise
+- technical but understandable
+- no marketing fluff in operational screens
+
+Examples:
+- Good: “Training Loss / Validation Accuracy”
+- Good: “Cluster: Stable”
+- Avoid: overly narrative or hype text in core workflows
+
+---
+
+## 9) Scope Guardrails
+
+This spec is authoritative for visual direction. If current UI differs:
+- new work follows this spec,
+- legacy UI is migrated incrementally,
+- behavior constraints from backend/API still take precedence over visual mockup details.
+
+---
+
+## 10) Migration Plan (Practical)
+
+1. Update global tokens/theme first
+2. Apply shell consistency (nav + sidebar + spacing)
+3. Migrate pages in order:
+  1) Datasets
+  2) Training
+  3) Leaderboard
+  4) Deployments
+4. Consolidate repeated UI into shared components
+5. QA for contrast, responsiveness, and state clarity
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>API</strong>: No official citation linked here.</li><li><strong>Accuracy</strong>: No official citation linked here.</li><li><strong>Active</strong>: No official citation linked here.</li><li><strong>Alternating</strong>: No official citation linked here.</li><li><strong>Apply</strong>: No official citation linked here.</li><li><strong>Avoid</strong>: No official citation linked here.</li><li><strong>Axiom</strong>: No official citation linked here.</li><li><strong>Background</strong>: No official citation linked here.</li><li><strong>Base</strong>: No official citation linked here.</li><li><strong>Behavior</strong>: No official citation linked here.</li><li><strong>Blueprints</strong>: No official citation linked here.</li><li><strong>Blur</strong>: No official citation linked here.</li><li><strong>Body</strong>: No official citation linked here.</li><li><strong>Border</strong>: No official citation linked here.</li><li><strong>Borders</strong>: No official citation linked here.</li><li><strong>Bottom</strong>: No official citation linked here.</li><li><strong>Buttons</strong>: No official citation linked here.</li><li><strong>CSV</strong>: No official citation linked here.</li><li><strong>CTA</strong>: No official citation linked here.</li><li><strong>Card</strong>: No official citation linked here.</li><li><strong>Cards</strong>: No official citation linked here.</li><li><strong>Charts</strong>: No official citation linked here.</li><li><strong>Cloud</strong>: No official citation linked here.</li><li><strong>Cluster</strong>: No official citation linked here.</li><li><strong>Color</strong>: No official citation linked here.</li><li><strong>Component</strong>: No official citation linked here.</li><li><strong>Consistent</strong>: No official citation linked here.</li><li><strong>Consolidate</strong>: No official citation linked here.</li><li><strong>Content</strong>: No official citation linked here.</li><li><strong>Context</strong>: No official citation linked here.</li><li><strong>Control</strong>: No official citation linked here.</li><li><strong>Controls</strong>: No official citation linked here.</li><li><strong>Data</strong>: No official citation linked here.</li><li><strong>DataTable</strong>: No official citation linked here.</li><li><strong>Datasets</strong>: No official citation linked here.</li><li><strong>Dense</strong>: No official citation linked here.</li><li><strong>Deployments</strong>: No official citation linked here.</li><li><strong>Depth</strong>: No official citation linked here.</li><li><strong>Design</strong>: No official citation linked here.</li><li><strong>Desktop</strong>: No official citation linked here.</li><li><strong>Direction</strong>: No official citation linked here.</li><li><strong>ETA</strong>: No official citation linked here.</li><li><strong>Endpoints</strong>: No official citation linked here.</li><li><strong>Error</strong>: No official citation linked here.</li><li><strong>Examples</strong>: No official citation linked here.</li><li><strong>Fast</strong>: No official citation linked here.</li><li><strong>Font</strong>: No official citation linked here.</li><li><strong>Foundations</strong>: No official citation linked here.</li><li><strong>Glass</strong>: No official citation linked here.</li><li><strong>Global</strong>: No official citation linked here.</li><li><strong>Goals</strong>: No official citation linked here.</li><li><strong>Good</strong>: No official citation linked here.</li><li><strong>Guardrails</strong>: No official citation linked here.</li><li><strong>Header</strong>: No official citation linked here.</li><li><strong>Healthy</strong>: No official citation linked here.</li><li><strong>Hibernating</strong>: No official citation linked here.</li><li><strong>High</strong>: No official citation linked here.</li><li><strong>Hover</strong>: No official citation linked here.</li><li><strong>Icon</strong>: No official citation linked here.</li><li><strong>Icons</strong>: No official citation linked here.</li><li><strong>Idle</strong>: No official citation linked here.</li><li><strong>If</strong>: No official citation linked here.</li><li><strong>Implementation</strong>: No official citation linked here.</li><li><strong>Inactive</strong>: No official citation linked here.</li><li><strong>Inference</strong>: No official citation linked here.</li><li><strong>Ingestion</strong>: No official citation linked here.</li><li><strong>Inter</strong>: No official citation linked here.</li><li><strong>Interaction</strong>: No official citation linked here.</li><li><strong>Keep</strong>: No official citation linked here.</li><li><strong>Layout</strong>: No official citation linked here.</li><li><strong>Leaderboard</strong>: No official citation linked here.</li><li><strong>Left</strong>: No official citation linked here.</li><li><strong>Loss</strong>: No official citation linked here.</li><li><strong>Lucide</strong>: No official citation linked here.</li><li><strong>ML</strong>: No official citation linked here.</li><li><strong>Main</strong>: No official citation linked here.</li><li><strong>Maintain</strong>: No official citation linked here.</li><li><strong>Material</strong>: No official citation linked here.</li><li><strong>Metric</strong>: No official citation linked here.</li><li><strong>MetricCard</strong>: No official citation linked here.</li><li><strong>Microtransitions</strong>: No official citation linked here.</li><li><strong>Migrate</strong>: No official citation linked here.</li><li><strong>Migration</strong>: No official citation linked here.</li><li><strong>Model</strong>: No official citation linked here.</li><li><strong>Mood</strong>: No official citation linked here.</li><li><strong>Most</strong>: No official citation linked here.</li><li><strong>Motion</strong>: No official citation linked here.</li><li><strong>Muted</strong>: No official citation linked here.</li><li><strong>Navigation</strong>: No official citation linked here.</li><li><strong>Next</strong>: No official citation linked here.</li><li><strong>Numeric</strong>: No official citation linked here.</li><li><strong>Obsidian</strong>: No official citation linked here.</li><li><strong>Operational</strong>: No official citation linked here.</li><li><strong>Outlined</strong>: No official citation linked here.</li><li><strong>Page</strong>: No official citation linked here.</li><li><strong>PanelHeader</strong>: No official citation linked here.</li><li><strong>Persistent</strong>: No official citation linked here.</li><li><strong>Plan</strong>: No official citation linked here.</li><li><strong>Practical</strong>: No official citation linked here.</li><li><strong>Prefer</strong>: No official citation linked here.</li><li><strong>Primary</strong>: No official citation linked here.</li><li><strong>Processing</strong>: No official citation linked here.</li><li><strong>Pulsing</strong>: No official citation linked here.</li><li><strong>Purpose</strong>: No official citation linked here.</li><li><strong>QA</strong>: No official citation linked here.</li><li><strong>ROC</strong>: No official citation linked here.</li><li><strong>Radius</strong>: No official citation linked here.</li><li><strong>Rank</strong>: No official citation linked here.</li><li><strong>Registry</strong>: No official citation linked here.</li><li><strong>Resource</strong>: No official citation linked here.</li><li><strong>Responsiveness</strong>: No official citation linked here.</li><li><strong>Reuse</strong>: No official citation linked here.</li><li><strong>Right</strong>: No official citation linked here.</li><li><strong>Rules</strong>: No official citation linked here.</li><li><strong>Scope</strong>: No official citation linked here.</li><li><strong>Secondary</strong>: No official citation linked here.</li><li><strong>Section</strong>: No official citation linked here.</li><li><strong>Sections</strong>: No official citation linked here.</li><li><strong>Session</strong>: No official citation linked here.</li><li><strong>Shadows</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

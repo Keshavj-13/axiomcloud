@@ -1,0 +1,520 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>dataset_profiling.py</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>backend/app/ml/dataset_profiling.py</span></div>
+        <h1 style="margin:10px 0 6px">dataset_profiling.py</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="analytics_service.py.html">Previous</a><a href="datasets.py.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: backend/app/ml/dataset_profiling.py</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>backend/app/ml/dataset_profiling.py</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-python">&quot;&quot;&quot;Dataset profiling helpers with compact chart-ready outputs.&quot;&quot;&quot;
+from __future__ import annotations
+
+from typing import Any, Dict, List, Optional
+import re
+
+import numpy as np
+import pandas as pd
+
+
+def _safe_float(v: Any) -&gt; Optional[float]:
+    try:
+        if v is None:
+            return None
+        val = float(v)
+        if np.isnan(val) or np.isinf(val):
+            return None
+        return val
+    except Exception:
+        return None
+
+
+def _dtype_group(dtype: Any) -&gt; str:
+    name = str(dtype)
+    if name.startswith(&quot;int&quot;) or name.startswith(&quot;float&quot;):
+        return &quot;numeric&quot;
+    if &quot;datetime&quot; in name:
+        return &quot;datetime&quot;
+    if name in {&quot;bool&quot;, &quot;boolean&quot;}:
+        return &quot;boolean&quot;
+    return &quot;categorical&quot;
+
+
+def _histogram(series: pd.Series, bins: int = 20) -&gt; Dict[str, Any]:
+    s = series.dropna()
+    if len(s) == 0:
+        return {&quot;labels&quot;: [], &quot;counts&quot;: []}
+
+    counts, edges = np.histogram(s.to_numpy(dtype=float), bins=min(max(bins, 5), 30))
+    labels = [f&quot;{round(edges[i], 4)} to {round(edges[i + 1], 4)}&quot; for i in range(len(edges) - 1)]
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-python">&quot;&quot;&quot;Dataset profiling helpers with compact chart-ready outputs.&quot;&quot;&quot;
+from __future__ import annotations
+
+from typing import Any, Dict, List, Optional
+import re
+
+import numpy as np
+import pandas as pd
+
+
+def _safe_float(v: Any) -&gt; Optional[float]:
+    try:
+        if v is None:
+            return None
+        val = float(v)
+        if np.isnan(val) or np.isinf(val):
+            return None
+        return val
+    except Exception:
+        return None
+
+
+def _dtype_group(dtype: Any) -&gt; str:
+    name = str(dtype)
+    if name.startswith(&quot;int&quot;) or name.startswith(&quot;float&quot;):
+        return &quot;numeric&quot;
+    if &quot;datetime&quot; in name:
+        return &quot;datetime&quot;
+    if name in {&quot;bool&quot;, &quot;boolean&quot;}:
+        return &quot;boolean&quot;
+    return &quot;categorical&quot;
+
+
+def _histogram(series: pd.Series, bins: int = 20) -&gt; Dict[str, Any]:
+    s = series.dropna()
+    if len(s) == 0:
+        return {&quot;labels&quot;: [], &quot;counts&quot;: []}
+
+    counts, edges = np.histogram(s.to_numpy(dtype=float), bins=min(max(bins, 5), 30))
+    labels = [f&quot;{round(edges[i], 4)} to {round(edges[i + 1], 4)}&quot; for i in range(len(edges) - 1)]
+    return {
+        &quot;labels&quot;: labels,
+        &quot;counts&quot;: [int(c) for c in counts.tolist()],
+    }
+
+
+def _infer_semantic_type(series: pd.Series, dtype_group: str, total_rows: int) -&gt; Dict[str, Any]:
+    unique = int(series.nunique(dropna=True))
+    unique_rate = float(unique / max(total_rows, 1))
+
+    if dtype_group == &quot;numeric&quot;:
+        return {
+            &quot;semantic_type&quot;: &quot;continuous&quot; if unique_rate &gt; 0.1 else &quot;ordinal_numeric&quot;,
+            &quot;datetime_parse_ratio&quot;: 0.0,
+        }
+
+    if dtype_group == &quot;datetime&quot;:
+        return {
+            &quot;semantic_type&quot;: &quot;datetime&quot;,
+            &quot;datetime_parse_ratio&quot;: 1.0,
+        }
+
+    if dtype_group == &quot;boolean&quot;:
+        return {
+            &quot;semantic_type&quot;: &quot;boolean&quot;,
+            &quot;datetime_parse_ratio&quot;: 0.0,
+        }
+
+    # Categorical/text heuristics
+    s = series.dropna().astype(str)
+    dt_ratio = 0.0
+    if len(s) &gt; 0:
+        parsed = pd.to_datetime(s.sample(min(len(s), 300), random_state=42), errors=&quot;coerce&quot;, utc=False)
+        dt_ratio = float(parsed.notna().mean())
+
+    semantic = &quot;nominal&quot;
+    if dt_ratio &gt;= 0.8:
+        semantic = &quot;datetime_like&quot;
+    elif unique &lt;= 20:
+        semantic = &quot;ordinal_or_nominal_low_cardinality&quot;
+
+    return {
+        &quot;semantic_type&quot;: semantic,
+        &quot;datetime_parse_ratio&quot;: round(dt_ratio, 4),
+    }
+
+
+def _detect_target_leakage_risk(df: pd.DataFrame, target_column: Optional[str]) -&gt; List[Dict[str, Any]]:
+    if not target_column or target_column not in df.columns:
+        return []
+
+    target = df[target_column]
+    risks: List[Dict[str, Any]] = []
+
+    # Name-based leakage hints
+    target_tokens = [t for t in re.split(r&quot;[^a-zA-Z0-9]+&quot;, str(target_column).lower()) if t]
+
+    for col in df.columns:
+        if col == target_column:
+            continue
+
+        col_lower = str(col).lower()
+        token_overlap = any(tok in col_lower for tok in target_tokens if len(tok) &gt;= 3)
+
+        risk_score = 0.0
+        reasons: List[str] = []
+
+        if token_overlap:
+            risk_score += 0.2
+            reasons.append(&quot;feature name overlaps with target name&quot;)
+
+        # Exact/near-exact equality check (categorical leakage)
+        try:
+            pair = pd.DataFrame({&quot;a&quot;: df[col], &quot;b&quot;: target}).dropna()
+            if len(pair) &gt; 0:
+                eq_rate = float((pair[&quot;a&quot;].astype(str) == pair[&quot;b&quot;].astype(str)).mean())
+                if eq_rate &gt;= 0.98:
+                    risk_score += 0.9
+                    reasons.append(f&quot;feature matches target values in {eq_rate:.2%} rows&quot;)
+        except Exception:
+            pass
+
+        # High correlation check for numeric target/feature
+        try:
+            if pd.api.types.is_numeric_dtype(df[col]) and pd.api.types.is_numeric_dtype(target):
+                corr = float(pd.concat([df[col], target], axis=1).corr(numeric_only=True).iloc[0, 1])
+                if np.isfinite(corr) and abs(corr) &gt;= 0.98:
+                    risk_score += 0.8
+                    reasons.append(f&quot;very high absolute correlation with target ({corr:.4f})&quot;)
+        except Exception:
+            pass
+
+        if risk_score &gt; 0:
+            risks.append(
+                {
+                    &quot;feature&quot;: str(col),
+                    &quot;risk_score&quot;: round(min(risk_score, 1.0), 4),
+                    &quot;reasons&quot;: reasons,
+                }
+            )
+
+    return sorted(risks, key=lambda x: x[&quot;risk_score&quot;], reverse=True)[:20]
+
+
+def build_drift_baseline_snapshot(df: pd.DataFrame, target_column: Optional[str] = None) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;Build compact baseline distribution snapshot for future drift comparisons.&quot;&quot;&quot;
+    baseline: Dict[str, Any] = {
+        &quot;rows&quot;: int(df.shape[0]),
+        &quot;columns&quot;: int(df.shape[1]),
+        &quot;numeric&quot;: {},
+        &quot;categorical&quot;: {},
+        &quot;target_column&quot;: target_column,
+    }
+
+    for col in df.columns:
+        if target_column and col == target_column:
+            continue
+        s = df[col]
+        if pd.api.types.is_numeric_dtype(s):
+            sn = s.dropna()
+            baseline[&quot;numeric&quot;][str(col)] = {
+                &quot;mean&quot;: _safe_float(sn.mean()) if len(sn) &gt; 0 else None,
+                &quot;std&quot;: _safe_float(sn.std()) if len(sn) &gt; 0 else None,
+                &quot;q05&quot;: _safe_float(sn.quantile(0.05)) if len(sn) &gt; 0 else None,
+                &quot;q50&quot;: _safe_float(sn.quantile(0.50)) if len(sn) &gt; 0 else None,
+                &quot;q95&quot;: _safe_float(sn.quantile(0.95)) if len(sn) &gt; 0 else None,
+                &quot;missing_rate&quot;: float(s.isna().mean()),
+            }
+        else:
+            vc = s.astype(str).fillna(&quot;&lt;missing&gt;&quot;).value_counts(normalize=True).head(10)
+            baseline[&quot;categorical&quot;][str(col)] = {
+                &quot;top_values&quot;: [{&quot;value&quot;: str(k), &quot;rate&quot;: float(v)} for k, v in vc.items()],
+                &quot;missing_rate&quot;: float(s.isna().mean()),
+            }
+
+    return baseline
+
+
+def build_eda_report(df: pd.DataFrame, dataset_name: str, target_column: Optional[str] = None) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;Build a structured EDA report payload for UI consumption.&quot;&quot;&quot;
+    total_rows, total_columns = int(df.shape[0]), int(df.shape[1])
+    missing_total = int(df.isna().sum().sum())
+    duplicate_rows = int(df.duplicated().sum())
+
+    numeric_cols = df.select_dtypes(include=[&quot;number&quot;]).columns.tolist()
+    categorical_cols = [c for c in df.columns if c not in numeric_cols]
+
+    numeric_summary: Dict[str, Any] = {}
+    for col in numeric_cols[:40]:
+        s = df[col].dropna()
+        if len(s) == 0:
+            continue
+        numeric_summary[str(col)] = {
+            &quot;count&quot;: int(len(s)),
+            &quot;mean&quot;: _safe_float(s.mean()),
+            &quot;std&quot;: _safe_float(s.std()),
+            &quot;min&quot;: _safe_float(s.min()),
+            &quot;q1&quot;: _safe_float(s.quantile(0.25)),
+            &quot;median&quot;: _safe_float(s.quantile(0.50)),
+            &quot;q3&quot;: _safe_float(s.quantile(0.75)),
+            &quot;max&quot;: _safe_float(s.max()),
+            &quot;histogram&quot;: _histogram(s),
+        }
+
+    categorical_summary: Dict[str, Any] = {}
+    for col in categorical_cols[:40]:
+        s = df[col].astype(str).fillna(&quot;&lt;missing&gt;&quot;)
+        vc = s.value_counts().head(20)
+        categorical_summary[str(col)] = {
+            &quot;unique&quot;: int(df[col].nunique(dropna=True)),
+            &quot;top_values&quot;: [{&quot;value&quot;: str(k), &quot;count&quot;: int(v)} for k, v in vc.items()],
+        }
+
+    correlations: List[Dict[str, Any]] = []
+    if len(numeric_cols) &gt;= 2:
+        corr = df[numeric_cols].corr(numeric_only=True).fillna(0.0)
+        cols = corr.columns.tolist()
+        for i in range(len(cols)):
+            for j in range(i + 1, len(cols)):
+                v = _safe_float(corr.iloc[i, j])
+                if v is None:
+                    continue
+                if abs(v) &gt;= 0.75:
+                    correlations.append(
+                        {
+                            &quot;feature_a&quot;: str(cols[i]),
+                            &quot;feature_b&quot;: str(cols[j]),
+                            &quot;correlation&quot;: float(v),
+                        }
+                    )
+    correlations = sorted(correlations, key=lambda x: abs(x[&quot;correlation&quot;]), reverse=True)[:30]
+
+    leakage_risks = _detect_target_leakage_risk(df, target_column=target_column)
+
+    recommendations: List[str] = []
+    if missing_total &gt; 0:
+        recommendations.append(&quot;Impute or remove missing values before final training runs.&quot;)
+    if duplicate_rows &gt; 0:
+        recommendations.append(&quot;Drop duplicate rows to avoid biased validation metrics.&quot;)
+    if len(correlations) &gt; 0:
+        recommendations.append(&quot;Review highly correlated features for redundancy and leakage risk.&quot;)
+    if len(leakage_risks) &gt; 0:
+        recommendations.append(&quot;Investigate high-risk leakage features before modeling.&quot;)
+    if not recommendations:
+        recommendations.append(&quot;Dataset looks stable for modeling; proceed with tuned training.&quot;)
+
+    return {
+        &quot;dataset_name&quot;: dataset_name,
+        &quot;overview&quot;: {
+            &quot;rows&quot;: total_rows,
+            &quot;columns&quot;: total_columns,
+            &quot;missing_total&quot;: missing_total,
+            &quot;duplicate_rows&quot;: duplicate_rows,
+            &quot;numeric_columns&quot;: len(numeric_cols),
+            &quot;categorical_columns&quot;: len(categorical_cols),
+            &quot;target_column&quot;: target_column,
+        },
+        &quot;numeric_summary&quot;: numeric_summary,
+        &quot;categorical_summary&quot;: categorical_summary,
+        &quot;high_correlations&quot;: correlations,
+        &quot;leakage_risks&quot;: leakage_risks,
+        &quot;typing_intelligence&quot;: {
+            &quot;semantic_types&quot;: [
+                {
+                    &quot;column&quot;: str(c),
+                    **_infer_semantic_type(df[c], _dtype_group(df[c].dtype), total_rows),
+                }
+                for c in df.columns[:120]
+            ]
+        },
+        &quot;drift_baseline&quot;: build_drift_baseline_snapshot(df, target_column=target_column),
+        &quot;recommendations&quot;: recommendations,
+    }
+
+
+def build_dataset_profile(df: pd.DataFrame, dataset_id: int, dataset_name: str, target_column: Optional[str] = None) -&gt; Dict[str, Any]:
+    total_rows, total_columns = int(df.shape[0]), int(df.shape[1])
+    memory_mb = float(df.memory_usage(deep=True).sum() / (1024 * 1024))
+
+    missing_total = int(df.isna().sum().sum())
+    missing_rate = float(missing_total / max(total_rows * max(total_columns, 1), 1))
+    duplicate_rows = int(df.duplicated().sum())
+
+    columns: List[Dict[str, Any]] = []
+    missing_by_column: List[Dict[str, Any]] = []
+    histograms: List[Dict[str, Any]] = []
+
+    numeric_cols = df.select_dtypes(include=[&quot;number&quot;]).columns.tolist()
+
+    for col in df.columns:
+        s = df[col]
+        dtype_group = _dtype_group(s.dtype)
+        missing = int(s.isna().sum())
+        unique = int(s.nunique(dropna=True))
+
+        item: Dict[str, Any] = {
+            &quot;name&quot;: str(col),
+            &quot;dtype&quot;: str(s.dtype),
+            &quot;dtype_group&quot;: dtype_group,
+            &quot;missing&quot;: missing,
+            &quot;missing_rate&quot;: float(missing / max(total_rows, 1)),
+            &quot;unique&quot;: unique,
+            &quot;unique_rate&quot;: float(unique / max(total_rows, 1)),
+            &quot;sample_values&quot;: [str(v) for v in s.dropna().head(5).tolist()],
+        }
+        item.update(_infer_semantic_type(s, dtype_group=dtype_group, total_rows=total_rows))
+
+        if dtype_group == &quot;numeric&quot;:
+            sn = s.dropna()
+            item[&quot;summary&quot;] = {
+                &quot;min&quot;: _safe_float(sn.min()) if len(sn) &gt; 0 else None,
+                &quot;max&quot;: _safe_float(sn.max()) if len(sn) &gt; 0 else None,
+                &quot;mean&quot;: _safe_float(sn.mean()) if len(sn) &gt; 0 else None,
+                &quot;std&quot;: _safe_float(sn.std()) if len(sn) &gt; 0 else None,
+                &quot;median&quot;: _safe_float(sn.median()) if len(sn) &gt; 0 else None,
+                &quot;q1&quot;: _safe_float(sn.quantile(0.25)) if len(sn) &gt; 0 else None,
+                &quot;q3&quot;: _safe_float(sn.quantile(0.75)) if len(sn) &gt; 0 else None,
+            }
+            histograms.append({&quot;column&quot;: str(col), **_histogram(s)})
+
+        columns.append(item)
+        missing_by_column.append({&quot;column&quot;: str(col), &quot;missing&quot;: missing})
+
+    corr_payload: Optional[Dict[str, Any]] = None
+    if len(numeric_cols) &gt;= 2:
+        corr_df = df[numeric_cols].corr(numeric_only=True).fillna(0.0)
+        corr_payload = {
+            &quot;labels&quot;: [str(c) for c in corr_df.columns.tolist()],
+            &quot;matrix&quot;: [[float(v) for v in row] for row in corr_df.to_numpy().tolist()],
+        }
+
+    target_distribution = None
+    if target_column and target_column in df.columns:
+        target = df[target_column]
+        if _dtype_group(target.dtype) == &quot;numeric&quot;:
+            target_distribution = {
+                &quot;type&quot;: &quot;numeric&quot;,
+                &quot;column&quot;: target_column,
+                **_histogram(target),
+            }
+        else:
+            vc = target.astype(str).fillna(&quot;&lt;missing&gt;&quot;).value_counts().head(20)
+            target_distribution = {
+                &quot;type&quot;: &quot;categorical&quot;,
+                &quot;column&quot;: target_column,
+                &quot;labels&quot;: vc.index.astype(str).tolist(),
+                &quot;counts&quot;: [int(v) for v in vc.values.tolist()],
+            }
+
+    summary_cards = [
+        {&quot;label&quot;: &quot;Rows&quot;, &quot;value&quot;: total_rows},
+        {&quot;label&quot;: &quot;Columns&quot;, &quot;value&quot;: total_columns},
+        {&quot;label&quot;: &quot;Missing cells&quot;, &quot;value&quot;: missing_total},
+        {&quot;label&quot;: &quot;Missing rate&quot;, &quot;value&quot;: round(missing_rate * 100, 2)},
+        {&quot;label&quot;: &quot;Duplicate rows&quot;, &quot;value&quot;: duplicate_rows},
+        {&quot;label&quot;: &quot;Memory (MB)&quot;, &quot;value&quot;: round(memory_mb, 2)},
+    ]
+
+    leakage_risks = _detect_target_leakage_risk(df, target_column=target_column)
+
+    typing_intelligence = {
+        &quot;numeric&quot;: int(sum(1 for c in columns if c.get(&quot;dtype_group&quot;) == &quot;numeric&quot;)),
+        &quot;categorical&quot;: int(sum(1 for c in columns if c.get(&quot;dtype_group&quot;) == &quot;categorical&quot;)),
+        &quot;datetime&quot;: int(sum(1 for c in columns if c.get(&quot;dtype_group&quot;) == &quot;datetime&quot; or c.get(&quot;semantic_type&quot;) == &quot;datetime_like&quot;)),
+        &quot;boolean&quot;: int(sum(1 for c in columns if c.get(&quot;dtype_group&quot;) == &quot;boolean&quot;)),
+        &quot;high_cardinality_candidates&quot;: [
+            c[&quot;name&quot;] for c in columns if c.get(&quot;dtype_group&quot;) == &quot;categorical&quot; and (c.get(&quot;unique_rate&quot;) or 0) &gt; 0.3
+        ][:20],
+    }
+
+    return {
+        &quot;dataset_id&quot;: dataset_id,
+        &quot;dataset_name&quot;: dataset_name,
+        &quot;total_rows&quot;: total_rows,
+        &quot;total_columns&quot;: total_columns,
+        &quot;memory_usage_mb&quot;: round(memory_mb, 4),
+        &quot;missing_total&quot;: missing_total,
+        &quot;missing_rate&quot;: round(missing_rate, 8),
+        &quot;duplicate_rows&quot;: duplicate_rows,
+        &quot;columns&quot;: columns,
+        &quot;summary_cards&quot;: summary_cards,
+        &quot;target_distribution&quot;: target_distribution,
+        &quot;correlation_heatmap&quot;: corr_payload,
+        &quot;typing_intelligence&quot;: typing_intelligence,
+        &quot;leakage_risks&quot;: leakage_risks,
+        &quot;drift_baseline&quot;: build_drift_baseline_snapshot(df, target_column=target_column),
+        &quot;missing_by_column&quot;: sorted(missing_by_column, key=lambda x: x[&quot;missing&quot;], reverse=True),
+        &quot;histograms&quot;: histograms[:20],
+    }
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>Any</strong>: No official citation linked here.</li><li><strong>Build</strong>: No official citation linked here.</li><li><strong>Categorical</strong>: No official citation linked here.</li><li><strong>Columns</strong>: No official citation linked here.</li><li><strong>DataFrame</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>Dict</strong>: No official citation linked here.</li><li><strong>Drop</strong>: No official citation linked here.</li><li><strong>Duplicate</strong>: No official citation linked here.</li><li><strong>EDA</strong>: No official citation linked here.</li><li><strong>Exact</strong>: No official citation linked here.</li><li><strong>Exception</strong>: No official citation linked here.</li><li><strong>False</strong>: No official citation linked here.</li><li><strong>High</strong>: No official citation linked here.</li><li><strong>Impute</strong>: No official citation linked here.</li><li><strong>Investigate</strong>: No official citation linked here.</li><li><strong>List</strong>: No official citation linked here.</li><li><strong>MB</strong>: No official citation linked here.</li><li><strong>Memory</strong>: No official citation linked here.</li><li><strong>Missing</strong>: No official citation linked here.</li><li><strong>Name</strong>: No official citation linked here.</li><li><strong>None</strong>: No official citation linked here.</li><li><strong>Optional</strong>: No official citation linked here.</li><li><strong>Review</strong>: No official citation linked here.</li><li><strong>Rows</strong>: No official citation linked here.</li><li><strong>Series</strong>: No official citation linked here.</li><li><strong>True</strong>: No official citation linked here.</li><li><strong>UI</strong>: No official citation linked here.</li><li><strong>Z0</strong>: No official citation linked here.</li><li><strong>__future__</strong>: No official citation linked here.</li><li><strong>_detect_target_leakage_risk</strong>: No official citation linked here.</li><li><strong>_dtype_group</strong>: No official citation linked here.</li><li><strong>_histogram</strong>: No official citation linked here.</li><li><strong>_infer_semantic_type</strong>: No official citation linked here.</li><li><strong>_safe_float</strong>: No official citation linked here.</li><li><strong>abs</strong>: No official citation linked here.</li><li><strong>absolute</strong>: No official citation linked here.</li><li><strong>and</strong>: No official citation linked here.</li><li><strong>annotations</strong>: No official citation linked here.</li><li><strong>any</strong>: No official citation linked here.</li><li><strong>api</strong>: No official citation linked here.</li><li><strong>append</strong>: No official citation linked here.</li><li><strong>as</strong>: No official citation linked here.</li><li><strong>astype</strong>: No official citation linked here.</li><li><strong>avoid</strong>: No official citation linked here.</li><li><strong>axis</strong>: No official citation linked here.</li><li><strong>based</strong>: No official citation linked here.</li><li><strong>baseline</strong>: No official citation linked here.</li><li><strong>before</strong>: No official citation linked here.</li><li><strong>biased</strong>: No official citation linked here.</li><li><strong>bins</strong>: No official citation linked here.</li><li><strong>bool</strong>: No official citation linked here.</li><li><strong>boolean</strong>: No official citation linked here.</li><li><strong>build_dataset_profile</strong>: No official citation linked here.</li><li><strong>build_drift_baseline_snapshot</strong>: No official citation linked here.</li><li><strong>build_eda_report</strong>: No official citation linked here.</li><li><strong>categorical</strong>: No official citation linked here.</li><li><strong>categorical_cols</strong>: No official citation linked here.</li><li><strong>categorical_columns</strong>: No official citation linked here.</li><li><strong>categorical_summary</strong>: No official citation linked here.</li><li><strong>cells</strong>: No official citation linked here.</li><li><strong>chart</strong>: No official citation linked here.</li><li><strong>check</strong>: No official citation linked here.</li><li><strong>coerce</strong>: No official citation linked here.</li><li><strong>col</strong>: No official citation linked here.</li><li><strong>col_lower</strong>: No official citation linked here.</li><li><strong>cols</strong>: No official citation linked here.</li><li><strong>column</strong>: No official citation linked here.</li><li><strong>columns</strong>: No official citation linked here.</li><li><strong>compact</strong>: No official citation linked here.</li><li><strong>comparisons</strong>: No official citation linked here.</li><li><strong>concat</strong>: No official citation linked here.</li><li><strong>consumption</strong>: No official citation linked here.</li><li><strong>continue</strong>: No official citation linked here.</li><li><strong>continuous</strong>: No official citation linked here.</li><li><strong>corr</strong>: No official citation linked here.</li><li><strong>corr_df</strong>: No official citation linked here.</li><li><strong>corr_payload</strong>: No official citation linked here.</li><li><strong>correlated</strong>: No official citation linked here.</li><li><strong>correlation</strong>: No official citation linked here.</li><li><strong>correlation_heatmap</strong>: No official citation linked here.</li><li><strong>correlations</strong>: No official citation linked here.</li><li><strong>count</strong>: No official citation linked here.</li><li><strong>counts</strong>: No official citation linked here.</li><li><strong>dataset_id</strong>: No official citation linked here.</li><li><strong>dataset_name</strong>: No official citation linked here.</li><li><strong>datetime</strong>: No official citation linked here.</li><li><strong>datetime_like</strong>: No official citation linked here.</li><li><strong>datetime_parse_ratio</strong>: No official citation linked here.</li><li><strong>deep</strong>: No official citation linked here.</li><li><strong>def</strong>: No official citation linked here.</li><li><strong>df</strong>: No official citation linked here.</li><li><strong>distribution</strong>: No official citation linked here.</li><li><strong>drift</strong>: No official citation linked here.</li><li><strong>drift_baseline</strong>: No official citation linked here.</li><li><strong>dropna</strong>: No official citation linked here.</li><li><strong>dt_ratio</strong>: No official citation linked here.</li><li><strong>dtype</strong>: No official citation linked here.</li><li><strong>dtype_group</strong>: No official citation linked here.</li><li><strong>duplicate</strong>: No official citation linked here.</li><li><strong>duplicate_rows</strong>: No official citation linked here.</li><li><strong>duplicated</strong>: No official citation linked here.</li><li><strong>edges</strong>: No official citation linked here.</li><li><strong>elif</strong>: No official citation linked here.</li><li><strong>else</strong>: No official citation linked here.</li><li><strong>eq_rate</strong>: No official citation linked here.</li><li><strong>equality</strong>: No official citation linked here.</li><li><strong>errors</strong>: No official citation linked here.</li><li><strong>exact</strong>: No official citation linked here.</li><li><strong>except</strong>: No official citation linked here.</li><li><strong>feature</strong>: No official citation linked here.</li><li><strong>feature_a</strong>: No official citation linked here.</li><li><strong>feature_b</strong>: No official citation linked here.</li><li><strong>features</strong>: No official citation linked here.</li><li><strong>fillna</strong>: No official citation linked here.</li><li><strong>final</strong>: No official citation linked here.</li><li><strong>float</strong>: No official citation linked here.</li><li><strong>for</strong>: No official citation linked here.</li><li><strong>from</strong>: No official citation linked here.</li><li><strong>future</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

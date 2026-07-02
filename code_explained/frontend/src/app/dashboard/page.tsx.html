@@ -1,0 +1,264 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>page.tsx</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>frontend/src/app/dashboard/page.tsx</span></div>
+        <h1 style="margin:10px 0 6px">page.tsx</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="models.html">Previous</a><a href="predict.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: frontend/src/app/dashboard/page.tsx</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>frontend/src/app/dashboard/page.tsx</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-tsx">&quot;use client&quot;;
+import { useEffect, useState } from &quot;react&quot;;
+import { metricsAPI, trainingAPI } from &quot;@/lib/api&quot;;
+import { Database, BrainCircuit, Rocket, CheckCircle, Clock, AlertTriangle, TrendingUp } from &quot;lucide-react&quot;;
+import Link from &quot;next/link&quot;;
+import MetricCard from &quot;@/components/ui/MetricCard&quot;;
+import PanelHeader from &quot;@/components/ui/PanelHeader&quot;;
+import StatusBadge from &quot;@/components/ui/StatusBadge&quot;;
+
+interface Summary {
+  total_datasets: number;
+  total_models: number;
+  deployed_models: number;
+  completed_jobs: number;
+  failed_jobs: number;
+}
+
+export default function DashboardPage() {
+  const [summary, setSummary] = useState&lt;Summary | null&gt;(null);
+  const [recentJobs, setRecentJobs] = useState&lt;any[]&gt;([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() =&gt; {
+    async function fetchData() {
+      try {
+        const [summaryRes, jobsRes] = await Promise.all([
+          metricsAPI.getDashboardSummary(),
+          trainingAPI.listJobs(),
+        ]);
+        setSummary(summaryRes.data);
+        setRecentJobs(jobsRes.data.slice(0, 5));
+      } catch { /* backend may not be running */ }
+      finally { setLoading(false); }
+    }
+    fetchData();
+  }, []);
+
+  const statCards = [
+    { label: &quot;Datasets&quot;, value: summary?.total_datasets ?? &quot;–&quot;, icon: Database },
+    { label: &quot;Trained Models&quot;, value: summary?.total_models ?? &quot;–&quot;, icon: BrainCircuit },
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-tsx">&quot;use client&quot;;
+import { useEffect, useState } from &quot;react&quot;;
+import { metricsAPI, trainingAPI } from &quot;@/lib/api&quot;;
+import { Database, BrainCircuit, Rocket, CheckCircle, Clock, AlertTriangle, TrendingUp } from &quot;lucide-react&quot;;
+import Link from &quot;next/link&quot;;
+import MetricCard from &quot;@/components/ui/MetricCard&quot;;
+import PanelHeader from &quot;@/components/ui/PanelHeader&quot;;
+import StatusBadge from &quot;@/components/ui/StatusBadge&quot;;
+
+interface Summary {
+  total_datasets: number;
+  total_models: number;
+  deployed_models: number;
+  completed_jobs: number;
+  failed_jobs: number;
+}
+
+export default function DashboardPage() {
+  const [summary, setSummary] = useState&lt;Summary | null&gt;(null);
+  const [recentJobs, setRecentJobs] = useState&lt;any[]&gt;([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() =&gt; {
+    async function fetchData() {
+      try {
+        const [summaryRes, jobsRes] = await Promise.all([
+          metricsAPI.getDashboardSummary(),
+          trainingAPI.listJobs(),
+        ]);
+        setSummary(summaryRes.data);
+        setRecentJobs(jobsRes.data.slice(0, 5));
+      } catch { /* backend may not be running */ }
+      finally { setLoading(false); }
+    }
+    fetchData();
+  }, []);
+
+  const statCards = [
+    { label: &quot;Datasets&quot;, value: summary?.total_datasets ?? &quot;–&quot;, icon: Database },
+    { label: &quot;Trained Models&quot;, value: summary?.total_models ?? &quot;–&quot;, icon: BrainCircuit },
+    { label: &quot;Deployed&quot;, value: summary?.deployed_models ?? &quot;–&quot;, icon: Rocket },
+    { label: &quot;Completed Jobs&quot;, value: summary?.completed_jobs ?? &quot;–&quot;, icon: CheckCircle },
+  ];
+
+  const statusIcon = (s: string) =&gt; {
+    if (s === &quot;completed&quot;) return &lt;CheckCircle className=&quot;h-4 w-4 text-emerald-300&quot; /&gt;;
+    if (s === &quot;running&quot;) return &lt;Clock className=&quot;h-4 w-4 animate-spin text-amber-300&quot; /&gt;;
+    if (s === &quot;failed&quot;) return &lt;AlertTriangle className=&quot;h-4 w-4 text-red-300&quot; /&gt;;
+    return &lt;Clock className=&quot;h-4 w-4 text-text-muted&quot; /&gt;;
+  };
+
+  return (
+    &lt;div className=&quot;mx-auto max-w-7xl&quot;&gt;
+      {/* Header */}
+      &lt;div className=&quot;mb-10&quot;&gt;
+        &lt;div className=&quot;section-kicker mb-2&quot;&gt;Dashboard&lt;/div&gt;
+        &lt;h1 className=&quot;font-display text-4xl font-semibold text-text-primary mb-2&quot;&gt;
+          ML Operations Overview
+        &lt;/h1&gt;
+        &lt;p className=&quot;text-text-muted&quot;&gt;Track datasets, training, and runtime posture from one control room.&lt;/p&gt;
+      &lt;/div&gt;
+
+      {/* Stat Cards */}
+      &lt;div className=&quot;mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4&quot;&gt;
+        {statCards.map(({ label, value, icon }) =&gt; (
+          &lt;MetricCard key={label} label={label} value={loading ? &quot;...&quot; : value} icon={icon} /&gt;
+        ))}
+      &lt;/div&gt;
+
+      {/* Quick Actions */}
+      &lt;div className=&quot;mb-8 grid gap-4 md:grid-cols-3&quot;&gt;
+        {[
+          { href: &quot;/dashboard/datasets&quot;, label: &quot;Upload Dataset&quot;, desc: &quot;Ingest CSV/XLSX to registry&quot;, icon: Database },
+          { href: &quot;/dashboard/training&quot;, label: &quot;Train Models&quot;, desc: &quot;Launch a new AutoML session&quot;, icon: BrainCircuit },
+          { href: &quot;/dashboard/predict&quot;, label: &quot;Run Prediction&quot;, desc: &quot;Validate deployed endpoint&quot;, icon: TrendingUp },
+        ].map(({ href, label, desc, icon: Icon }) =&gt; (
+          &lt;Link key={href} href={href}
+            className=&quot;panel flex cursor-pointer items-center gap-4 rounded-lg border-outline/20 p-5 transition-all hover:border-primary/40&quot;&gt;
+            &lt;Icon className=&quot;h-7 w-7 flex-shrink-0 text-primary&quot; /&gt;
+            &lt;div&gt;
+              &lt;div className=&quot;text-sm font-semibold text-text-primary&quot;&gt;{label}&lt;/div&gt;
+              &lt;div className=&quot;text-xs text-text-muted&quot;&gt;{desc}&lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/Link&gt;
+        ))}
+      &lt;/div&gt;
+
+      {/* Recent Jobs */}
+      &lt;div className=&quot;panel rounded-xl p-6&quot;&gt;
+        &lt;PanelHeader title=&quot;Recent Training Jobs&quot; subtitle=&quot;Latest sessions and operational status.&quot; icon={Clock} className=&quot;mb-4&quot; /&gt;
+        {recentJobs.length === 0 ? (
+          &lt;div className=&quot;py-10 text-center text-text-muted&quot;&gt;
+            &lt;BrainCircuit className=&quot;mx-auto mb-3 h-10 w-10 opacity-30&quot; /&gt;
+            &lt;p className=&quot;text-sm&quot;&gt;No training jobs yet. Start by uploading a dataset!&lt;/p&gt;
+            &lt;Link href=&quot;/dashboard/datasets&quot; className=&quot;btn-primary text-sm mt-4 inline-flex&quot;&gt;
+              Upload Dataset
+            &lt;/Link&gt;
+          &lt;/div&gt;
+        ) : (
+          &lt;div className=&quot;space-y-2&quot;&gt;
+            {recentJobs.map((job) =&gt; (
+              &lt;div key={job.job_id} className=&quot;flex items-center gap-4 rounded-lg border border-outline/15 bg-surface-variant/25 p-3 transition-colors hover:bg-surface-variant/45&quot;&gt;
+                {statusIcon(job.status)}
+                &lt;div className=&quot;flex-1 min-w-0&quot;&gt;
+                  &lt;div className=&quot;truncate font-mono text-sm font-medium text-text-primary&quot;&gt;{job.job_id.slice(0, 8)}…&lt;/div&gt;
+                  &lt;div className=&quot;text-xs text-text-muted&quot;&gt;Target: {job.target_column}&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;StatusBadge
+                  label={job.status}
+                  tone={
+                    job.status === &quot;completed&quot;
+                      ? &quot;healthy&quot;
+                      : job.status === &quot;running&quot;
+                        ? &quot;processing&quot;
+                        : job.status === &quot;failed&quot;
+                          ? &quot;error&quot;
+                          : &quot;idle&quot;
+                  }
+                /&gt;
+                {job.status === &quot;completed&quot; &amp;&amp; (
+                  &lt;Link href={`/dashboard/models?job=${job.job_id}`}
+                    className=&quot;text-xs text-primary hover:text-primary/80 underline&quot;&gt;
+                    View →
+                  &lt;/Link&gt;
+                )}
+              &lt;/div&gt;
+            ))}
+          &lt;/div&gt;
+        )}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>Actions</strong>: No official citation linked here.</li><li><strong>AlertTriangle</strong>: No official citation linked here.</li><li><strong>AutoML</strong>: No official citation linked here.</li><li><strong>BrainCircuit</strong>: No official citation linked here.</li><li><strong>CSV</strong>: No official citation linked here.</li><li><strong>Cards</strong>: No official citation linked here.</li><li><strong>CheckCircle</strong>: No official citation linked here.</li><li><strong>Clock</strong>: No official citation linked here.</li><li><strong>Completed</strong>: No official citation linked here.</li><li><strong>Dashboard</strong>: No official citation linked here.</li><li><strong>DashboardPage</strong>: No official citation linked here.</li><li><strong>Database</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>Datasets</strong>: No official citation linked here.</li><li><strong>Deployed</strong>: No official citation linked here.</li><li><strong>Header</strong>: No official citation linked here.</li><li><strong>Icon</strong>: No official citation linked here.</li><li><strong>Ingest</strong>: No official citation linked here.</li><li><strong>Jobs</strong>: No official citation linked here.</li><li><strong>Latest</strong>: No official citation linked here.</li><li><strong>Launch</strong>: No official citation linked here.</li><li><strong>Link</strong>: No official citation linked here.</li><li><strong>ML</strong>: No official citation linked here.</li><li><strong>MetricCard</strong>: No official citation linked here.</li><li><strong>Models</strong>: No official citation linked here.</li><li><strong>No</strong>: No official citation linked here.</li><li><strong>Operations</strong>: No official citation linked here.</li><li><strong>Overview</strong>: No official citation linked here.</li><li><strong>PanelHeader</strong>: No official citation linked here.</li><li><strong>Prediction</strong>: No official citation linked here.</li><li><strong>Promise</strong>: No official citation linked here.</li><li><strong>Quick</strong>: No official citation linked here.</li><li><strong>Recent</strong>: No official citation linked here.</li><li><strong>Rocket</strong>: No official citation linked here.</li><li><strong>Run</strong>: No official citation linked here.</li><li><strong>Start</strong>: No official citation linked here.</li><li><strong>Stat</strong>: No official citation linked here.</li><li><strong>StatusBadge</strong>: No official citation linked here.</li><li><strong>Summary</strong>: No official citation linked here.</li><li><strong>Target</strong>: No official citation linked here.</li><li><strong>Track</strong>: No official citation linked here.</li><li><strong>Train</strong>: No official citation linked here.</li><li><strong>Trained</strong>: No official citation linked here.</li><li><strong>Training</strong>: No official citation linked here.</li><li><strong>TrendingUp</strong>: No official citation linked here.</li><li><strong>Upload</strong>: No official citation linked here.</li><li><strong>Validate</strong>: No official citation linked here.</li><li><strong>View</strong>: No official citation linked here.</li><li><strong>XLSX</strong>: No official citation linked here.</li><li><strong>all</strong>: No official citation linked here.</li><li><strong>amber</strong>: No official citation linked here.</li><li><strong>and</strong>: No official citation linked here.</li><li><strong>animate</strong>: No official citation linked here.</li><li><strong>any</strong>: No official citation linked here.</li><li><strong>api</strong>: No official citation linked here.</li><li><strong>async</strong>: No official citation linked here.</li><li><strong>auto</strong>: No official citation linked here.</li><li><strong>await</strong>: No official citation linked here.</li><li><strong>backend</strong>: No official citation linked here.</li><li><strong>be</strong>: No official citation linked here.</li><li><strong>bg</strong>: No official citation linked here.</li><li><strong>border</strong>: No official citation linked here.</li><li><strong>btn</strong>: No official citation linked here.</li><li><strong>by</strong>: No official citation linked here.</li><li><strong>catch</strong>: No official citation linked here.</li><li><strong>center</strong>: No official citation linked here.</li><li><strong>className</strong>: No official citation linked here.</li><li><strong>client</strong>: No official citation linked here.</li><li><strong>colors</strong>: No official citation linked here.</li><li><strong>cols</strong>: No official citation linked here.</li><li><strong>completed</strong>: No official citation linked here.</li><li><strong>completed_jobs</strong>: No official citation linked here.</li><li><strong>components</strong>: No official citation linked here.</li><li><strong>const</strong>: No official citation linked here.</li><li><strong>control</strong>: No official citation linked here.</li><li><strong>cursor</strong>: No official citation linked here.</li><li><strong>dashboard</strong>: No official citation linked here.</li><li><strong>data</strong>: No official citation linked here.</li><li><strong>dataset</strong>: No official citation linked here.</li><li><strong>datasets</strong>: No official citation linked here.</li><li><strong>default</strong>: No official citation linked here.</li><li><strong>deployed</strong>: No official citation linked here.</li><li><strong>deployed_models</strong>: No official citation linked here.</li><li><strong>desc</strong>: No official citation linked here.</li><li><strong>display</strong>: No official citation linked here.</li><li><strong>div</strong>: No official citation linked here.</li><li><strong>emerald</strong>: No official citation linked here.</li><li><strong>endpoint</strong>: No official citation linked here.</li><li><strong>error</strong>: No official citation linked here.</li><li><strong>export</strong>: No official citation linked here.</li><li><strong>failed</strong>: No official citation linked here.</li><li><strong>failed_jobs</strong>: No official citation linked here.</li><li><strong>false</strong>: No official citation linked here.</li><li><strong>fetchData</strong>: No official citation linked here.</li><li><strong>finally</strong>: No official citation linked here.</li><li><strong>flex</strong>: No official citation linked here.</li><li><strong>font</strong>: No official citation linked here.</li><li><strong>from</strong>: No official citation linked here.</li><li><strong>function</strong>: No official citation linked here.</li><li><strong>gap</strong>: No official citation linked here.</li><li><strong>getDashboardSummary</strong>: No official citation linked here.</li><li><strong>grid</strong>: No official citation linked here.</li><li><strong>h1</strong>: No official citation linked here.</li><li><strong>healthy</strong>: No official citation linked here.</li><li><strong>hover</strong>: No official citation linked here.</li><li><strong>href</strong>: No official citation linked here.</li><li><strong>icon</strong>: No official citation linked here.</li><li><strong>idle</strong>: No official citation linked here.</li><li><strong>if</strong>: No official citation linked here.</li><li><strong>import</strong>: No official citation linked here.</li><li><strong>inline</strong>: No official citation linked here.</li><li><strong>interface</strong>: No official citation linked here.</li><li><strong>items</strong>: No official citation linked here.</li><li><strong>job</strong>: No official citation linked here.</li><li><strong>job_id</strong>: No official citation linked here.</li><li><strong>jobs</strong>: No official citation linked here.</li><li><strong>jobsRes</strong>: No official citation linked here.</li><li><strong>key</strong>: No official citation linked here.</li><li><strong>kicker</strong>: No official citation linked here.</li><li><strong>label</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

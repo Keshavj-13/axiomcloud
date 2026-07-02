@@ -1,0 +1,217 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sidebar.tsx</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>frontend/src/components/layout/Sidebar.tsx</span></div>
+        <h1 style="margin:10px 0 6px">Sidebar.tsx</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="../../app/login/page.tsx.html">Previous</a><a href="../ui/DataTable.tsx.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: frontend/src/components/layout/Sidebar.tsx</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>frontend/src/components/layout/Sidebar.tsx</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-tsx">&quot;use client&quot;;
+import Link from &quot;next/link&quot;;
+import { usePathname } from &quot;next/navigation&quot;;
+import {
+  LayoutDashboard, Database, BrainCircuit, BarChart3,
+  Rocket, Zap, ChevronRight, Activity, PanelLeftClose, PanelLeftOpen
+} from &quot;lucide-react&quot;;
+
+const navItems = [
+  { label: &quot;Dashboard&quot;,    href: &quot;/dashboard&quot;,         icon: LayoutDashboard },
+  { label: &quot;Datasets&quot;,     href: &quot;/dashboard/datasets&quot;, icon: Database },
+  { label: &quot;Train Models&quot;, href: &quot;/dashboard/training&quot;, icon: BrainCircuit },
+  { label: &quot;Leaderboard&quot;,  href: &quot;/dashboard/models&quot;,   icon: BarChart3 },
+  { label: &quot;Predict&quot;,      href: &quot;/dashboard/predict&quot;,  icon: Zap },
+  { label: &quot;Deploy&quot;,       href: &quot;/dashboard/deploy&quot;,   icon: Rocket },
+];
+
+interface SidebarProps {
+  collapsed?: boolean;
+  onToggle?: () =&gt; void;
+}
+
+export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
+  const pathname = usePathname();
+
+  return (
+    &lt;aside className={`fixed left-0 top-16 z-40 hidden h-[calc(100vh-4rem)] flex-shrink-0 flex-col border-r border-outline/30 bg-surface transition-all duration-300 lg:flex ${collapsed ? &quot;w-16&quot; : &quot;w-72&quot;}`}&gt;
+      &lt;button
+        onClick={onToggle}
+        className={`absolute -right-3 top-4 z-50 inline-flex h-6 w-6 items-center justify-center rounded-full border border-outline/40 bg-surface text-text-muted hover:text-text-primary`}
+        aria-label={collapsed ? &quot;Expand sidebar&quot; : &quot;Collapse sidebar&quot;}
+        title={collapsed ? &quot;Expand sidebar&quot; : &quot;Collapse sidebar&quot;}
+      &gt;
+        {collapsed ? &lt;PanelLeftOpen className=&quot;h-3.5 w-3.5&quot; /&gt; : &lt;PanelLeftClose className=&quot;h-3.5 w-3.5&quot; /&gt;}
+      &lt;/button&gt;
+
+      {/* Logo */}
+      &lt;div className={`border-b border-outline/25 ${collapsed ? &quot;p-3&quot; : &quot;p-6&quot;}`}&gt;
+        &lt;Link href=&quot;/&quot; className=&quot;flex items-center gap-3 group&quot;&gt;
+          &lt;div className=&quot;flex h-9 w-9 items-center justify-center rounded-lg bg-primary-deep transition-colors group-hover:bg-primary-deep/90&quot;&gt;
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-tsx">&quot;use client&quot;;
+import Link from &quot;next/link&quot;;
+import { usePathname } from &quot;next/navigation&quot;;
+import {
+  LayoutDashboard, Database, BrainCircuit, BarChart3,
+  Rocket, Zap, ChevronRight, Activity, PanelLeftClose, PanelLeftOpen
+} from &quot;lucide-react&quot;;
+
+const navItems = [
+  { label: &quot;Dashboard&quot;,    href: &quot;/dashboard&quot;,         icon: LayoutDashboard },
+  { label: &quot;Datasets&quot;,     href: &quot;/dashboard/datasets&quot;, icon: Database },
+  { label: &quot;Train Models&quot;, href: &quot;/dashboard/training&quot;, icon: BrainCircuit },
+  { label: &quot;Leaderboard&quot;,  href: &quot;/dashboard/models&quot;,   icon: BarChart3 },
+  { label: &quot;Predict&quot;,      href: &quot;/dashboard/predict&quot;,  icon: Zap },
+  { label: &quot;Deploy&quot;,       href: &quot;/dashboard/deploy&quot;,   icon: Rocket },
+];
+
+interface SidebarProps {
+  collapsed?: boolean;
+  onToggle?: () =&gt; void;
+}
+
+export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
+  const pathname = usePathname();
+
+  return (
+    &lt;aside className={`fixed left-0 top-16 z-40 hidden h-[calc(100vh-4rem)] flex-shrink-0 flex-col border-r border-outline/30 bg-surface transition-all duration-300 lg:flex ${collapsed ? &quot;w-16&quot; : &quot;w-72&quot;}`}&gt;
+      &lt;button
+        onClick={onToggle}
+        className={`absolute -right-3 top-4 z-50 inline-flex h-6 w-6 items-center justify-center rounded-full border border-outline/40 bg-surface text-text-muted hover:text-text-primary`}
+        aria-label={collapsed ? &quot;Expand sidebar&quot; : &quot;Collapse sidebar&quot;}
+        title={collapsed ? &quot;Expand sidebar&quot; : &quot;Collapse sidebar&quot;}
+      &gt;
+        {collapsed ? &lt;PanelLeftOpen className=&quot;h-3.5 w-3.5&quot; /&gt; : &lt;PanelLeftClose className=&quot;h-3.5 w-3.5&quot; /&gt;}
+      &lt;/button&gt;
+
+      {/* Logo */}
+      &lt;div className={`border-b border-outline/25 ${collapsed ? &quot;p-3&quot; : &quot;p-6&quot;}`}&gt;
+        &lt;Link href=&quot;/&quot; className=&quot;flex items-center gap-3 group&quot;&gt;
+          &lt;div className=&quot;flex h-9 w-9 items-center justify-center rounded-lg bg-primary-deep transition-colors group-hover:bg-primary-deep/90&quot;&gt;
+            &lt;Activity className=&quot;h-5 w-5 text-text-primary&quot; /&gt;
+          &lt;/div&gt;
+          {!collapsed &amp;&amp; (
+            &lt;div&gt;
+              &lt;div className=&quot;font-display text-sm font-semibold tracking-wide text-text-primary&quot;&gt;Axiom Cloud&lt;/div&gt;
+              &lt;div className=&quot;text-[10px] uppercase tracking-[0.14em] text-text-muted&quot;&gt;ML Control Plane&lt;/div&gt;
+            &lt;/div&gt;
+          )}
+        &lt;/Link&gt;
+      &lt;/div&gt;
+
+      {/* Nav */}
+      &lt;nav className={`flex-1 space-y-1 ${collapsed ? &quot;p-2&quot; : &quot;p-4&quot;}`}&gt;
+        {navItems.map(({ label, href, icon: Icon }) =&gt; {
+          const active = pathname === href || (href !== &quot;/dashboard&quot; &amp;&amp; pathname.startsWith(href));
+          return (
+            &lt;Link
+              key={href}
+              href={href}
+              title={collapsed ? label : undefined}
+              className={`group flex items-center rounded-lg border-l-2 text-sm font-medium transition-all
+                ${collapsed ? &quot;justify-center px-2 py-2.5&quot; : &quot;gap-3 px-3 py-2.5&quot;}
+                ${active
+                  ? &quot;border-primary bg-primary/10 text-primary&quot;
+                  : &quot;border-transparent text-text-muted hover:bg-surface-variant/45 hover:text-text-primary&quot;
+                }`}
+            &gt;
+              &lt;Icon className={`h-4 w-4 flex-shrink-0 ${active ? &quot;text-primary&quot; : &quot;text-outline group-hover:text-text-muted&quot;}`} /&gt;
+              {!collapsed &amp;&amp; &lt;span className=&quot;flex-1&quot;&gt;{label}&lt;/span&gt;}
+              {!collapsed &amp;&amp; active &amp;&amp; &lt;ChevronRight className=&quot;h-3 w-3 text-primary&quot; /&gt;}
+            &lt;/Link&gt;
+          );
+        })}
+      &lt;/nav&gt;
+
+      {/* Footer */}
+      &lt;div className=&quot;border-t border-outline/25 p-4&quot;&gt;
+        {!collapsed &amp;&amp; (
+          &lt;div className=&quot;text-center font-mono text-xs text-text-muted&quot;&gt;
+            axiom v1.0.0
+          &lt;/div&gt;
+        )}
+      &lt;/div&gt;
+    &lt;/aside&gt;
+  );
+}
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>Activity</strong>: No official citation linked here.</li><li><strong>Axiom</strong>: No official citation linked here.</li><li><strong>BarChart3</strong>: No official citation linked here.</li><li><strong>BrainCircuit</strong>: No official citation linked here.</li><li><strong>ChevronRight</strong>: No official citation linked here.</li><li><strong>Cloud</strong>: No official citation linked here.</li><li><strong>Collapse</strong>: No official citation linked here.</li><li><strong>Control</strong>: No official citation linked here.</li><li><strong>Dashboard</strong>: No official citation linked here.</li><li><strong>Database</strong>: No official citation linked here.</li><li><strong>Datasets</strong>: No official citation linked here.</li><li><strong>Deploy</strong>: No official citation linked here.</li><li><strong>Expand</strong>: No official citation linked here.</li><li><strong>Footer</strong>: No official citation linked here.</li><li><strong>Icon</strong>: No official citation linked here.</li><li><strong>LayoutDashboard</strong>: No official citation linked here.</li><li><strong>Leaderboard</strong>: No official citation linked here.</li><li><strong>Link</strong>: No official citation linked here.</li><li><strong>Logo</strong>: No official citation linked here.</li><li><strong>ML</strong>: No official citation linked here.</li><li><strong>Models</strong>: No official citation linked here.</li><li><strong>Nav</strong>: No official citation linked here.</li><li><strong>PanelLeftClose</strong>: No official citation linked here.</li><li><strong>PanelLeftOpen</strong>: No official citation linked here.</li><li><strong>Plane</strong>: No official citation linked here.</li><li><strong>Predict</strong>: No official citation linked here.</li><li><strong>Rocket</strong>: No official citation linked here.</li><li><strong>Sidebar</strong>: No official citation linked here.</li><li><strong>SidebarProps</strong>: No official citation linked here.</li><li><strong>Train</strong>: No official citation linked here.</li><li><strong>Zap</strong>: No official citation linked here.</li><li><strong>absolute</strong>: No official citation linked here.</li><li><strong>active</strong>: No official citation linked here.</li><li><strong>all</strong>: No official citation linked here.</li><li><strong>aria</strong>: No official citation linked here.</li><li><strong>aside</strong>: No official citation linked here.</li><li><strong>axiom</strong>: No official citation linked here.</li><li><strong>bg</strong>: No official citation linked here.</li><li><strong>boolean</strong>: No official citation linked here.</li><li><strong>border</strong>: No official citation linked here.</li><li><strong>button</strong>: No official citation linked here.</li><li><strong>calc</strong>: No official citation linked here.</li><li><strong>center</strong>: No official citation linked here.</li><li><strong>className</strong>: No official citation linked here.</li><li><strong>client</strong>: No official citation linked here.</li><li><strong>col</strong>: No official citation linked here.</li><li><strong>collapsed</strong>: No official citation linked here.</li><li><strong>colors</strong>: No official citation linked here.</li><li><strong>const</strong>: No official citation linked here.</li><li><strong>dashboard</strong>: No official citation linked here.</li><li><strong>datasets</strong>: No official citation linked here.</li><li><strong>deep</strong>: No official citation linked here.</li><li><strong>default</strong>: No official citation linked here.</li><li><strong>deploy</strong>: No official citation linked here.</li><li><strong>display</strong>: No official citation linked here.</li><li><strong>div</strong>: No official citation linked here.</li><li><strong>duration</strong>: No official citation linked here.</li><li><strong>em</strong>: No official citation linked here.</li><li><strong>export</strong>: No official citation linked here.</li><li><strong>false</strong>: No official citation linked here.</li><li><strong>fixed</strong>: No official citation linked here.</li><li><strong>flex</strong>: No official citation linked here.</li><li><strong>font</strong>: No official citation linked here.</li><li><strong>from</strong>: No official citation linked here.</li><li><strong>full</strong>: No official citation linked here.</li><li><strong>function</strong>: No official citation linked here.</li><li><strong>gap</strong>: No official citation linked here.</li><li><strong>group</strong>: No official citation linked here.</li><li><strong>hidden</strong>: No official citation linked here.</li><li><strong>hover</strong>: No official citation linked here.</li><li><strong>href</strong>: No official citation linked here.</li><li><strong>icon</strong>: No official citation linked here.</li><li><strong>import</strong>: No official citation linked here.</li><li><strong>inline</strong>: No official citation linked here.</li><li><strong>interface</strong>: No official citation linked here.</li><li><strong>items</strong>: No official citation linked here.</li><li><strong>justify</strong>: No official citation linked here.</li><li><strong>key</strong>: No official citation linked here.</li><li><strong>label</strong>: No official citation linked here.</li><li><strong>left</strong>: No official citation linked here.</li><li><strong>lg</strong>: No official citation linked here.</li><li><strong>link</strong>: No official citation linked here.</li><li><strong>lucide</strong>: No official citation linked here.</li><li><strong>map</strong>: No official citation linked here.</li><li><strong>medium</strong>: No official citation linked here.</li><li><strong>models</strong>: No official citation linked here.</li><li><strong>mono</strong>: No official citation linked here.</li><li><strong>muted</strong>: No official citation linked here.</li><li><strong>nav</strong>: No official citation linked here.</li><li><strong>navItems</strong>: No official citation linked here.</li><li><strong>navigation</strong>: No official citation linked here.</li><li><strong>next</strong>: No official citation linked here.</li><li><strong>onClick</strong>: No official citation linked here.</li><li><strong>onToggle</strong>: No official citation linked here.</li><li><strong>outline</strong>: No official citation linked here.</li><li><strong>pathname</strong>: No official citation linked here.</li><li><strong>predict</strong>: No official citation linked here.</li><li><strong>primary</strong>: No official citation linked here.</li><li><strong>px</strong>: No official citation linked here.</li><li><strong>py</strong>: No official citation linked here.</li><li><strong>react</strong>: No official citation linked here.</li><li><strong>rem</strong>: No official citation linked here.</li><li><strong>return</strong>: No official citation linked here.</li><li><strong>right</strong>: No official citation linked here.</li><li><strong>rounded</strong>: No official citation linked here.</li><li><strong>semibold</strong>: No official citation linked here.</li><li><strong>shrink</strong>: No official citation linked here.</li><li><strong>sidebar</strong>: No official citation linked here.</li><li><strong>sm</strong>: No official citation linked here.</li><li><strong>space</strong>: No official citation linked here.</li><li><strong>span</strong>: No official citation linked here.</li><li><strong>startsWith</strong>: No official citation linked here.</li><li><strong>surface</strong>: No official citation linked here.</li><li><strong>text</strong>: No official citation linked here.</li><li><strong>title</strong>: No official citation linked here.</li><li><strong>top</strong>: No official citation linked here.</li><li><strong>tracking</strong>: No official citation linked here.</li><li><strong>training</strong>: No official citation linked here.</li><li><strong>transition</strong>: No official citation linked here.</li><li><strong>transparent</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

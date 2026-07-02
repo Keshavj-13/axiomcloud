@@ -1,0 +1,145 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>firebase.ts</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>frontend/src/lib/firebase.ts</span></div>
+        <h1 style="margin:10px 0 6px">firebase.ts</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="chartTransforms.ts.html">Previous</a><a href="logger.ts.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: frontend/src/lib/firebase.ts</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>frontend/src/lib/firebase.ts</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-typescript">import { initializeApp } from &quot;firebase/app&quot;;
+import { Auth, getAuth } from &quot;firebase/auth&quot;;
+import { FirebaseApp } from &quot;firebase/app&quot;;
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
+export const firebaseConfigured = Object.values(firebaseConfig).every(
+  (value) =&gt; typeof value === &quot;string&quot; &amp;&amp; value.trim().length &gt; 0 &amp;&amp; !value.includes(&quot;your_&quot;)
+);
+
+let app: FirebaseApp | null = null;
+let authInstance: Auth | null = null;
+
+if (firebaseConfigured) {
+  app = initializeApp(firebaseConfig);
+  authInstance = getAuth(app);
+}
+
+export const auth = authInstance;
+export default app;
+</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-typescript">import { initializeApp } from &quot;firebase/app&quot;;
+import { Auth, getAuth } from &quot;firebase/auth&quot;;
+import { FirebaseApp } from &quot;firebase/app&quot;;
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
+export const firebaseConfigured = Object.values(firebaseConfig).every(
+  (value) =&gt; typeof value === &quot;string&quot; &amp;&amp; value.trim().length &gt; 0 &amp;&amp; !value.includes(&quot;your_&quot;)
+);
+
+let app: FirebaseApp | null = null;
+let authInstance: Auth | null = null;
+
+if (firebaseConfigured) {
+  app = initializeApp(firebaseConfig);
+  authInstance = getAuth(app);
+}
+
+export const auth = authInstance;
+export default app;
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>Auth</strong>: No official citation linked here.</li><li><strong>FirebaseApp</strong>: No official citation linked here.</li><li><strong>NEXT_PUBLIC_FIREBASE_API_KEY</strong>: No official citation linked here.</li><li><strong>NEXT_PUBLIC_FIREBASE_APP_ID</strong>: No official citation linked here.</li><li><strong>NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN</strong>: No official citation linked here.</li><li><strong>NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID</strong>: No official citation linked here.</li><li><strong>NEXT_PUBLIC_FIREBASE_PROJECT_ID</strong>: No official citation linked here.</li><li><strong>NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET</strong>: No official citation linked here.</li><li><strong>Object</strong>: No official citation linked here.</li><li><strong>apiKey</strong>: No official citation linked here.</li><li><strong>app</strong>: No official citation linked here.</li><li><strong>appId</strong>: No official citation linked here.</li><li><strong>auth</strong>: No official citation linked here.</li><li><strong>authDomain</strong>: No official citation linked here.</li><li><strong>authInstance</strong>: No official citation linked here.</li><li><strong>const</strong>: No official citation linked here.</li><li><strong>default</strong>: No official citation linked here.</li><li><strong>env</strong>: No official citation linked here.</li><li><strong>every</strong>: No official citation linked here.</li><li><strong>export</strong>: No official citation linked here.</li><li><strong>firebase</strong>: No official citation linked here.</li><li><strong>firebaseConfig</strong>: No official citation linked here.</li><li><strong>firebaseConfigured</strong>: No official citation linked here.</li><li><strong>from</strong>: No official citation linked here.</li><li><strong>getAuth</strong>: No official citation linked here.</li><li><strong>if</strong>: No official citation linked here.</li><li><strong>import</strong>: No official citation linked here.</li><li><strong>includes</strong>: No official citation linked here.</li><li><strong>initializeApp</strong>: No official citation linked here.</li><li><strong>length</strong>: No official citation linked here.</li><li><strong>let</strong>: No official citation linked here.</li><li><strong>messagingSenderId</strong>: No official citation linked here.</li><li><strong>null</strong>: No official citation linked here.</li><li><strong>process</strong>: No official citation linked here.</li><li><strong>projectId</strong>: No official citation linked here.</li><li><strong>storageBucket</strong>: No official citation linked here.</li><li><strong>string</strong>: No official citation linked here.</li><li><strong>trim</strong>: No official citation linked here.</li><li><strong>typeof</strong>: No official citation linked here.</li><li><strong>value</strong>: No official citation linked here.</li><li><strong>values</strong>: No official citation linked here.</li><li><strong>your_</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

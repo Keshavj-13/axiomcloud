@@ -1,0 +1,315 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>main.py</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>backend/app/main.py</span></div>
+        <h1 style="margin:10px 0 6px">main.py</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="core.html">Previous</a><a href="ml.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: backend/app/main.py</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>backend/app/main.py</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-python">&quot;&quot;&quot;
+Axiom Cloud AI - FastAPI Backend
+Production-grade AutoML Platform
+&quot;&quot;&quot;
+
+from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+import logging
+from logging.handlers import RotatingFileHandler
+import os
+from time import perf_counter
+from uuid import uuid4
+
+from app.api import datasets, training, models, predictions, metrics, auth
+from app.api.deps import get_current_user
+from app.core.config import settings
+from app.core.database import engine, Base
+from sqlalchemy.exc import OperationalError
+
+
+# File-based logging setup
+LOG_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), &quot;..&quot;, &quot;..&quot;, &quot;logs&quot;))
+os.makedirs(LOG_DIR, exist_ok=True)
+LOG_FILE = os.path.join(LOG_DIR, &quot;backend.log&quot;)
+
+file_handler = RotatingFileHandler(LOG_FILE, maxBytes=5*1024*1024, backupCount=5)
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(logging.Formatter(&quot;%(asctime)s - %(name)s - %(levelname)s - %(message)s&quot;))
+
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(logging.Formatter(&quot;%(asctime)s - %(name)s - %(levelname)s - %(message)s&quot;))
+
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.INFO)
+root_logger.handlers.clear()
+root_logger.addHandler(file_handler)
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-python">&quot;&quot;&quot;
+Axiom Cloud AI - FastAPI Backend
+Production-grade AutoML Platform
+&quot;&quot;&quot;
+
+from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+import logging
+from logging.handlers import RotatingFileHandler
+import os
+from time import perf_counter
+from uuid import uuid4
+
+from app.api import datasets, training, models, predictions, metrics, auth
+from app.api.deps import get_current_user
+from app.core.config import settings
+from app.core.database import engine, Base
+from sqlalchemy.exc import OperationalError
+
+
+# File-based logging setup
+LOG_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), &quot;..&quot;, &quot;..&quot;, &quot;logs&quot;))
+os.makedirs(LOG_DIR, exist_ok=True)
+LOG_FILE = os.path.join(LOG_DIR, &quot;backend.log&quot;)
+
+file_handler = RotatingFileHandler(LOG_FILE, maxBytes=5*1024*1024, backupCount=5)
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(logging.Formatter(&quot;%(asctime)s - %(name)s - %(levelname)s - %(message)s&quot;))
+
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(logging.Formatter(&quot;%(asctime)s - %(name)s - %(levelname)s - %(message)s&quot;))
+
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.INFO)
+root_logger.handlers.clear()
+root_logger.addHandler(file_handler)
+root_logger.addHandler(console_handler)
+
+logger = logging.getLogger(__name__)
+
+# Initialize FastAPI
+app = FastAPI(
+    title=&quot;Axiom Cloud AI&quot;,
+    description=&quot;Production-grade AutoML Platform - Train, Compare, and Deploy ML Models&quot;,
+    version=&quot;1.0.0&quot;,
+    docs_url=&quot;/api/docs&quot;,
+    redoc_url=&quot;/api/redoc&quot;,
+)
+
+# Middleware
+app.add_middleware(
+    CORSMiddleware,
+    # NOTE: For debug, allow any origin. Use explicit Vercel domain(s) in production.
+    # `allow_origins=[&quot;*&quot;]` + credentials can cause rejected preflights in some setups,
+    # so we use a permissive regex temporarily and will tighten it later.
+    allow_origins=[],
+    allow_origin_regex=&quot;.*&quot;,
+    allow_credentials=True,
+    allow_methods=[&quot;*&quot;],
+    allow_headers=[&quot;*&quot;],
+)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+# Mount static files for model downloads
+os.makedirs(settings.MODEL_STORAGE_PATH, exist_ok=True)
+os.makedirs(settings.DATASET_STORAGE_PATH, exist_ok=True)
+reports_storage_path = os.path.abspath(os.path.join(settings.BASE_STORAGE_PATH, &quot;reports&quot;))
+os.makedirs(reports_storage_path, exist_ok=True)
+app.mount(&quot;/static/models&quot;, StaticFiles(directory=settings.MODEL_STORAGE_PATH), name=&quot;models&quot;)
+app.mount(&quot;/static/reports&quot;, StaticFiles(directory=reports_storage_path), name=&quot;reports&quot;)
+
+# Include routers
+app.include_router(datasets.router, prefix=&quot;/api&quot;, tags=[&quot;Datasets&quot;], dependencies=[Depends(get_current_user)])
+app.include_router(training.router, prefix=&quot;/api&quot;, tags=[&quot;Training&quot;], dependencies=[Depends(get_current_user)])
+app.include_router(models.router, prefix=&quot;/api&quot;, tags=[&quot;Models&quot;], dependencies=[Depends(get_current_user)])
+app.include_router(predictions.router, prefix=&quot;/api&quot;, tags=[&quot;Predictions&quot;], dependencies=[Depends(get_current_user)])
+app.include_router(metrics.router, prefix=&quot;/api&quot;, tags=[&quot;Metrics&quot;], dependencies=[Depends(get_current_user)])
+app.include_router(auth.router, prefix=&quot;/api&quot;, tags=[&quot;Auth&quot;])
+
+
+@app.middleware(&quot;http&quot;)
+async def request_logging_middleware(request: Request, call_next):
+    &quot;&quot;&quot;Log every request with status code and response time.&quot;&quot;&quot;
+    request_id = str(uuid4())[:8]
+    request.state.request_id = request_id
+    start = perf_counter()
+
+    try:
+        response = await call_next(request)
+    except Exception:
+        duration_ms = (perf_counter() - start) * 1000
+        logger.exception(
+            &quot;Unhandled request error | id=%s method=%s path=%s duration_ms=%.2f&quot;,
+            request_id,
+            request.method,
+            request.url.path,
+            duration_ms,
+        )
+        raise
+
+    duration_ms = (perf_counter() - start) * 1000
+    logger.info(
+        &quot;Request completed | id=%s method=%s path=%s status=%s duration_ms=%.2f&quot;,
+        request_id,
+        request.method,
+        request.url.path,
+        response.status_code,
+        duration_ms,
+    )
+    response.headers[&quot;X-Request-ID&quot;] = request_id
+    return response
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    &quot;&quot;&quot;Log HTTP exceptions with request context.&quot;&quot;&quot;
+    request_id = getattr(request.state, &quot;request_id&quot;, &quot;unknown&quot;)
+    logger.warning(
+        &quot;HTTP exception | id=%s method=%s path=%s status=%s detail=%s&quot;,
+        request_id,
+        request.method,
+        request.url.path,
+        exc.status_code,
+        exc.detail,
+    )
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={&quot;detail&quot;: exc.detail, &quot;request_id&quot;: request_id},
+    )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    &quot;&quot;&quot;Catch and log unexpected exceptions with stack traces.&quot;&quot;&quot;
+    request_id = getattr(request.state, &quot;request_id&quot;, &quot;unknown&quot;)
+    logger.exception(
+        &quot;Unhandled exception | id=%s method=%s path=%s&quot;,
+        request_id,
+        request.method,
+        request.url.path,
+    )
+    return JSONResponse(
+        status_code=500,
+        content={&quot;detail&quot;: &quot;Internal server error&quot;, &quot;request_id&quot;: request_id},
+    )
+
+
+@app.on_event(&quot;startup&quot;)
+async def startup_event():
+    &quot;&quot;&quot;Initialize database tables on startup.&quot;&quot;&quot;
+    try:
+        Base.metadata.create_all(bind=engine)
+    except OperationalError as exc:
+        if &quot;already exists&quot; not in str(exc).lower():
+            raise
+        logger.warning(&quot;Startup table creation race detected, continuing: %s&quot;, exc)
+    logger.info(&quot;Axiom Cloud AI started successfully&quot;)
+    logger.info(f&quot;Model storage: {settings.MODEL_STORAGE_PATH}&quot;)
+    logger.info(f&quot;Dataset storage: {settings.DATASET_STORAGE_PATH}&quot;)
+
+
+@app.get(&quot;/api/health&quot;)
+def health():
+    &quot;&quot;&quot;Health check endpoint.&quot;&quot;&quot;
+    return {&quot;status&quot;: &quot;ok&quot;}
+
+
+@app.get(&quot;/api/debug/routes&quot;)
+def debug_routes():
+    &quot;&quot;&quot;List all registered routes (debug endpoint).&quot;&quot;&quot;
+    routes = []
+    for route in app.routes:
+        if hasattr(route, &#x27;path&#x27;):
+            routes.append(route.path)
+    return {&quot;routes&quot;: sorted(routes)}
+
+
+@app.get(&quot;/&quot;)
+async def root():
+    return {&quot;message&quot;: &quot;Axiom Cloud AI API - Visit /api/docs for documentation&quot;}
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>AI</strong>: No official citation linked here.</li><li><strong>API</strong>: No official citation linked here.</li><li><strong>Auth</strong>: No official citation linked here.</li><li><strong>AutoML</strong>: No official citation linked here.</li><li><strong>Axiom</strong>: No official citation linked here.</li><li><strong>BASE_STORAGE_PATH</strong>: No official citation linked here.</li><li><strong>Backend</strong>: No official citation linked here.</li><li><strong>Base</strong>: No official citation linked here.</li><li><strong>CORSMiddleware</strong>: No official citation linked here.</li><li><strong>Catch</strong>: No official citation linked here.</li><li><strong>Cloud</strong>: No official citation linked here.</li><li><strong>Compare</strong>: No official citation linked here.</li><li><strong>DATASET_STORAGE_PATH</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>Datasets</strong>: No official citation linked here.</li><li><strong>Depends</strong>: No official citation linked here.</li><li><strong>Deploy</strong>: No official citation linked here.</li><li><strong>Exception</strong>: No official citation linked here.</li><li><strong>FastAPI</strong>: <a href="https://fastapi.tiangolo.com/">https://fastapi.tiangolo.com/</a></li><li><strong>File</strong>: No official citation linked here.</li><li><strong>For</strong>: No official citation linked here.</li><li><strong>Formatter</strong>: No official citation linked here.</li><li><strong>GZipMiddleware</strong>: No official citation linked here.</li><li><strong>HTTP</strong>: No official citation linked here.</li><li><strong>HTTPException</strong>: No official citation linked here.</li><li><strong>Health</strong>: No official citation linked here.</li><li><strong>ID</strong>: No official citation linked here.</li><li><strong>INFO</strong>: No official citation linked here.</li><li><strong>Include</strong>: No official citation linked here.</li><li><strong>Initialize</strong>: No official citation linked here.</li><li><strong>Internal</strong>: No official citation linked here.</li><li><strong>JSONResponse</strong>: No official citation linked here.</li><li><strong>LOG_DIR</strong>: No official citation linked here.</li><li><strong>LOG_FILE</strong>: No official citation linked here.</li><li><strong>List</strong>: No official citation linked here.</li><li><strong>Log</strong>: No official citation linked here.</li><li><strong>ML</strong>: No official citation linked here.</li><li><strong>MODEL_STORAGE_PATH</strong>: No official citation linked here.</li><li><strong>Metrics</strong>: No official citation linked here.</li><li><strong>Middleware</strong>: No official citation linked here.</li><li><strong>Model</strong>: No official citation linked here.</li><li><strong>Models</strong>: No official citation linked here.</li><li><strong>Mount</strong>: No official citation linked here.</li><li><strong>NOTE</strong>: No official citation linked here.</li><li><strong>OperationalError</strong>: No official citation linked here.</li><li><strong>Platform</strong>: No official citation linked here.</li><li><strong>Predictions</strong>: No official citation linked here.</li><li><strong>Production</strong>: No official citation linked here.</li><li><strong>Request</strong>: No official citation linked here.</li><li><strong>RotatingFileHandler</strong>: No official citation linked here.</li><li><strong>Startup</strong>: No official citation linked here.</li><li><strong>StaticFiles</strong>: No official citation linked here.</li><li><strong>StreamHandler</strong>: No official citation linked here.</li><li><strong>Train</strong>: No official citation linked here.</li><li><strong>Training</strong>: No official citation linked here.</li><li><strong>True</strong>: No official citation linked here.</li><li><strong>Unhandled</strong>: No official citation linked here.</li><li><strong>Use</strong>: No official citation linked here.</li><li><strong>Vercel</strong>: No official citation linked here.</li><li><strong>Visit</strong>: No official citation linked here.</li><li><strong>__file__</strong>: No official citation linked here.</li><li><strong>__name__</strong>: No official citation linked here.</li><li><strong>abspath</strong>: No official citation linked here.</li><li><strong>addHandler</strong>: No official citation linked here.</li><li><strong>add_middleware</strong>: No official citation linked here.</li><li><strong>all</strong>: No official citation linked here.</li><li><strong>allow</strong>: No official citation linked here.</li><li><strong>allow_credentials</strong>: No official citation linked here.</li><li><strong>allow_headers</strong>: No official citation linked here.</li><li><strong>allow_methods</strong>: No official citation linked here.</li><li><strong>allow_origin_regex</strong>: No official citation linked here.</li><li><strong>allow_origins</strong>: No official citation linked here.</li><li><strong>already</strong>: No official citation linked here.</li><li><strong>and</strong>: No official citation linked here.</li><li><strong>any</strong>: No official citation linked here.</li><li><strong>api</strong>: No official citation linked here.</li><li><strong>app</strong>: No official citation linked here.</li><li><strong>append</strong>: No official citation linked here.</li><li><strong>as</strong>: No official citation linked here.</li><li><strong>asctime</strong>: No official citation linked here.</li><li><strong>async</strong>: No official citation linked here.</li><li><strong>auth</strong>: No official citation linked here.</li><li><strong>await</strong>: No official citation linked here.</li><li><strong>backend</strong>: No official citation linked here.</li><li><strong>backupCount</strong>: No official citation linked here.</li><li><strong>based</strong>: No official citation linked here.</li><li><strong>bind</strong>: No official citation linked here.</li><li><strong>call_next</strong>: No official citation linked here.</li><li><strong>can</strong>: No official citation linked here.</li><li><strong>cause</strong>: No official citation linked here.</li><li><strong>check</strong>: No official citation linked here.</li><li><strong>clear</strong>: No official citation linked here.</li><li><strong>code</strong>: No official citation linked here.</li><li><strong>completed</strong>: No official citation linked here.</li><li><strong>config</strong>: No official citation linked here.</li><li><strong>console_handler</strong>: No official citation linked here.</li><li><strong>content</strong>: No official citation linked here.</li><li><strong>context</strong>: No official citation linked here.</li><li><strong>continuing</strong>: No official citation linked here.</li><li><strong>core</strong>: No official citation linked here.</li><li><strong>cors</strong>: No official citation linked here.</li><li><strong>create_all</strong>: No official citation linked here.</li><li><strong>creation</strong>: No official citation linked here.</li><li><strong>credentials</strong>: No official citation linked here.</li><li><strong>database</strong>: No official citation linked here.</li><li><strong>datasets</strong>: No official citation linked here.</li><li><strong>debug</strong>: No official citation linked here.</li><li><strong>debug_routes</strong>: No official citation linked here.</li><li><strong>def</strong>: No official citation linked here.</li><li><strong>dependencies</strong>: No official citation linked here.</li><li><strong>deps</strong>: No official citation linked here.</li><li><strong>description</strong>: No official citation linked here.</li><li><strong>detail</strong>: No official citation linked here.</li><li><strong>detected</strong>: No official citation linked here.</li><li><strong>directory</strong>: No official citation linked here.</li><li><strong>dirname</strong>: No official citation linked here.</li><li><strong>docs</strong>: No official citation linked here.</li><li><strong>docs_url</strong>: No official citation linked here.</li><li><strong>documentation</strong>: No official citation linked here.</li><li><strong>domain</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

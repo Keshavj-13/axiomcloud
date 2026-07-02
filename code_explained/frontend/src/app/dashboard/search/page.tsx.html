@@ -1,0 +1,305 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>page.tsx</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>frontend/src/app/dashboard/search/page.tsx</span></div>
+        <h1 style="margin:10px 0 6px">page.tsx</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="../predict/page.tsx.html">Previous</a><a href="../training/page.tsx.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: frontend/src/app/dashboard/search/page.tsx</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>frontend/src/app/dashboard/search/page.tsx</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-tsx">&quot;use client&quot;;
+
+import { useEffect, useMemo, useState } from &quot;react&quot;;
+import Link from &quot;next/link&quot;;
+import { useSearchParams } from &quot;next/navigation&quot;;
+import { datasetsAPI, modelsAPI, trainingAPI } from &quot;@/lib/api&quot;;
+import { Dataset, TrainedModel, TrainingJob } from &quot;@/types&quot;;
+import { Loader2, Search, Database, Brain, BarChart3 } from &quot;lucide-react&quot;;
+
+function includesQuery(value: unknown, query: string) {
+  if (!query) return true;
+  return String(value ?? &quot;&quot;).toLowerCase().includes(query);
+}
+
+export default function SearchPage() {
+  const searchParams = useSearchParams();
+  const rawQuery = (searchParams.get(&quot;q&quot;) || &quot;&quot;).trim();
+  const query = rawQuery.toLowerCase();
+
+  const [loading, setLoading] = useState(true);
+  const [jobs, setJobs] = useState&lt;TrainingJob[]&gt;([]);
+  const [datasets, setDatasets] = useState&lt;Dataset[]&gt;([]);
+  const [models, setModels] = useState&lt;TrainedModel[]&gt;([]);
+
+  useEffect(() =&gt; {
+    const load = async () =&gt; {
+      setLoading(true);
+      try {
+        const [jobsRes, datasetsRes, modelsRes] = await Promise.all([
+          trainingAPI.listJobs(),
+          datasetsAPI.list(),
+          modelsAPI.list(),
+        ]);
+
+        setJobs(jobsRes.data || []);
+        setDatasets(datasetsRes.data || []);
+        setModels(modelsRes.data || []);
+      } finally {
+        setLoading(false);
+      }
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-tsx">&quot;use client&quot;;
+
+import { useEffect, useMemo, useState } from &quot;react&quot;;
+import Link from &quot;next/link&quot;;
+import { useSearchParams } from &quot;next/navigation&quot;;
+import { datasetsAPI, modelsAPI, trainingAPI } from &quot;@/lib/api&quot;;
+import { Dataset, TrainedModel, TrainingJob } from &quot;@/types&quot;;
+import { Loader2, Search, Database, Brain, BarChart3 } from &quot;lucide-react&quot;;
+
+function includesQuery(value: unknown, query: string) {
+  if (!query) return true;
+  return String(value ?? &quot;&quot;).toLowerCase().includes(query);
+}
+
+export default function SearchPage() {
+  const searchParams = useSearchParams();
+  const rawQuery = (searchParams.get(&quot;q&quot;) || &quot;&quot;).trim();
+  const query = rawQuery.toLowerCase();
+
+  const [loading, setLoading] = useState(true);
+  const [jobs, setJobs] = useState&lt;TrainingJob[]&gt;([]);
+  const [datasets, setDatasets] = useState&lt;Dataset[]&gt;([]);
+  const [models, setModels] = useState&lt;TrainedModel[]&gt;([]);
+
+  useEffect(() =&gt; {
+    const load = async () =&gt; {
+      setLoading(true);
+      try {
+        const [jobsRes, datasetsRes, modelsRes] = await Promise.all([
+          trainingAPI.listJobs(),
+          datasetsAPI.list(),
+          modelsAPI.list(),
+        ]);
+
+        setJobs(jobsRes.data || []);
+        setDatasets(datasetsRes.data || []);
+        setModels(modelsRes.data || []);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, []);
+
+  const matchedJobs = useMemo(
+    () =&gt; jobs.filter((j) =&gt; (
+      includesQuery(j.job_id, query)
+      || includesQuery(j.target_column, query)
+      || includesQuery(j.task_type, query)
+      || includesQuery(j.status, query)
+    )),
+    [jobs, query]
+  );
+
+  const matchedDatasets = useMemo(
+    () =&gt; datasets.filter((d) =&gt; (
+      includesQuery(d.name, query)
+      || includesQuery(d.filename, query)
+      || includesQuery(d.target_column, query)
+      || includesQuery(d.task_type, query)
+    )),
+    [datasets, query]
+  );
+
+  const matchedModels = useMemo(
+    () =&gt; models.filter((m) =&gt; (
+      includesQuery(m.model_name, query)
+      || includesQuery(m.model_type, query)
+      || includesQuery(m.task_type, query)
+      || includesQuery(m.job_id, query)
+    )),
+    [models, query]
+  );
+
+  const total = matchedJobs.length + matchedDatasets.length + matchedModels.length;
+
+  return (
+    &lt;div className=&quot;mx-auto max-w-6xl&quot;&gt;
+      &lt;div className=&quot;mb-8&quot;&gt;
+        &lt;div className=&quot;section-kicker mb-2&quot;&gt;Search&lt;/div&gt;
+        &lt;h1 className=&quot;font-display mb-1 text-4xl font-semibold text-text-primary&quot;&gt;Workspace Search&lt;/h1&gt;
+        &lt;p className=&quot;text-text-muted&quot;&gt;Find jobs, datasets, and models from one place.&lt;/p&gt;
+      &lt;/div&gt;
+
+      &lt;div className=&quot;panel mb-6 rounded-xl p-4&quot;&gt;
+        &lt;form action=&quot;/dashboard/search&quot; method=&quot;get&quot; className=&quot;flex items-center gap-2&quot;&gt;
+          &lt;Search className=&quot;h-4 w-4 text-text-muted&quot; /&gt;
+          &lt;input
+            type=&quot;search&quot;
+            name=&quot;q&quot;
+            defaultValue={rawQuery}
+            placeholder=&quot;Search by id, name, target, task type...&quot;
+            className=&quot;w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary/50&quot;
+          /&gt;
+        &lt;/form&gt;
+      &lt;/div&gt;
+
+      {loading ? (
+        &lt;div className=&quot;flex justify-center py-20&quot;&gt;
+          &lt;Loader2 className=&quot;h-8 w-8 animate-spin text-primary&quot; /&gt;
+        &lt;/div&gt;
+      ) : (
+        &lt;&gt;
+          &lt;div className=&quot;mb-4 text-sm text-text-muted&quot;&gt;
+            {rawQuery ? `Found ${total} result${total === 1 ? &quot;&quot; : &quot;s&quot;} for &quot;${rawQuery}&quot;` : &quot;Enter a search term to filter results.&quot;}
+          &lt;/div&gt;
+
+          &lt;div className=&quot;grid gap-6 lg:grid-cols-3&quot;&gt;
+            &lt;section className=&quot;panel rounded-xl p-4&quot;&gt;
+              &lt;div className=&quot;mb-3 flex items-center gap-2 text-text-primary&quot;&gt;
+                &lt;BarChart3 className=&quot;h-4 w-4&quot; /&gt;
+                &lt;h2 className=&quot;text-sm font-semibold&quot;&gt;Training Jobs ({matchedJobs.length})&lt;/h2&gt;
+              &lt;/div&gt;
+              &lt;div className=&quot;space-y-2&quot;&gt;
+                {matchedJobs.slice(0, 20).map((job) =&gt; (
+                  &lt;Link
+                    key={job.job_id}
+                    href={`/dashboard/models?job=${encodeURIComponent(job.job_id)}`}
+                    className=&quot;block rounded-lg border border-outline/20 bg-surface-variant/30 px-3 py-2 text-xs hover:border-primary/40&quot;
+                  &gt;
+                    &lt;div className=&quot;font-mono text-text-primary&quot;&gt;{job.job_id}&lt;/div&gt;
+                    &lt;div className=&quot;text-text-muted&quot;&gt;{job.target_column} • {job.task_type || &quot;unknown&quot;} • {job.status}&lt;/div&gt;
+                  &lt;/Link&gt;
+                ))}
+                {matchedJobs.length === 0 &amp;&amp; &lt;div className=&quot;text-xs text-text-muted&quot;&gt;No matching jobs.&lt;/div&gt;}
+              &lt;/div&gt;
+            &lt;/section&gt;
+
+            &lt;section className=&quot;panel rounded-xl p-4&quot;&gt;
+              &lt;div className=&quot;mb-3 flex items-center gap-2 text-text-primary&quot;&gt;
+                &lt;Database className=&quot;h-4 w-4&quot; /&gt;
+                &lt;h2 className=&quot;text-sm font-semibold&quot;&gt;Datasets ({matchedDatasets.length})&lt;/h2&gt;
+              &lt;/div&gt;
+              &lt;div className=&quot;space-y-2&quot;&gt;
+                {matchedDatasets.slice(0, 20).map((dataset) =&gt; (
+                  &lt;Link
+                    key={dataset.id}
+                    href=&quot;/dashboard/datasets&quot;
+                    className=&quot;block rounded-lg border border-outline/20 bg-surface-variant/30 px-3 py-2 text-xs hover:border-primary/40&quot;
+                  &gt;
+                    &lt;div className=&quot;text-text-primary&quot;&gt;{dataset.name}&lt;/div&gt;
+                    &lt;div className=&quot;text-text-muted&quot;&gt;{dataset.target_column || &quot;no target&quot;} • {dataset.task_type || &quot;unknown&quot;}&lt;/div&gt;
+                  &lt;/Link&gt;
+                ))}
+                {matchedDatasets.length === 0 &amp;&amp; &lt;div className=&quot;text-xs text-text-muted&quot;&gt;No matching datasets.&lt;/div&gt;}
+              &lt;/div&gt;
+            &lt;/section&gt;
+
+            &lt;section className=&quot;panel rounded-xl p-4&quot;&gt;
+              &lt;div className=&quot;mb-3 flex items-center gap-2 text-text-primary&quot;&gt;
+                &lt;Brain className=&quot;h-4 w-4&quot; /&gt;
+                &lt;h2 className=&quot;text-sm font-semibold&quot;&gt;Models ({matchedModels.length})&lt;/h2&gt;
+              &lt;/div&gt;
+              &lt;div className=&quot;space-y-2&quot;&gt;
+                {matchedModels.slice(0, 20).map((model) =&gt; (
+                  &lt;Link
+                    key={model.id}
+                    href={`/dashboard/models?job=${encodeURIComponent(model.job_id)}`}
+                    className=&quot;block rounded-lg border border-outline/20 bg-surface-variant/30 px-3 py-2 text-xs hover:border-primary/40&quot;
+                  &gt;
+                    &lt;div className=&quot;text-text-primary&quot;&gt;{model.model_name}&lt;/div&gt;
+                    &lt;div className=&quot;text-text-muted&quot;&gt;{model.model_type} • {model.task_type} • {model.job_id.slice(0, 8)}…&lt;/div&gt;
+                  &lt;/Link&gt;
+                ))}
+                {matchedModels.length === 0 &amp;&amp; &lt;div className=&quot;text-xs text-text-muted&quot;&gt;No matching models.&lt;/div&gt;}
+              &lt;/div&gt;
+            &lt;/section&gt;
+          &lt;/div&gt;
+        &lt;/&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>BarChart3</strong>: No official citation linked here.</li><li><strong>Brain</strong>: No official citation linked here.</li><li><strong>Database</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>Datasets</strong>: No official citation linked here.</li><li><strong>Enter</strong>: No official citation linked here.</li><li><strong>Find</strong>: No official citation linked here.</li><li><strong>Found</strong>: No official citation linked here.</li><li><strong>Jobs</strong>: No official citation linked here.</li><li><strong>Link</strong>: No official citation linked here.</li><li><strong>Loader2</strong>: No official citation linked here.</li><li><strong>Models</strong>: No official citation linked here.</li><li><strong>No</strong>: No official citation linked here.</li><li><strong>Promise</strong>: No official citation linked here.</li><li><strong>Search</strong>: No official citation linked here.</li><li><strong>SearchPage</strong>: No official citation linked here.</li><li><strong>String</strong>: No official citation linked here.</li><li><strong>TrainedModel</strong>: No official citation linked here.</li><li><strong>Training</strong>: No official citation linked here.</li><li><strong>TrainingJob</strong>: No official citation linked here.</li><li><strong>Workspace</strong>: No official citation linked here.</li><li><strong>action</strong>: No official citation linked here.</li><li><strong>all</strong>: No official citation linked here.</li><li><strong>and</strong>: No official citation linked here.</li><li><strong>animate</strong>: No official citation linked here.</li><li><strong>api</strong>: No official citation linked here.</li><li><strong>async</strong>: No official citation linked here.</li><li><strong>auto</strong>: No official citation linked here.</li><li><strong>await</strong>: No official citation linked here.</li><li><strong>bg</strong>: No official citation linked here.</li><li><strong>block</strong>: No official citation linked here.</li><li><strong>border</strong>: No official citation linked here.</li><li><strong>by</strong>: No official citation linked here.</li><li><strong>center</strong>: No official citation linked here.</li><li><strong>className</strong>: No official citation linked here.</li><li><strong>client</strong>: No official citation linked here.</li><li><strong>cols</strong>: No official citation linked here.</li><li><strong>const</strong>: No official citation linked here.</li><li><strong>dashboard</strong>: No official citation linked here.</li><li><strong>data</strong>: No official citation linked here.</li><li><strong>dataset</strong>: No official citation linked here.</li><li><strong>datasets</strong>: No official citation linked here.</li><li><strong>datasetsAPI</strong>: No official citation linked here.</li><li><strong>datasetsRes</strong>: No official citation linked here.</li><li><strong>default</strong>: No official citation linked here.</li><li><strong>defaultValue</strong>: No official citation linked here.</li><li><strong>display</strong>: No official citation linked here.</li><li><strong>div</strong>: No official citation linked here.</li><li><strong>encodeURIComponent</strong>: No official citation linked here.</li><li><strong>export</strong>: No official citation linked here.</li><li><strong>false</strong>: No official citation linked here.</li><li><strong>filename</strong>: No official citation linked here.</li><li><strong>filter</strong>: No official citation linked here.</li><li><strong>finally</strong>: No official citation linked here.</li><li><strong>flex</strong>: No official citation linked here.</li><li><strong>focus</strong>: No official citation linked here.</li><li><strong>font</strong>: No official citation linked here.</li><li><strong>for</strong>: No official citation linked here.</li><li><strong>form</strong>: No official citation linked here.</li><li><strong>from</strong>: No official citation linked here.</li><li><strong>full</strong>: No official citation linked here.</li><li><strong>function</strong>: No official citation linked here.</li><li><strong>gap</strong>: No official citation linked here.</li><li><strong>get</strong>: No official citation linked here.</li><li><strong>grid</strong>: No official citation linked here.</li><li><strong>h1</strong>: No official citation linked here.</li><li><strong>h2</strong>: No official citation linked here.</li><li><strong>hover</strong>: No official citation linked here.</li><li><strong>href</strong>: No official citation linked here.</li><li><strong>id</strong>: No official citation linked here.</li><li><strong>if</strong>: No official citation linked here.</li><li><strong>import</strong>: No official citation linked here.</li><li><strong>includes</strong>: No official citation linked here.</li><li><strong>includesQuery</strong>: No official citation linked here.</li><li><strong>input</strong>: No official citation linked here.</li><li><strong>items</strong>: No official citation linked here.</li><li><strong>job</strong>: No official citation linked here.</li><li><strong>job_id</strong>: No official citation linked here.</li><li><strong>jobs</strong>: No official citation linked here.</li><li><strong>jobsRes</strong>: No official citation linked here.</li><li><strong>justify</strong>: No official citation linked here.</li><li><strong>key</strong>: No official citation linked here.</li><li><strong>kicker</strong>: No official citation linked here.</li><li><strong>length</strong>: No official citation linked here.</li><li><strong>lg</strong>: No official citation linked here.</li><li><strong>lib</strong>: No official citation linked here.</li><li><strong>link</strong>: No official citation linked here.</li><li><strong>list</strong>: No official citation linked here.</li><li><strong>listJobs</strong>: No official citation linked here.</li><li><strong>load</strong>: No official citation linked here.</li><li><strong>loading</strong>: No official citation linked here.</li><li><strong>lucide</strong>: No official citation linked here.</li><li><strong>map</strong>: No official citation linked here.</li><li><strong>matchedDatasets</strong>: No official citation linked here.</li><li><strong>matchedJobs</strong>: No official citation linked here.</li><li><strong>matchedModels</strong>: No official citation linked here.</li><li><strong>matching</strong>: No official citation linked here.</li><li><strong>max</strong>: No official citation linked here.</li><li><strong>mb</strong>: No official citation linked here.</li><li><strong>method</strong>: No official citation linked here.</li><li><strong>model</strong>: No official citation linked here.</li><li><strong>model_name</strong>: No official citation linked here.</li><li><strong>model_type</strong>: No official citation linked here.</li><li><strong>models</strong>: No official citation linked here.</li><li><strong>modelsAPI</strong>: No official citation linked here.</li><li><strong>modelsRes</strong>: No official citation linked here.</li><li><strong>mono</strong>: No official citation linked here.</li><li><strong>muted</strong>: No official citation linked here.</li><li><strong>mx</strong>: No official citation linked here.</li><li><strong>name</strong>: No official citation linked here.</li><li><strong>navigation</strong>: No official citation linked here.</li><li><strong>next</strong>: No official citation linked here.</li><li><strong>no</strong>: No official citation linked here.</li><li><strong>none</strong>: No official citation linked here.</li><li><strong>one</strong>: No official citation linked here.</li><li><strong>outline</strong>: No official citation linked here.</li><li><strong>panel</strong>: No official citation linked here.</li><li><strong>place</strong>: No official citation linked here.</li><li><strong>placeholder</strong>: No official citation linked here.</li><li><strong>primary</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,487 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>local_agent.py</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>local_agent.py</span></div>
+        <h1 style="margin:10px 0 6px">local_agent.py</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="frontend.html">Previous</a><a href="logs.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: local_agent.py</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>local_agent.py</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-python">#!/usr/bin/env python3
+&quot;&quot;&quot;Local training agent for SigmaCloud AutoML.
+
+Usage examples:
+1) Pull job spec from backend and train/sync:
+    python local_agent.py --connect &lt;job_id&gt; --api-url http://localhost:8000 --token &quot;YOUR_FIREBASE_ID_TOKEN&quot;
+
+2) Train from exported spec JSON:
+   python local_agent.py --spec-file ./job_spec.json --offline
+
+3) Offline train, then later sync:
+   python local_agent.py --spec-file ./job_spec.json --offline --sync-file ./pending_sync.json
+    python local_agent.py --sync-file ./pending_sync.json --api-url http://localhost:8000 --token &quot;YOUR_FIREBASE_ID_TOKEN&quot;
+&quot;&quot;&quot;
+from __future__ import annotations
+
+import argparse
+import importlib
+import json
+import os
+import time
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+
+import joblib
+import numpy as np
+import pandas as pd
+import requests
+from sklearn.metrics import (
+    accuracy_score,
+    f1_score,
+    mean_absolute_error,
+    mean_squared_error,
+    precision_score,
+    r2_score,
+    recall_score,
+)
+from sklearn.model_selection import train_test_split
+
+torch = None
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-python">#!/usr/bin/env python3
+&quot;&quot;&quot;Local training agent for SigmaCloud AutoML.
+
+Usage examples:
+1) Pull job spec from backend and train/sync:
+    python local_agent.py --connect &lt;job_id&gt; --api-url http://localhost:8000 --token &quot;YOUR_FIREBASE_ID_TOKEN&quot;
+
+2) Train from exported spec JSON:
+   python local_agent.py --spec-file ./job_spec.json --offline
+
+3) Offline train, then later sync:
+   python local_agent.py --spec-file ./job_spec.json --offline --sync-file ./pending_sync.json
+    python local_agent.py --sync-file ./pending_sync.json --api-url http://localhost:8000 --token &quot;YOUR_FIREBASE_ID_TOKEN&quot;
+&quot;&quot;&quot;
+from __future__ import annotations
+
+import argparse
+import importlib
+import json
+import os
+import time
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+
+import joblib
+import numpy as np
+import pandas as pd
+import requests
+from sklearn.metrics import (
+    accuracy_score,
+    f1_score,
+    mean_absolute_error,
+    mean_squared_error,
+    precision_score,
+    r2_score,
+    recall_score,
+)
+from sklearn.model_selection import train_test_split
+
+torch = None
+nn = None
+
+
+def _ensure_torch() -&gt; None:
+    global torch, nn
+    if torch is not None and nn is not None:
+        return
+    try:
+        torch = importlib.import_module(&quot;torch&quot;)
+        nn = importlib.import_module(&quot;torch.nn&quot;)
+    except Exception as exc:  # pragma: no cover
+        raise RuntimeError(
+            &quot;PyTorch is required for local GPU execution. Install with: pip install torch&quot;
+        ) from exc
+
+
+@dataclass
+class AgentContext:
+    logs: List[str]
+
+    def log(self, message: str) -&gt; None:
+        stamp = time.strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)
+        line = f&quot;[{stamp}] {message}&quot;
+        self.logs.append(line)
+        print(line)
+
+
+def _headers(token: Optional[str]) -&gt; Dict[str, str]:
+    h = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+    if token:
+        h[&quot;Authorization&quot;] = f&quot;Bearer {token}&quot;
+    return h
+
+
+def fetch_job_spec(api_url: str, job_id: str, token: Optional[str], ctx: AgentContext) -&gt; Dict[str, Any]:
+    url = f&quot;{api_url.rstrip(&#x27;/&#x27;)}/api/training/local-job-spec/{job_id}&quot;
+    ctx.log(f&quot;Fetching local job spec: {url}&quot;)
+    resp = requests.get(url, headers=_headers(token), timeout=60)
+    if resp.status_code == 401:
+        raise RuntimeError(
+            &quot;Unauthorized (401). Use a valid Firebase ID token, not the training job id. &quot;
+            &quot;Pass it as: --token \&quot;YOUR_FIREBASE_ID_TOKEN\&quot;&quot;
+        )
+    resp.raise_for_status()
+    return resp.json()
+
+
+def load_spec(spec_file: Optional[str], connect_job: Optional[str], api_url: str, token: Optional[str], ctx: AgentContext) -&gt; Dict[str, Any]:
+    if spec_file:
+        ctx.log(f&quot;Loading spec from file: {spec_file}&quot;)
+        with open(spec_file, &quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
+            return json.load(f)
+    if connect_job:
+        return fetch_job_spec(api_url, connect_job, token, ctx)
+    raise ValueError(&quot;Provide either --spec-file or --connect &lt;job_id&gt;&quot;)
+
+
+def load_dataset(path: str, ctx: AgentContext) -&gt; pd.DataFrame:
+    if not os.path.exists(path):
+        raise FileNotFoundError(f&quot;Dataset path not found: {path}&quot;)
+    ctx.log(f&quot;Loading dataset: {path}&quot;)
+    if path.lower().endswith(&quot;.csv&quot;):
+        return pd.read_csv(path)
+    return pd.read_excel(path)
+
+
+def create_torch_mlp(input_dim: int, output_dim: int, regression: bool):
+    _ensure_torch()
+
+    class TorchMLP(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.regression = regression
+            self.net = nn.Sequential(
+                nn.Linear(input_dim, 128),
+                nn.ReLU(),
+                nn.Linear(128, 64),
+                nn.ReLU(),
+                nn.Linear(64, output_dim),
+            )
+
+        def forward(self, x: Any) -&gt; Any:
+            return self.net(x)
+
+    return TorchMLP()
+
+
+def build_features(df: pd.DataFrame, target_col: str) -&gt; tuple[pd.DataFrame, pd.Series]:
+    y = df[target_col]
+    X = df.drop(columns=[target_col]).copy()
+    X = pd.get_dummies(X, drop_first=True)
+    for col in X.columns:
+        if pd.api.types.is_numeric_dtype(X[col]):
+            X[col] = pd.to_numeric(X[col], errors=&quot;coerce&quot;)
+        X[col] = X[col].fillna(X[col].median() if pd.api.types.is_numeric_dtype(X[col]) else 0)
+    if X.shape[1] == 0:
+        raise ValueError(&quot;No usable features after preprocessing&quot;)
+    return X, y
+
+
+def detect_task(y: pd.Series, declared: Optional[str]) -&gt; str:
+    if declared in {&quot;classification&quot;, &quot;regression&quot;}:
+        return declared
+    if not pd.api.types.is_numeric_dtype(y):
+        return &quot;classification&quot;
+    clean = y.dropna()
+    unique = int(clean.nunique())
+    unique_rate = float(unique / max(len(clean), 1))
+    return &quot;classification&quot; if unique &lt;= 20 and unique_rate &lt;= 0.2 else &quot;regression&quot;
+
+
+def train_local_torch(spec: Dict[str, Any], ctx: AgentContext) -&gt; Dict[str, Any]:
+    _ensure_torch()
+    dataset_path = spec[&quot;dataset_path&quot;]
+    target_col = spec[&quot;target_column&quot;]
+    declared_task = spec.get(&quot;task_type&quot;)
+
+    df = load_dataset(dataset_path, ctx)
+    if target_col not in df.columns:
+        raise ValueError(f&quot;Target column not present: {target_col}&quot;)
+
+    X_df, y_s = build_features(df, target_col)
+    task_type = detect_task(y_s, declared_task)
+    ctx.log(f&quot;Detected task type: {task_type}&quot;)
+
+    device = &quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;
+    ctx.log(f&quot;GPU available: {torch.cuda.is_available()} | selected device: {device}&quot;)
+
+    valid = y_s.notna()
+    X_df = X_df.loc[valid]
+    y_s = y_s.loc[valid]
+
+    if task_type == &quot;classification&quot;:
+        labels = sorted(y_s.astype(str).unique().tolist())
+        label_to_idx = {v: i for i, v in enumerate(labels)}
+        y_arr = y_s.astype(str).map(label_to_idx).to_numpy(dtype=np.int64)
+        stratify = y_arr if len(np.unique(y_arr)) &gt; 1 else None
+    else:
+        labels = None
+        y_arr = pd.to_numeric(y_s, errors=&quot;coerce&quot;).fillna(0.0).to_numpy(dtype=np.float32)
+        stratify = None
+
+    X_arr = X_df.to_numpy(dtype=np.float32)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_arr,
+        y_arr,
+        test_size=float(spec.get(&quot;hyperparameters&quot;, {}).get(&quot;test_size&quot;, 0.2)),
+        random_state=42,
+        stratify=stratify,
+    )
+
+    input_dim = X_train.shape[1]
+    output_dim = 1 if task_type == &quot;regression&quot; else int(np.max(y_train)) + 1
+
+    model = create_torch_mlp(input_dim=input_dim, output_dim=output_dim, regression=task_type == &quot;regression&quot;).to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    criterion = nn.MSELoss() if task_type == &quot;regression&quot; else nn.CrossEntropyLoss()
+
+    Xt = torch.tensor(X_train, dtype=torch.float32, device=device)
+    if task_type == &quot;regression&quot;:
+        yt = torch.tensor(y_train, dtype=torch.float32, device=device).view(-1, 1)
+    else:
+        yt = torch.tensor(y_train, dtype=torch.long, device=device)
+
+    epochs = 35
+    batch_size = min(256, max(32, len(X_train) // 8))
+    start = time.time()
+    model.train()
+    for ep in range(epochs):
+        perm = torch.randperm(Xt.size(0), device=device)
+        epoch_loss = 0.0
+        for i in range(0, Xt.size(0), batch_size):
+            idx = perm[i : i + batch_size]
+            xb = Xt[idx]
+            yb = yt[idx]
+            optimizer.zero_grad()
+            out = model(xb)
+            loss = criterion(out, yb)
+            loss.backward()
+            optimizer.step()
+            epoch_loss += float(loss.item())
+        if ep in {0, 9, 19, 34}:
+            ctx.log(f&quot;epoch={ep+1}/{epochs} loss={epoch_loss:.4f}&quot;)
+
+    model.eval()
+    Xte = torch.tensor(X_test, dtype=torch.float32, device=device)
+    with torch.no_grad():
+        pred_raw = model(Xte).detach().cpu().numpy()
+
+    if task_type == &quot;regression&quot;:
+        y_pred = pred_raw.reshape(-1)
+        mse = float(mean_squared_error(y_test, y_pred))
+        metrics = {
+            &quot;mae&quot;: float(mean_absolute_error(y_test, y_pred)),
+            &quot;mse&quot;: mse,
+            &quot;rmse&quot;: float(np.sqrt(mse)),
+            &quot;r2&quot;: float(r2_score(y_test, y_pred)),
+        }
+        confusion = None
+        roc_curve_data = None
+    else:
+        y_pred_idx = np.argmax(pred_raw, axis=1)
+        metrics = {
+            &quot;accuracy&quot;: float(accuracy_score(y_test, y_pred_idx)),
+            &quot;precision&quot;: float(precision_score(y_test, y_pred_idx, average=&quot;weighted&quot;, zero_division=0)),
+            &quot;recall&quot;: float(recall_score(y_test, y_pred_idx, average=&quot;weighted&quot;, zero_division=0)),
+            &quot;f1_score&quot;: float(f1_score(y_test, y_pred_idx, average=&quot;weighted&quot;, zero_division=0)),
+        }
+        n_classes = int(np.max(y_test)) + 1
+        confusion = [[0 for _ in range(n_classes)] for _ in range(n_classes)]
+        for a, p in zip(y_test.tolist(), y_pred_idx.tolist()):
+            confusion[int(a)][int(p)] += 1
+        roc_curve_data = None
+
+    training_time = float(time.time() - start)
+    ctx.log(f&quot;Training finished in {training_time:.2f}s&quot;)
+
+    output_dir = spec.get(&quot;output_dir&quot;) or os.path.abspath(f&quot;./local_outputs/{spec[&#x27;job_id&#x27;]}&quot;)
+    os.makedirs(output_dir, exist_ok=True)
+    model_path = os.path.join(output_dir, f&quot;{spec[&#x27;job_id&#x27;]}_local_torch_mlp.pt&quot;)
+    preprocess_path = os.path.join(output_dir, f&quot;{spec[&#x27;job_id&#x27;]}_feature_columns.joblib&quot;)
+    torch.save(model.state_dict(), model_path)
+    joblib.dump({&quot;feature_columns&quot;: X_df.columns.tolist(), &quot;labels&quot;: labels}, preprocess_path)
+    ctx.log(f&quot;Saved local model artifact: {model_path}&quot;)
+
+    return {
+        &quot;job_id&quot;: spec[&quot;job_id&quot;],
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;task_type&quot;: task_type,
+        &quot;execution_env&quot;: {
+            &quot;device&quot;: device,
+            &quot;gpu_available&quot;: bool(torch.cuda.is_available()),
+            &quot;torch_version&quot;: torch.__version__,
+        },
+        &quot;logs&quot;: ctx.logs,
+        &quot;models&quot;: [
+            {
+                &quot;model_name&quot;: &quot;Local Torch MLP&quot;,
+                &quot;model_type&quot;: &quot;local_torch_mlp&quot;,
+                &quot;task_type&quot;: task_type,
+                &quot;metrics&quot;: metrics,
+                &quot;feature_importance&quot;: None,
+                &quot;confusion_matrix&quot;: confusion,
+                &quot;roc_curve_data&quot;: roc_curve_data,
+                &quot;cv_scores&quot;: [],
+                &quot;training_time&quot;: training_time,
+                &quot;artifact_ref&quot;: {
+                    &quot;path&quot;: model_path,
+                    &quot;preprocess_path&quot;: preprocess_path,
+                },
+            }
+        ],
+    }
+
+
+def sync_payload(api_url: str, payload: Dict[str, Any], token: Optional[str], ctx: AgentContext) -&gt; Dict[str, Any]:
+    url = f&quot;{api_url.rstrip(&#x27;/&#x27;)}/api/training/local-sync&quot;
+    ctx.log(f&quot;Syncing results to backend: {url}&quot;)
+    resp = requests.post(url, headers=_headers(token), data=json.dumps(payload), timeout=120)
+    if resp.status_code == 401:
+        raise RuntimeError(
+            &quot;Unauthorized (401) during sync. Use a valid Firebase ID token: --token \&quot;YOUR_FIREBASE_ID_TOKEN\&quot;&quot;
+        )
+    resp.raise_for_status()
+    return resp.json()
+
+
+def parse_args() -&gt; argparse.Namespace:
+    p = argparse.ArgumentParser(description=&quot;SigmaCloud local training agent&quot;)
+    p.add_argument(&quot;--connect&quot;, type=str, default=None, help=&quot;Job id to pull local spec from backend&quot;)
+    p.add_argument(&quot;--spec-file&quot;, type=str, default=None, help=&quot;Path to local job spec JSON&quot;)
+    p.add_argument(&quot;--api-url&quot;, type=str, default=os.getenv(&quot;SIGMACLOUD_API_URL&quot;), help=&quot;Full backend URL, e.g. http://localhost:8000&quot;)
+    p.add_argument(&quot;--api-host&quot;, type=str, default=os.getenv(&quot;SIGMACLOUD_API_HOST&quot;, &quot;localhost&quot;), help=&quot;Backend host when --api-url is not provided&quot;)
+    p.add_argument(&quot;--api-port&quot;, type=int, default=int(os.getenv(&quot;SIGMACLOUD_API_PORT&quot;, os.getenv(&quot;SIGMACLOUD_PORT&quot;, &quot;8000&quot;))), help=&quot;Backend port when --api-url is not provided&quot;)
+    p.add_argument(&quot;--token&quot;, type=str, default=os.getenv(&quot;SIGMACLOUD_TOKEN&quot;), help=&quot;Firebase bearer token&quot;)
+    p.add_argument(&quot;--offline&quot;, action=&quot;store_true&quot;, help=&quot;Do not sync immediately; save payload to file&quot;)
+    p.add_argument(&quot;--sync-file&quot;, type=str, default=None, help=&quot;Existing payload file to sync OR output file for --offline&quot;)
+    return p.parse_args()
+
+
+def resolve_api_url(args: argparse.Namespace) -&gt; str:
+    if args.api_url:
+        return args.api_url
+    return f&quot;http://{args.api_host}:{args.api_port}&quot;
+
+
+def main() -&gt; None:
+    args = parse_args()
+    ctx = AgentContext(logs=[])
+    api_url = resolve_api_url(args)
+
+    # Sync-only mode for offline payloads.
+    if args.sync_file and os.path.exists(args.sync_file) and not args.spec_file and not args.connect:
+        ctx.log(f&quot;Loading offline sync payload: {args.sync_file}&quot;)
+        with open(args.sync_file, &quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
+            payload = json.load(f)
+        res = sync_payload(api_url, payload, args.token, ctx)
+        ctx.log(f&quot;Sync response: {res}&quot;)
+        return
+
+    spec = load_spec(args.spec_file, args.connect, api_url, args.token, ctx)
+    payload = train_local_torch(spec, ctx)
+
+    if args.offline:
+        output = args.sync_file or os.path.abspath(f&quot;./pending_sync_{payload[&#x27;job_id&#x27;]}.json&quot;)
+        with open(output, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+        ctx.log(f&quot;Offline mode enabled. Sync payload saved: {output}&quot;)
+        return
+
+    res = sync_payload(api_url, payload, args.token, ctx)
+    ctx.log(f&quot;Sync response: {res}&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>Adam</strong>: No official citation linked here.</li><li><strong>AgentContext</strong>: No official citation linked here.</li><li><strong>Any</strong>: No official citation linked here.</li><li><strong>ArgumentParser</strong>: No official citation linked here.</li><li><strong>Authorization</strong>: No official citation linked here.</li><li><strong>AutoML</strong>: No official citation linked here.</li><li><strong>Backend</strong>: No official citation linked here.</li><li><strong>Bearer</strong>: No official citation linked here.</li><li><strong>Content</strong>: No official citation linked here.</li><li><strong>CrossEntropyLoss</strong>: No official citation linked here.</li><li><strong>DataFrame</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>Detected</strong>: No official citation linked here.</li><li><strong>Dict</strong>: No official citation linked here.</li><li><strong>Do</strong>: No official citation linked here.</li><li><strong>Exception</strong>: No official citation linked here.</li><li><strong>Existing</strong>: No official citation linked here.</li><li><strong>False</strong>: No official citation linked here.</li><li><strong>Fetching</strong>: No official citation linked here.</li><li><strong>FileNotFoundError</strong>: No official citation linked here.</li><li><strong>Firebase</strong>: <a href="https://firebase.google.com/docs">https://firebase.google.com/docs</a></li><li><strong>Full</strong>: No official citation linked here.</li><li><strong>GPU</strong>: No official citation linked here.</li><li><strong>ID</strong>: No official citation linked here.</li><li><strong>Install</strong>: No official citation linked here.</li><li><strong>JSON</strong>: No official citation linked here.</li><li><strong>Job</strong>: No official citation linked here.</li><li><strong>Linear</strong>: No official citation linked here.</li><li><strong>List</strong>: No official citation linked here.</li><li><strong>Loading</strong>: No official citation linked here.</li><li><strong>Local</strong>: No official citation linked here.</li><li><strong>MLP</strong>: No official citation linked here.</li><li><strong>MSELoss</strong>: No official citation linked here.</li><li><strong>Module</strong>: No official citation linked here.</li><li><strong>Namespace</strong>: No official citation linked here.</li><li><strong>No</strong>: No official citation linked here.</li><li><strong>None</strong>: No official citation linked here.</li><li><strong>OR</strong>: No official citation linked here.</li><li><strong>Offline</strong>: No official citation linked here.</li><li><strong>Optional</strong>: No official citation linked here.</li><li><strong>Pass</strong>: No official citation linked here.</li><li><strong>Path</strong>: No official citation linked here.</li><li><strong>Provide</strong>: No official citation linked here.</li><li><strong>Pull</strong>: No official citation linked here.</li><li><strong>PyTorch</strong>: No official citation linked here.</li><li><strong>ReLU</strong>: No official citation linked here.</li><li><strong>RuntimeError</strong>: No official citation linked here.</li><li><strong>SIGMACLOUD_API_HOST</strong>: No official citation linked here.</li><li><strong>SIGMACLOUD_API_PORT</strong>: No official citation linked here.</li><li><strong>SIGMACLOUD_API_URL</strong>: No official citation linked here.</li><li><strong>SIGMACLOUD_PORT</strong>: No official citation linked here.</li><li><strong>SIGMACLOUD_TOKEN</strong>: No official citation linked here.</li><li><strong>Saved</strong>: No official citation linked here.</li><li><strong>Sequential</strong>: No official citation linked here.</li><li><strong>Series</strong>: No official citation linked here.</li><li><strong>SigmaCloud</strong>: No official citation linked here.</li><li><strong>Sync</strong>: No official citation linked here.</li><li><strong>Syncing</strong>: No official citation linked here.</li><li><strong>Target</strong>: No official citation linked here.</li><li><strong>Torch</strong>: No official citation linked here.</li><li><strong>TorchMLP</strong>: No official citation linked here.</li><li><strong>Train</strong>: No official citation linked here.</li><li><strong>Training</strong>: No official citation linked here.</li><li><strong>True</strong>: No official citation linked here.</li><li><strong>Type</strong>: No official citation linked here.</li><li><strong>URL</strong>: No official citation linked here.</li><li><strong>Unauthorized</strong>: No official citation linked here.</li><li><strong>Usage</strong>: No official citation linked here.</li><li><strong>Use</strong>: No official citation linked here.</li><li><strong>ValueError</strong>: No official citation linked here.</li><li><strong>X_arr</strong>: No official citation linked here.</li><li><strong>X_df</strong>: No official citation linked here.</li><li><strong>X_test</strong>: No official citation linked here.</li><li><strong>X_train</strong>: No official citation linked here.</li><li><strong>Xt</strong>: No official citation linked here.</li><li><strong>Xte</strong>: No official citation linked here.</li><li><strong>YOUR_FIREBASE_ID_TOKEN</strong>: No official citation linked here.</li><li><strong>__future__</strong>: No official citation linked here.</li><li><strong>__init__</strong>: No official citation linked here.</li><li><strong>__main__</strong>: No official citation linked here.</li><li><strong>__name__</strong>: No official citation linked here.</li><li><strong>__version__</strong>: No official citation linked here.</li><li><strong>_ensure_torch</strong>: No official citation linked here.</li><li><strong>_feature_columns</strong>: No official citation linked here.</li><li><strong>_headers</strong>: No official citation linked here.</li><li><strong>_local_torch_mlp</strong>: No official citation linked here.</li><li><strong>abspath</strong>: No official citation linked here.</li><li><strong>accuracy</strong>: No official citation linked here.</li><li><strong>accuracy_score</strong>: No official citation linked here.</li><li><strong>action</strong>: No official citation linked here.</li><li><strong>add_argument</strong>: No official citation linked here.</li><li><strong>after</strong>: No official citation linked here.</li><li><strong>agent</strong>: No official citation linked here.</li><li><strong>and</strong>: No official citation linked here.</li><li><strong>annotations</strong>: No official citation linked here.</li><li><strong>api</strong>: No official citation linked here.</li><li><strong>api_host</strong>: No official citation linked here.</li><li><strong>api_port</strong>: No official citation linked here.</li><li><strong>api_url</strong>: No official citation linked here.</li><li><strong>append</strong>: No official citation linked here.</li><li><strong>application</strong>: No official citation linked here.</li><li><strong>argmax</strong>: No official citation linked here.</li><li><strong>argparse</strong>: No official citation linked here.</li><li><strong>args</strong>: No official citation linked here.</li><li><strong>artifact</strong>: No official citation linked here.</li><li><strong>artifact_ref</strong>: No official citation linked here.</li><li><strong>as</strong>: No official citation linked here.</li><li><strong>astype</strong>: No official citation linked here.</li><li><strong>available</strong>: No official citation linked here.</li><li><strong>average</strong>: No official citation linked here.</li><li><strong>axis</strong>: No official citation linked here.</li><li><strong>backend</strong>: No official citation linked here.</li><li><strong>backward</strong>: No official citation linked here.</li><li><strong>batch_size</strong>: No official citation linked here.</li><li><strong>bearer</strong>: No official citation linked here.</li><li><strong>bin</strong>: No official citation linked here.</li><li><strong>bool</strong>: No official citation linked here.</li><li><strong>build_features</strong>: No official citation linked here.</li><li><strong>class</strong>: No official citation linked here.</li><li><strong>classification</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

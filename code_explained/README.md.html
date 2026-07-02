@@ -1,0 +1,624 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>README.md</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>README.md</span></div>
+        <h1 style="margin:10px 0 6px">README.md</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="DESIGN.md.html">Previous</a><a href="backend.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: README.md</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>README.md</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-markdown"># Axiom Cloud AI — AutoML Platform
+
+&gt; A production-grade, full-stack AutoML platform for dataset diagnostics, controlled model training (server or local GPU), explainability, deployment, and live inference.
+
+---
+
+## Platform Overview
+
+Axiom Cloud AI mirrors a practical Vertex/Kaggle-style workflow with stronger diagnostics and controlled execution.
+
+### Shipped Features (Current)
+
+#### 1) Data onboarding and profiling
+- Upload CSV/Excel datasets.
+- Built-in example datasets for instant trials.
+- Dataset quality report (missingness, duplicates, outliers, score + recommendations).
+- EDA report with chart artifacts and metadata.
+- Leakage risk analysis per feature.
+- Drift baseline snapshot generation for later monitoring.
+- Clean preview and clean-and-save workflow.
+
+#### 2) AutoML training and experiment control
+- Auto-detect task type (`classification` / `regression`) when not explicitly set.
+- Task-aware model catalog and recommendation flow.
+- Hard safety limits enforced in UI + backend:
+  - max **5 models** per run,
+  - max **5 CV folds**.
+- Adaptive hyperparameter tuning with Optuna (trial and time budgets).
+- Dataset-aware starting hyperparameters (sensible defaults before tuning).
+- Expert mode with optional per-model hyperparameter overrides.
+- Experiment registry with run configs, status, best model, and summary metrics.
+
+#### 3) Execution modes
+- **Remote mode**: server-side training queue/execution.
+- **Local mode**: prepares local job spec, trains on your machine (GPU if available), then syncs results back.
+- Local agent download from UI with authenticated request.
+- Offline local sync payload support and later re-sync.
+
+#### 4) Model evaluation and explainability
+- Leaderboard comparison across trained models.
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-markdown"># Axiom Cloud AI — AutoML Platform
+
+&gt; A production-grade, full-stack AutoML platform for dataset diagnostics, controlled model training (server or local GPU), explainability, deployment, and live inference.
+
+---
+
+## Platform Overview
+
+Axiom Cloud AI mirrors a practical Vertex/Kaggle-style workflow with stronger diagnostics and controlled execution.
+
+### Shipped Features (Current)
+
+#### 1) Data onboarding and profiling
+- Upload CSV/Excel datasets.
+- Built-in example datasets for instant trials.
+- Dataset quality report (missingness, duplicates, outliers, score + recommendations).
+- EDA report with chart artifacts and metadata.
+- Leakage risk analysis per feature.
+- Drift baseline snapshot generation for later monitoring.
+- Clean preview and clean-and-save workflow.
+
+#### 2) AutoML training and experiment control
+- Auto-detect task type (`classification` / `regression`) when not explicitly set.
+- Task-aware model catalog and recommendation flow.
+- Hard safety limits enforced in UI + backend:
+  - max **5 models** per run,
+  - max **5 CV folds**.
+- Adaptive hyperparameter tuning with Optuna (trial and time budgets).
+- Dataset-aware starting hyperparameters (sensible defaults before tuning).
+- Expert mode with optional per-model hyperparameter overrides.
+- Experiment registry with run configs, status, best model, and summary metrics.
+
+#### 3) Execution modes
+- **Remote mode**: server-side training queue/execution.
+- **Local mode**: prepares local job spec, trains on your machine (GPU if available), then syncs results back.
+- Local agent download from UI with authenticated request.
+- Offline local sync payload support and later re-sync.
+
+#### 4) Model evaluation and explainability
+- Leaderboard comparison across trained models.
+- Classification visuals: confusion matrix, ROC, CV folds, key metrics.
+- Regression visuals: residual/error diagnostics and metric comparisons.
+- SHAP and LIME endpoints for model explainability.
+- Feature importance extraction for supported estimators.
+
+#### 5) Deployment and inference
+- Deploy/undeploy model lifecycle controls.
+- Inference sandbox with generated feature template.
+- Randomized defaults sampled from training data profile.
+- Integer-like numeric fields now produce integer defaults (not float-only noise).
+- REST prediction endpoint for programmatic inference.
+- Model artifact download (`.joblib`).
+
+#### 6) Security and UX
+- Firebase-authenticated API access.
+- Responsive dashboard pages for datasets, training, models, predict, deploy, and search.
+- Authenticated local-agent command generation for local runs.
+
+---
+
+## Website Use Cases
+
+### 1) Fast baseline AutoML (analyst/data scientist)
+Upload a dataset, select target, use auto recommendations, train up to 5 models, and compare results quickly.
+
+### 2) Safe dataset validation before training (ML engineer)
+Run quality + leakage + EDA checks first, then decide feature/target readiness before expensive runs.
+
+### 3) Controlled experimentation (team workflows)
+Use CV/tuning budgets, store experiment runs, track best model and summary outcomes over time.
+
+### 4) Local compute / GPU-assisted training (hybrid workflow)
+Prepare a local job from the web UI, run training on a local machine, and sync metrics/artifacts back to the platform.
+
+### 5) Model review and explainability (stakeholder handoff)
+Use leaderboard metrics plus SHAP/LIME outputs to justify model behavior.
+
+### 6) Deployment + inference sandbox (productization)
+Deploy selected models, validate inputs in sandbox, and call prediction APIs from external applications.
+
+### 7) Demo/education workflow
+Use built-in example datasets to demonstrate complete ML lifecycle without external data prep.
+
+---
+
+## Current Project Goals
+
+Use this as the active backlog. When a goal is fully implemented and verified, move it to the **Platform Overview** table and remove it from this section.
+
+- [ ] **Data Understanding Upgrade**
+  - [x] Automatic EDA report generation (distribution plots, correlation summaries)
+  - [x] Target leakage checks
+  - [x] Feature typing intelligence (ordinal/nominal/datetime-like)
+  - [x] Data drift baseline snapshot storage
+  - [ ] Pairplot-style feature relationship exploration
+  - [ ] Downloadable EDA artifact export (JSON/PDF)
+
+- [ ] **Adaptive AutoML Search**
+  - [x] Hyperparameter optimization (Optuna)
+  - [x] Time-budget-based tuning
+  - [x] Trial-budget tuning controls
+  - [ ] Early stopping of weak candidates
+  - Progressive resource allocation
+  - Metadata-driven model priors (meta-learning)
+
+- [ ] **Feature Engineering Engine**
+  - Automatic feature generation (interactions/polynomial/encodings)
+  - Feature selection (MI/RFE)
+  - Optional dimensionality reduction (PCA)
+
+- [ ] **Experiment Tracking and Reproducibility**
+  - [x] Experiment registry (configs + summary metrics + best model)
+  - [x] Training UI panel for latest experiment runs
+  - [ ] Dataset version linkage in experiment records
+  - [ ] Seed and pipeline snapshot tracking
+  - [ ] Run-to-run comparison UI
+
+- [ ] **Explainability Deepening**
+  - Strong global/local explainability views
+  - Feature interaction visualizations
+  - Counterfactual explanations
+
+- [ ] **Deployment Intelligence**
+  - A/B testing
+  - Shadow deployment
+  - Rollback mechanism
+  - Latency monitoring
+
+- [ ] **Production Monitoring Expansion**
+  - Data drift (KS/PSI)
+  - Concept drift/performance decay
+  - Alerting workflows
+
+- [ ] **Advanced EDA and Discovery**
+  - Class imbalance diagnostics with auto-threshold warnings
+  - Outlier cluster exploration views
+  - Target-feature interaction ranking
+
+- [ ] **Data Contract and Validation Layer**
+  - Schema expectation checks before training
+  - Constraint validation (ranges, enums, nullability)
+  - Contract drift alerts between versions
+
+- [ ] **Dataset Versioning and Lineage**
+  - Version every dataset stage
+  - Track lineage from raw to transformed assets
+
+- [ ] **Advanced Prediction Interface**
+  - Batch predictions
+  - Confidence presentation improvements
+  - Explain-prediction action in UI
+  - CSV bulk inference upload
+
+- [ ] **Performance Optimization**
+  - Parallel model training
+  - GPU support toggle
+  - Preprocessing/pipeline caching
+
+- [ ] **Security and Production Hardening**
+  - API authentication (JWT or API keys)
+  - Rate limiting
+  - Input validation hardening
+
+- [ ] **Advanced UX for Model Ops**
+  - Training progress timeline
+  - Interactive leaderboard filters
+  - Model comparison radar charts
+  - Dataset insights dashboard
+
+- [ ] **Strategic Differentiator**
+  - Choose and optimize for one identity:
+    - Explainability-first AutoML, or
+    - Low-data AutoML, or
+    - Real-time adaptive models, or
+    - Domain-specific AutoML
+
+### Goal Management Rule
+
+1. Do not mark a goal complete until backend, frontend, tests, and docs are all updated.
+2. When complete:
+   - Move it from **Current Project Goals** to **Platform Overview** as a shipped capability.
+   - Remove it from the goals checklist (no duplicates).
+3. Keep backlog depth constant:
+   - Every time one goal is completed and removed, add one new next-priority goal to this section.
+
+---
+
+## Architecture
+
+```
+axiom-cloud-ai/
+├── backend/                   # FastAPI + Python ML backend
+│   ├── app/
+│   │   ├── main.py            # FastAPI app entry point
+│   │   ├── api/
+│   │   │   ├── datasets.py    # /upload-dataset, /datasets
+│   │   │   ├── training.py    # /train-model, /training-status
+│   │   │   ├── models.py      # /models, /deploy, /download
+│   │   │   ├── predictions.py # /predict
+│   │   │   └── metrics.py     # /metrics/{job_id}
+│   │   ├── core/
+│   │   │   ├── config.py      # Pydantic settings
+│   │   │   └── database.py    # SQLAlchemy engine
+│   │   ├── ml/
+│   │   │   ├── pipeline.py    # AutoML pipeline (core engine)
+│   │   │   └── datasets.py    # Example dataset loaders
+│   │   ├── models/
+│   │   │   └── db_models.py   # SQLAlchemy ORM models
+│   │   └── schemas/
+│   │       └── schemas.py     # Pydantic API schemas
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   └── .env
+│
+├── frontend/                  # Next.js 14 + Tailwind frontend
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── page.tsx       # Landing page
+│   │   │   └── dashboard/
+│   │   │       ├── page.tsx          # Dashboard home
+│   │   │       ├── datasets/page.tsx # Dataset upload + explorer
+│   │   │       ├── training/page.tsx # AutoML training config
+│   │   │       ├── models/page.tsx   # Leaderboard + charts
+│   │   │       ├── predict/page.tsx  # Prediction interface
+│   │   │       └── deploy/page.tsx   # Deployment management
+│   │   ├── components/
+│   │   │   └── layout/Sidebar.tsx
+│   │   ├── lib/api.ts         # Axios API client
+│   │   └── types/index.ts     # TypeScript types
+│   ├── package.json
+│   ├── tailwind.config.js
+│   └── Dockerfile
+│
+├── database/
+│   └── init.sql               # PostgreSQL schema
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
+## Quick Start (Local Dev — No Docker)
+
+### Prerequisites
+- Python 3.10 (recommended for pinned ML dependencies)
+- Node.js 18+
+- pip
+
+### 0. One-command local workflow (recommended)
+
+From the project root:
+
+```bash
+npm install
+npm run dev
+```
+
+This starts both services concurrently with labeled logs:
+- `BACKEND` → FastAPI on `http://localhost:8000` with reload
+- `FRONTEND` → Next.js on `http://localhost:3000` with hot reload
+
+If either service exits, the combined dev session stops immediately and the failure is visible in labeled logs.
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/keshavj-13/axiom-cloud-ai.git
+cd axiom-cloud-ai
+```
+
+### 2. Backend Setup
+
+```bash
+cd backend
+
+# Option A (recommended): Conda + Python 3.10
+conda create -n sigmacld310 python=3.10 -y
+conda activate sigmacld310
+
+# Option B: venv
+# python3.10 -m venv venv
+# source venv/bin/activate       # macOS/Linux
+# venv\Scripts\activate          # Windows
+
+# Install dependencies (binds install to the active Python interpreter)
+python -m pip install -r requirements.txt
+
+# Configure environment (defaults to SQLite, no Redis needed for local dev)
+cp .env.example .env
+
+# Start the API server (uses the same interpreter/environment)
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+&gt; After the backend environment is set up once, return to project root and use `npm run dev` for daily development.
+
+The API is now running at **http://localhost:8000**
+Swagger docs at **http://localhost:8000/api/docs**
+
+### 3. Frontend Setup
+
+```bash
+cd ../frontend
+
+# Install dependencies
+npm install --legacy-peer-deps
+
+# Start the dev server
+npm run dev
+```
+
+The frontend is now running at **http://localhost:3000**
+
+---
+
+## 🐳 Docker Setup (Full Stack)
+
+```bash
+# From project root
+docker-compose up --build
+
+# Services:
+# Frontend:  http://localhost:3000
+# Backend:   http://localhost:8000
+# API Docs:  http://localhost:8000/api/docs
+# Postgres:  localhost:5432
+# Redis:     localhost:6379
+```
+
+### Production Deploy (VPS/Cloud VM)
+
+Use environment overrides so frontend points to your real API URL:
+
+```bash
+cp .env.production.example .env.production
+# edit .env.production values
+docker compose --env-file .env.production up -d --build
+```
+
+Detailed steps: see [`DEPLOYMENT.md`](DEPLOYMENT.md)
+
+---
+
+## AutoML Pipeline
+
+The pipeline in `backend/app/ml/pipeline.py` performs:
+
+### 1. Task Detection
+```python
+# Auto-detects classification vs regression:
+# - dtype is object/bool → classification
+# - ≤ 20 unique values AND &lt; 5% of total rows → classification
+# - Otherwise → regression
+```
+
+### 2. Preprocessing
+- **Missing values**: Median imputation (numeric), Mode imputation (categorical)
+- **Feature encoding**: OneHotEncoder for categoricals (≤50 unique values)
+- **Scaling**: StandardScaler for all numeric features
+- **Train/test split**: 80/20 by default, stratified for classification
+- Drops high-cardinality categoricals (&gt;50 unique values)
+
+### 3. Models Trained
+
+**Classification:**
+| Model | Library |
+|---|---|
+| Logistic Regression | scikit-learn |
+| Random Forest | scikit-learn |
+| XGBoost | xgboost |
+| LightGBM | lightgbm |
+| Gradient Boosting | scikit-learn |
+
+**Regression:**
+| Model | Library |
+|---|---|
+| Ridge Regression | scikit-learn |
+| Random Forest | scikit-learn |
+| XGBoost | xgboost |
+| LightGBM | lightgbm |
+| Gradient Boosting | scikit-learn |
+
+### 4. Evaluation
+- **Classification**: Accuracy, F1, ROC-AUC, Confusion Matrix, ROC Curve
+- **Regression**: RMSE, MAE, R²
+- **Cross-Validation**: Stratified K-Fold (default 5 folds) on all models
+- **Feature importance**: Extracted from tree models; abs(coef) for linear models
+
+---
+
+## API Reference
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/upload-dataset` | Upload CSV/Excel file |
+| `GET` | `/api/datasets` | List all datasets |
+| `GET` | `/api/datasets/{id}/quality-report` | Dataset quality report + recommendations |
+| `GET` | `/api/datasets/{id}/eda-report` | Structured exploratory data analysis report |
+| `GET` | `/api/datasets/{id}/leakage-report` | Target leakage risk report |
+| `GET` | `/api/datasets/{id}/drift-baseline` | Baseline distribution snapshot for drift monitoring |
+| `GET` | `/api/datasets/{id}/clean-preview` | Non-destructive auto-clean preview |
+| `GET` | `/api/datasets/{id}/analytics-report` | Combined analytics report (EDA + model evaluation charts) |
+| `POST` | `/api/datasets/{id}/clean-and-save` | Create and store cleaned dataset copy |
+| `POST` | `/api/load-example/{key}` | Load example dataset |
+| `POST` | `/api/train-model` | Start AutoML training job |
+| `GET` | `/api/training-status/{job_id}` | Poll training progress |
+| `GET` | `/api/training-jobs` | List training jobs |
+| `GET` | `/api/training/model-catalog` | Task-aware model catalog + model metadata |
+| `GET` | `/api/training/local-job-spec/{job_id}` | Fetch local training spec for local execution mode |
+| `POST` | `/api/training/local-sync` | Sync local training results to backend |
+| `GET` | `/api/training/local-agent/download` | Download `local_agent.py` |
+| `GET` | `/api/experiments` | List experiment runs |
+| `GET` | `/api/experiments/{run_id}` | Get single experiment run |
+| `GET` | `/api/models` | List trained models |
+| `GET` | `/api/models/{id}/shap` | SHAP explanation payload |
+| `GET` | `/api/models/{id}/lime` | LIME explanation payload |
+| `GET` | `/api/models/{id}/monitoring` | Model health + optional drift report |
+| `POST` | `/api/models/{id}/deploy` | Deploy model |
+| `GET` | `/api/models/{id}/download` | Download model (.joblib) |
+| `POST` | `/api/predict` | Run inference |
+| `GET` | `/api/metrics/{job_id}` | Get comparison metrics |
+| `GET` | `/api/health` | Health check |
+
+### Example: Train a model via API
+```bash
+# 1. Upload dataset
+curl -X POST http://localhost:8000/api/upload-dataset \
+  -F &quot;file=@data.csv&quot; \
+  -F &quot;name=MyDataset&quot;
+
+# 2. Start training
+curl -X POST http://localhost:8000/api/train-model \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;dataset_id&quot;: 1, &quot;target_column&quot;: &quot;price&quot;, &quot;cv_folds&quot;: 5, &quot;enable_tuning&quot;: true, &quot;tuning_trials&quot;: 16, &quot;tuning_time_budget_sec&quot;: 180}&#x27;
+
+# 3. Check status
+curl http://localhost:8000/api/training-status/{job_id}
+
+# 4. Get metrics
+curl http://localhost:8000/api/metrics/{job_id}
+
+# 5. Run prediction
+curl -X POST http://localhost:8000/api/predict \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;model_id&quot;: 1, &quot;features&quot;: {&quot;feature1&quot;: 5.2, &quot;feature2&quot;: &quot;value&quot;}}&#x27;
+```
+
+---
+
+## Dashboard Pages
+
+| Page | Route | Description |
+|---|---|---|
+| Landing | `/` | Marketing page with platform overview |
+| Dashboard | `/dashboard` | Stats, recent jobs, quick actions |
+| Datasets | `/dashboard/datasets` | Upload, clean, profile, leakage/EDA/analytics exploration |
+| Training | `/dashboard/training` | Configure remote/local runs, expert mode, tuning, local-agent flow |
+| Leaderboard | `/dashboard/models` | Compare models, evaluation visuals, diagnostics, explainability hooks |
+| Search | `/dashboard/search` | Cross-entity search for jobs, datasets, and models |
+| Predict | `/dashboard/predict` | Inference sandbox with dataset-derived feature defaults |
+| Deploy | `/dashboard/deploy` | Deploy lifecycle and endpoint-style inference testing |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Frontend** | Next.js 14, TypeScript, Tailwind CSS, Recharts |
+| **Backend** | FastAPI, Python 3.11, Pydantic v2 |
+| **ML** | scikit-learn, XGBoost, LightGBM, joblib |
+| **Database** | SQLite (dev) / PostgreSQL (prod) |
+| **ORM** | SQLAlchemy 2.0 |
+| **Background** | FastAPI BackgroundTasks / Celery + Redis (prod) |
+| **Container** | Docker + Docker Compose |
+| **Storage** | Local filesystem (extendable to S3) |
+
+---
+
+## Resume Highlights
+
+This project demonstrates:
+- **Full-stack ML system design** — API → training pipeline → frontend in production architecture
+- **AutoML concepts** — task detection, preprocessing pipelines, multi-model comparison, CV
+- **Clean REST API design** — proper schemas, error handling, background jobs
+- **Modern React** — hooks, TypeScript, real-time polling, drag &amp; drop
+- **Production practices** — Docker, environment configs, health checks, logging
+- **ML engineering** — sklearn Pipelines, feature encoding, model serialization, evaluation metrics
+
+---
+
+## License
+
+MIT © Axiom Cloud AI
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>AI</strong>: No official citation linked here.</li><li><strong>AND</strong>: No official citation linked here.</li><li><strong>API</strong>: No official citation linked here.</li><li><strong>APIs</strong>: No official citation linked here.</li><li><strong>AUC</strong>: No official citation linked here.</li><li><strong>Accuracy</strong>: No official citation linked here.</li><li><strong>Adaptive</strong>: No official citation linked here.</li><li><strong>Advanced</strong>: No official citation linked here.</li><li><strong>After</strong>: No official citation linked here.</li><li><strong>Alerting</strong>: No official citation linked here.</li><li><strong>Architecture</strong>: No official citation linked here.</li><li><strong>Authenticated</strong>: No official citation linked here.</li><li><strong>Auto</strong>: No official citation linked here.</li><li><strong>AutoML</strong>: No official citation linked here.</li><li><strong>Automatic</strong>: No official citation linked here.</li><li><strong>Axiom</strong>: No official citation linked here.</li><li><strong>Axios</strong>: No official citation linked here.</li><li><strong>BACKEND</strong>: No official citation linked here.</li><li><strong>Backend</strong>: No official citation linked here.</li><li><strong>Background</strong>: No official citation linked here.</li><li><strong>BackgroundTasks</strong>: No official citation linked here.</li><li><strong>Baseline</strong>: No official citation linked here.</li><li><strong>Batch</strong>: No official citation linked here.</li><li><strong>Boosting</strong>: No official citation linked here.</li><li><strong>Built</strong>: No official citation linked here.</li><li><strong>CSS</strong>: No official citation linked here.</li><li><strong>CSV</strong>: No official citation linked here.</li><li><strong>CV</strong>: No official citation linked here.</li><li><strong>Cases</strong>: No official citation linked here.</li><li><strong>Celery</strong>: No official citation linked here.</li><li><strong>Check</strong>: No official citation linked here.</li><li><strong>Choose</strong>: No official citation linked here.</li><li><strong>Class</strong>: No official citation linked here.</li><li><strong>Classification</strong>: No official citation linked here.</li><li><strong>Clean</strong>: No official citation linked here.</li><li><strong>Clone</strong>: No official citation linked here.</li><li><strong>Cloud</strong>: No official citation linked here.</li><li><strong>Combined</strong>: No official citation linked here.</li><li><strong>Compare</strong>: No official citation linked here.</li><li><strong>Compose</strong>: No official citation linked here.</li><li><strong>Concept</strong>: No official citation linked here.</li><li><strong>Conda</strong>: No official citation linked here.</li><li><strong>Confidence</strong>: No official citation linked here.</li><li><strong>Configure</strong>: No official citation linked here.</li><li><strong>Confusion</strong>: No official citation linked here.</li><li><strong>Constraint</strong>: No official citation linked here.</li><li><strong>Container</strong>: No official citation linked here.</li><li><strong>Content</strong>: No official citation linked here.</li><li><strong>Contract</strong>: No official citation linked here.</li><li><strong>Controlled</strong>: No official citation linked here.</li><li><strong>Counterfactual</strong>: No official citation linked here.</li><li><strong>Create</strong>: No official citation linked here.</li><li><strong>Cross</strong>: No official citation linked here.</li><li><strong>Current</strong>: No official citation linked here.</li><li><strong>Curve</strong>: No official citation linked here.</li><li><strong>DEPLOYMENT</strong>: No official citation linked here.</li><li><strong>Dashboard</strong>: No official citation linked here.</li><li><strong>Data</strong>: No official citation linked here.</li><li><strong>Database</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>Datasets</strong>: No official citation linked here.</li><li><strong>Deepening</strong>: No official citation linked here.</li><li><strong>Demo</strong>: No official citation linked here.</li><li><strong>Deploy</strong>: No official citation linked here.</li><li><strong>Deployment</strong>: No official citation linked here.</li><li><strong>Description</strong>: No official citation linked here.</li><li><strong>Detailed</strong>: No official citation linked here.</li><li><strong>Detection</strong>: No official citation linked here.</li><li><strong>Dev</strong>: No official citation linked here.</li><li><strong>Differentiator</strong>: No official citation linked here.</li><li><strong>Discovery</strong>: No official citation linked here.</li><li><strong>Do</strong>: No official citation linked here.</li><li><strong>Docker</strong>: <a href="https://docs.docker.com/">https://docs.docker.com/</a></li><li><strong>Dockerfile</strong>: No official citation linked here.</li><li><strong>Docs</strong>: No official citation linked here.</li><li><strong>Domain</strong>: No official citation linked here.</li><li><strong>Download</strong>: No official citation linked here.</li><li><strong>Downloadable</strong>: No official citation linked here.</li><li><strong>Drift</strong>: No official citation linked here.</li><li><strong>Drops</strong>: No official citation linked here.</li><li><strong>EDA</strong>: No official citation linked here.</li><li><strong>Early</strong>: No official citation linked here.</li><li><strong>Endpoint</strong>: No official citation linked here.</li><li><strong>Engine</strong>: No official citation linked here.</li><li><strong>Engineering</strong>: No official citation linked here.</li><li><strong>Evaluation</strong>: No official citation linked here.</li><li><strong>Every</strong>: No official citation linked here.</li><li><strong>Example</strong>: No official citation linked here.</li><li><strong>Excel</strong>: No official citation linked here.</li><li><strong>Execution</strong>: No official citation linked here.</li><li><strong>Expansion</strong>: No official citation linked here.</li><li><strong>Experiment</strong>: No official citation linked here.</li><li><strong>Expert</strong>: No official citation linked here.</li><li><strong>Explain</strong>: No official citation linked here.</li><li><strong>Explainability</strong>: No official citation linked here.</li><li><strong>Extracted</strong>: No official citation linked here.</li><li><strong>F1</strong>: No official citation linked here.</li><li><strong>FRONTEND</strong>: No official citation linked here.</li><li><strong>Fast</strong>: No official citation linked here.</li><li><strong>FastAPI</strong>: <a href="https://fastapi.tiangolo.com/">https://fastapi.tiangolo.com/</a></li><li><strong>Feature</strong>: No official citation linked here.</li><li><strong>Features</strong>: No official citation linked here.</li><li><strong>Fetch</strong>: No official citation linked here.</li><li><strong>Firebase</strong>: <a href="https://firebase.google.com/docs">https://firebase.google.com/docs</a></li><li><strong>Fold</strong>: No official citation linked here.</li><li><strong>Forest</strong>: No official citation linked here.</li><li><strong>From</strong>: No official citation linked here.</li><li><strong>Frontend</strong>: No official citation linked here.</li><li><strong>Full</strong>: No official citation linked here.</li><li><strong>GET</strong>: No official citation linked here.</li><li><strong>GPU</strong>: No official citation linked here.</li><li><strong>Get</strong>: No official citation linked here.</li><li><strong>Goal</strong>: No official citation linked here.</li><li><strong>Goals</strong>: No official citation linked here.</li><li><strong>Gradient</strong>: No official citation linked here.</li><li><strong>Hard</strong>: No official citation linked here.</li><li><strong>Hardening</strong>: No official citation linked here.</li><li><strong>Health</strong>: No official citation linked here.</li><li><strong>Highlights</strong>: No official citation linked here.</li><li><strong>Hyperparameter</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

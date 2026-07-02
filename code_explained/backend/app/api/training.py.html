@@ -1,0 +1,794 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>training.py</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>backend/app/api/training.py</span></div>
+        <h1 style="margin:10px 0 6px">training.py</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="predictions.py.html">Previous</a><a href="../core/__init__.py.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: backend/app/api/training.py</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>backend/app/api/training.py</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-python">&quot;&quot;&quot;
+Axiom Cloud AI - Training API Router
+Launches AutoML training jobs (sync for simplicity, async with Celery in prod).
+&quot;&quot;&quot;
+import uuid
+import logging
+import os
+import pandas as pd
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
+from datetime import datetime
+from typing import Optional
+
+from app.core.database import get_db
+from app.api.deps import get_current_user
+from app.models.db_models import Dataset, TrainingJob, TrainedModel, ExperimentRun
+from app.schemas.schemas import (
+    TrainingConfig,
+    TrainingJobResponse,
+    ExperimentRunResponse,
+    TrainingLaunchResponse,
+    LocalTrainingSyncPayload,
+)
+from app.ml.dataset_profiling import build_drift_baseline_snapshot
+
+router = APIRouter()
+logger = logging.getLogger(__name__)
+
+# In-memory progress tracking (use Redis in production)
+_job_progress: dict = {}
+MAX_TRAINING_ROWS = 50_000
+MAX_MODELS_PER_RUN = 5
+MAX_CV_FOLDS = 5
+
+CLASSIFICATION_MODEL_NAMES = [
+    &quot;Logistic Regression&quot;,
+    &quot;Linear SVM&quot;,
+    &quot;RBF SVM&quot;,
+    &quot;KNN&quot;,
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-python">&quot;&quot;&quot;
+Axiom Cloud AI - Training API Router
+Launches AutoML training jobs (sync for simplicity, async with Celery in prod).
+&quot;&quot;&quot;
+import uuid
+import logging
+import os
+import pandas as pd
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
+from datetime import datetime
+from typing import Optional
+
+from app.core.database import get_db
+from app.api.deps import get_current_user
+from app.models.db_models import Dataset, TrainingJob, TrainedModel, ExperimentRun
+from app.schemas.schemas import (
+    TrainingConfig,
+    TrainingJobResponse,
+    ExperimentRunResponse,
+    TrainingLaunchResponse,
+    LocalTrainingSyncPayload,
+)
+from app.ml.dataset_profiling import build_drift_baseline_snapshot
+
+router = APIRouter()
+logger = logging.getLogger(__name__)
+
+# In-memory progress tracking (use Redis in production)
+_job_progress: dict = {}
+MAX_TRAINING_ROWS = 50_000
+MAX_MODELS_PER_RUN = 5
+MAX_CV_FOLDS = 5
+
+CLASSIFICATION_MODEL_NAMES = [
+    &quot;Logistic Regression&quot;,
+    &quot;Linear SVM&quot;,
+    &quot;RBF SVM&quot;,
+    &quot;KNN&quot;,
+    &quot;Decision Tree&quot;,
+    &quot;Random Forest&quot;,
+    &quot;Extra Trees&quot;,
+    &quot;AdaBoost&quot;,
+    &quot;XGBoost&quot;,
+    &quot;LightGBM&quot;,
+    &quot;Gradient Boosting&quot;,
+    &quot;MLP Neural Net&quot;,
+    &quot;Deep MLP Neural Net&quot;,
+    &quot;Graph Neural Network (experimental)&quot;,
+]
+
+REGRESSION_MODEL_NAMES = [
+    &quot;Linear Regression&quot;,
+    &quot;Linear SVR&quot;,
+    &quot;RBF SVR&quot;,
+    &quot;KNN&quot;,
+    &quot;Decision Tree&quot;,
+    &quot;Random Forest&quot;,
+    &quot;Extra Trees&quot;,
+    &quot;AdaBoost&quot;,
+    &quot;XGBoost&quot;,
+    &quot;LightGBM&quot;,
+    &quot;Gradient Boosting&quot;,
+    &quot;MLP Neural Net&quot;,
+    &quot;Deep MLP Neural Net&quot;,
+    &quot;Graph Neural Network (experimental)&quot;,
+]
+
+MODEL_HYPERPARAMETERS = {
+    &quot;Logistic Regression&quot;: {
+        &quot;C&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.001, &quot;max&quot;: 20.0, &quot;step&quot;: 0.001, &quot;default&quot;: 1.0},
+    },
+    &quot;Linear Regression&quot;: {
+        &quot;alpha&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.001, &quot;max&quot;: 20.0, &quot;step&quot;: 0.001, &quot;default&quot;: 1.0},
+    },
+    &quot;KNN&quot;: {
+        &quot;n_neighbors&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 1, &quot;max&quot;: 50, &quot;step&quot;: 1, &quot;default&quot;: 7},
+    },
+    &quot;Decision Tree&quot;: {
+        &quot;max_depth&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 2, &quot;max&quot;: 30, &quot;step&quot;: 1, &quot;default&quot;: 12},
+        &quot;min_samples_split&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 2, &quot;max&quot;: 20, &quot;step&quot;: 1, &quot;default&quot;: 2},
+    },
+    &quot;Random Forest&quot;: {
+        &quot;n_estimators&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 80, &quot;max&quot;: 500, &quot;step&quot;: 10, &quot;default&quot;: 180},
+        &quot;max_depth&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 3, &quot;max&quot;: 30, &quot;step&quot;: 1, &quot;default&quot;: 14},
+        &quot;min_samples_split&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 2, &quot;max&quot;: 20, &quot;step&quot;: 1, &quot;default&quot;: 2},
+        &quot;min_samples_leaf&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 1, &quot;max&quot;: 10, &quot;step&quot;: 1, &quot;default&quot;: 1},
+    },
+    &quot;Extra Trees&quot;: {
+        &quot;n_estimators&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 80, &quot;max&quot;: 500, &quot;step&quot;: 10, &quot;default&quot;: 180},
+        &quot;max_depth&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 3, &quot;max&quot;: 30, &quot;step&quot;: 1, &quot;default&quot;: 14},
+    },
+    &quot;AdaBoost&quot;: {
+        &quot;n_estimators&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 50, &quot;max&quot;: 500, &quot;step&quot;: 10, &quot;default&quot;: 180},
+        &quot;learning_rate&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.01, &quot;max&quot;: 2.0, &quot;step&quot;: 0.01, &quot;default&quot;: 0.1},
+    },
+    &quot;XGBoost&quot;: {
+        &quot;n_estimators&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 80, &quot;max&quot;: 500, &quot;step&quot;: 10, &quot;default&quot;: 220},
+        &quot;max_depth&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 3, &quot;max&quot;: 20, &quot;step&quot;: 1, &quot;default&quot;: 8},
+        &quot;learning_rate&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.005, &quot;max&quot;: 0.5, &quot;step&quot;: 0.005, &quot;default&quot;: 0.06},
+        &quot;subsample&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.5, &quot;max&quot;: 1.0, &quot;step&quot;: 0.01, &quot;default&quot;: 0.85},
+        &quot;colsample_bytree&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.5, &quot;max&quot;: 1.0, &quot;step&quot;: 0.01, &quot;default&quot;: 0.85},
+    },
+    &quot;LightGBM&quot;: {
+        &quot;n_estimators&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 80, &quot;max&quot;: 500, &quot;step&quot;: 10, &quot;default&quot;: 220},
+        &quot;num_leaves&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 16, &quot;max&quot;: 256, &quot;step&quot;: 1, &quot;default&quot;: 64},
+        &quot;learning_rate&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.005, &quot;max&quot;: 0.5, &quot;step&quot;: 0.005, &quot;default&quot;: 0.06},
+        &quot;subsample&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.5, &quot;max&quot;: 1.0, &quot;step&quot;: 0.01, &quot;default&quot;: 0.9},
+        &quot;colsample_bytree&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.5, &quot;max&quot;: 1.0, &quot;step&quot;: 0.01, &quot;default&quot;: 0.9},
+    },
+    &quot;Gradient Boosting&quot;: {
+        &quot;n_estimators&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 60, &quot;max&quot;: 500, &quot;step&quot;: 10, &quot;default&quot;: 180},
+        &quot;learning_rate&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.005, &quot;max&quot;: 0.5, &quot;step&quot;: 0.005, &quot;default&quot;: 0.05},
+        &quot;max_depth&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 2, &quot;max&quot;: 12, &quot;step&quot;: 1, &quot;default&quot;: 4},
+        &quot;subsample&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.5, &quot;max&quot;: 1.0, &quot;step&quot;: 0.01, &quot;default&quot;: 0.9},
+    },
+    &quot;Linear SVM&quot;: {
+        &quot;C&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.01, &quot;max&quot;: 50.0, &quot;step&quot;: 0.01, &quot;default&quot;: 1.0},
+    },
+    &quot;RBF SVM&quot;: {
+        &quot;C&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.01, &quot;max&quot;: 50.0, &quot;step&quot;: 0.01, &quot;default&quot;: 1.0},
+        &quot;gamma&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.0001, &quot;max&quot;: 5.0, &quot;step&quot;: 0.0001, &quot;default&quot;: 0.1},
+    },
+    &quot;Linear SVR&quot;: {
+        &quot;C&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.01, &quot;max&quot;: 50.0, &quot;step&quot;: 0.01, &quot;default&quot;: 1.0},
+    },
+    &quot;RBF SVR&quot;: {
+        &quot;C&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.01, &quot;max&quot;: 50.0, &quot;step&quot;: 0.01, &quot;default&quot;: 1.0},
+        &quot;gamma&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.0001, &quot;max&quot;: 5.0, &quot;step&quot;: 0.0001, &quot;default&quot;: 0.1},
+    },
+    &quot;MLP Neural Net&quot;: {
+        &quot;alpha&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.000001, &quot;max&quot;: 0.1, &quot;step&quot;: 0.000001, &quot;default&quot;: 0.0001},
+        &quot;max_iter&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 100, &quot;max&quot;: 1000, &quot;step&quot;: 10, &quot;default&quot;: 320},
+    },
+    &quot;Deep MLP Neural Net&quot;: {
+        &quot;alpha&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;min&quot;: 0.000001, &quot;max&quot;: 0.1, &quot;step&quot;: 0.000001, &quot;default&quot;: 0.0001},
+        &quot;max_iter&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;min&quot;: 120, &quot;max&quot;: 1500, &quot;step&quot;: 10, &quot;default&quot;: 420},
+    },
+}
+
+
+def _model_catalog_payload() -&gt; dict:
+    classification = list(CLASSIFICATION_MODEL_NAMES)
+    regression = list(REGRESSION_MODEL_NAMES)
+    union = sorted(set(classification + regression))
+    details = {}
+    for name in union:
+        is_nn = &quot;Neural&quot; in name
+        is_gnn = &quot;Graph Neural&quot; in name
+        is_svm = &quot;SVM&quot; in name or &quot;SVR&quot; in name
+        is_heavy = is_nn or is_gnn or is_svm
+        details[name] = {
+            &quot;family&quot;: (
+                &quot;gnn&quot; if is_gnn else
+                &quot;neural&quot; if is_nn else
+                &quot;svm&quot; if is_svm else
+                &quot;tree&quot; if (&quot;Forest&quot; in name or &quot;Boost&quot; in name or &quot;Tree&quot; in name) else
+                &quot;linear&quot;
+            ),
+            &quot;cost_tier&quot;: &quot;high&quot; if is_heavy else &quot;medium&quot;,
+            &quot;warning&quot;: (
+                &quot;This option can significantly increase training time.&quot;
+                if is_heavy else None
+            ),
+            &quot;experimental&quot;: bool(is_gnn),
+            &quot;hyperparameters&quot;: MODEL_HYPERPARAMETERS.get(name, {}),
+        }
+    return {
+        &quot;classification&quot;: classification,
+        &quot;regression&quot;: regression,
+        &quot;all&quot;: union,
+        &quot;details&quot;: details,
+    }
+
+
+def _read_dataset_file(path: str) -&gt; pd.DataFrame:
+    if path.endswith(&quot;.csv&quot;):
+        return pd.read_csv(path)
+    return pd.read_excel(path)
+
+
+def run_training(job_id: str, run_id: str, dataset_path: str, config: dict, db_url: str):
+    &quot;&quot;&quot;Background training function.&quot;&quot;&quot;
+    from app.ml.pipeline import AutoMLPipeline
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    engine = create_engine(db_url, connect_args={&quot;check_same_thread&quot;: False})
+    SessionLocal = sessionmaker(bind=engine)
+    db = SessionLocal()
+
+    try:
+        # Update job status
+        job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
+        run = db.query(ExperimentRun).filter(ExperimentRun.run_id == run_id).first()
+        if not job:
+            return
+        job.status = &quot;running&quot;
+        if run:
+            run.status = &quot;running&quot;
+        db.commit()
+
+        def update_progress(progress: int, message: str = &quot;&quot;):
+            _job_progress[job_id] = {&quot;progress&quot;: progress, &quot;message&quot;: message}
+            job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
+            if job:
+                job.progress = progress
+                db.commit()
+
+        # Load dataset
+        df = _read_dataset_file(dataset_path)
+
+        # Run AutoML
+        pipeline = AutoMLPipeline(job_id=job_id, progress_callback=update_progress)
+        results = pipeline.train_all_models(
+            df=df,
+            target_column=config[&quot;target_column&quot;],
+            task_type=config.get(&quot;task_type&quot;),
+            test_size=config.get(&quot;test_size&quot;, 0.2),
+            cv_folds=config.get(&quot;cv_folds&quot;, 5),
+            models_to_train=config.get(&quot;models_to_train&quot;),
+            enable_tuning=config.get(&quot;enable_tuning&quot;, False),
+            tuning_trials=config.get(&quot;tuning_trials&quot;, 12),
+            tuning_time_budget_sec=config.get(&quot;tuning_time_budget_sec&quot;, 180),
+            model_hyperparams=config.get(&quot;model_hyperparams&quot;),
+        )
+
+        # Update job task_type
+        job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
+        job.task_type = results[&quot;task_type&quot;]
+
+        # Save model results
+        for model_result in results[&quot;models&quot;]:
+            if &quot;error&quot; in model_result:
+                continue
+
+            model_metrics = model_result.get(&quot;metrics&quot;) or {}
+            model_metrics = {
+                **model_metrics,
+                &quot;storage_origin&quot;: &quot;remote&quot;,
+                &quot;execution_mode&quot;: &quot;remote&quot;,
+            }
+
+            trained_model = TrainedModel(
+                job_id=job_id,
+                model_name=model_result[&quot;model_name&quot;],
+                model_type=model_result[&quot;model_type&quot;],
+                task_type=results[&quot;task_type&quot;],
+                file_path=model_result.get(&quot;file_path&quot;),
+                accuracy=model_result.get(&quot;accuracy&quot;),
+                f1_score=model_result.get(&quot;f1_score&quot;),
+                roc_auc=model_result.get(&quot;roc_auc&quot;),
+                rmse=model_result.get(&quot;rmse&quot;),
+                mae=model_result.get(&quot;mae&quot;),
+                r2_score=model_result.get(&quot;r2_score&quot;),
+                metrics=model_metrics,
+                feature_importance=model_result.get(&quot;feature_importance&quot;),
+                confusion_matrix=model_result.get(&quot;confusion_matrix&quot;),
+                roc_curve_data=model_result.get(&quot;roc_curve_data&quot;),
+                cv_scores=model_result.get(&quot;cv_scores&quot;),
+                training_time=model_result.get(&quot;training_time&quot;),
+            )
+            db.add(trained_model)
+
+        best_score = None
+        best_model_name = None
+        metric_name = &quot;accuracy&quot; if results.get(&quot;task_type&quot;) == &quot;classification&quot; else &quot;r2_score&quot;
+        successful_models = [m for m in results[&quot;models&quot;] if &quot;error&quot; not in m]
+        if successful_models:
+            ranked = sorted(
+                successful_models,
+                key=lambda m: (m.get(metric_name) if m.get(metric_name) is not None else -1e9),
+                reverse=True,
+            )
+            best_model_name = ranked[0].get(&quot;model_name&quot;)
+            best_score = ranked[0].get(metric_name)
+
+        job.status = &quot;completed&quot;
+        job.completed_at = datetime.utcnow()
+        job.progress = 100
+        if run:
+            run.status = &quot;completed&quot;
+            run.task_type = results.get(&quot;task_type&quot;)
+            run.best_model_name = best_model_name
+            run.best_score = float(best_score) if best_score is not None else None
+            run.summary_metrics = {
+                &quot;primary_metric&quot;: metric_name,
+                &quot;best_model&quot;: best_model_name,
+                &quot;best_score&quot;: best_score,
+                &quot;models_trained&quot;: len(successful_models),
+                &quot;failed_models&quot;: len(results[&quot;models&quot;]) - len(successful_models),
+            }
+            run.completed_at = datetime.utcnow()
+        db.commit()
+        logger.info(f&quot;Training job {job_id} completed&quot;)
+
+    except Exception as e:
+        logger.exception(f&quot;Training job {job_id} failed: {e}&quot;)
+        job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
+        run = db.query(ExperimentRun).filter(ExperimentRun.run_id == run_id).first()
+        if job:
+            job.status = &quot;failed&quot;
+            job.error_message = str(e)
+        if run:
+            run.status = &quot;failed&quot;
+            run.error_message = str(e)
+            run.completed_at = datetime.utcnow()
+            db.commit()
+    finally:
+        db.close()
+
+
+@router.post(&quot;/train-model&quot;, response_model=TrainingLaunchResponse)
+async def train_model(
+    config: TrainingConfig,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    &quot;&quot;&quot;Launch an AutoML training job. Requires Firebase authentication.&quot;&quot;&quot;
+    # Validate dataset
+    dataset = db.query(Dataset).filter(Dataset.id == config.dataset_id).first()
+    if not dataset:
+        raise HTTPException(status_code=404, detail=&quot;Dataset not found&quot;)
+
+    # Validate target column
+    df_cols = [c[&quot;name&quot;] for c in (dataset.columns_info or [])]
+    if config.target_column not in df_cols:
+        raise HTTPException(status_code=400, detail=f&quot;Target column &#x27;{config.target_column}&#x27; not found in dataset&quot;)
+
+    catalog = _model_catalog_payload()
+
+    if config.cv_folds and config.cv_folds &gt; MAX_CV_FOLDS:
+        raise HTTPException(
+            status_code=400,
+            detail=f&quot;cv_folds cannot exceed {MAX_CV_FOLDS} for demo tier&quot;,
+        )
+
+    if config.models_to_train:
+        if len(config.models_to_train) &gt; MAX_MODELS_PER_RUN:
+            raise HTTPException(
+                status_code=400,
+                detail=f&quot;Select at most {MAX_MODELS_PER_RUN} models per run&quot;,
+            )
+
+        invalid = sorted(set(config.models_to_train) - set(catalog[&quot;all&quot;]))
+        if invalid:
+            raise HTTPException(
+                status_code=400,
+                detail=f&quot;Unsupported models requested: {&#x27;, &#x27;.join(invalid)}&quot;,
+            )
+
+        if config.task_type in {&quot;classification&quot;, &quot;regression&quot;}:
+            allowed = set(catalog[config.task_type])
+            incompatible = [m for m in config.models_to_train if m not in allowed]
+            if incompatible:
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        f&quot;Selected models incompatible with task_type &#x27;{config.task_type}&#x27;: &quot;
+                        + &quot;, &quot;.join(incompatible)
+                    ),
+                )
+
+    job_id = str(uuid.uuid4())
+    run_id = str(uuid.uuid4())
+
+    try:
+        baseline_df = _read_dataset_file(dataset.file_path)
+        if len(baseline_df) &gt; MAX_TRAINING_ROWS:
+            raise HTTPException(
+                status_code=400,
+                detail=f&quot;Dataset too large for demo tier. Max {MAX_TRAINING_ROWS} rows.&quot;,
+            )
+        drift_baseline = build_drift_baseline_snapshot(baseline_df, target_column=config.target_column)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.warning(&quot;Could not build drift baseline snapshot for dataset=%s reason=%s&quot;, dataset.id, exc)
+        drift_baseline = None
+
+    job = TrainingJob(
+        job_id=job_id,
+        dataset_id=config.dataset_id,
+        target_column=config.target_column,
+        task_type=config.task_type,
+        status=&quot;local_pending&quot; if config.execution_mode == &quot;local&quot; else &quot;pending&quot;,
+        progress=0,
+        config={
+            &quot;target_column&quot;: config.target_column,
+            &quot;dataset_path&quot;: dataset.file_path,
+            &quot;task_type&quot;: config.task_type,
+            &quot;execution_mode&quot;: config.execution_mode,
+            &quot;test_size&quot;: config.test_size,
+            &quot;cv_folds&quot;: config.cv_folds,
+            &quot;models_to_train&quot;: config.models_to_train,
+            &quot;enable_tuning&quot;: config.enable_tuning,
+            &quot;tuning_trials&quot;: config.tuning_trials,
+            &quot;tuning_time_budget_sec&quot;: config.tuning_time_budget_sec,
+            &quot;model_hyperparams&quot;: config.model_hyperparams,
+            &quot;experiment_run_id&quot;: run_id,
+            &quot;drift_baseline&quot;: drift_baseline,
+        },
+    )
+
+    run = ExperimentRun(
+        run_id=run_id,
+        job_id=job_id,
+        dataset_id=config.dataset_id,
+        target_column=config.target_column,
+        task_type=config.task_type,
+        status=&quot;local_pending&quot; if config.execution_mode == &quot;local&quot; else &quot;pending&quot;,
+        config={
+            &quot;execution_mode&quot;: config.execution_mode,
+            &quot;task_type&quot;: config.task_type,
+            &quot;test_size&quot;: config.test_size,
+            &quot;cv_folds&quot;: config.cv_folds,
+            &quot;models_to_train&quot;: config.models_to_train,
+            &quot;enable_tuning&quot;: config.enable_tuning,
+            &quot;tuning_trials&quot;: config.tuning_trials,
+            &quot;tuning_time_budget_sec&quot;: config.tuning_time_budget_sec,
+            &quot;model_hyperparams&quot;: config.model_hyperparams,
+            &quot;dataset_path&quot;: dataset.file_path,
+            &quot;drift_baseline&quot;: drift_baseline,
+        },
+    )
+    db.add(job)
+    db.add(run)
+    db.commit()
+    db.refresh(job)
+
+    if config.execution_mode == &quot;local&quot;:
+        output_dir = os.path.abspath(os.path.join(&quot;./backend/storage/models&quot;, &quot;local_runs&quot;, job_id))
+        local_spec = {
+            &quot;job_id&quot;: job_id,
+            &quot;run_id&quot;: run_id,
+            &quot;dataset_id&quot;: dataset.id,
+            &quot;dataset_name&quot;: dataset.name,
+            &quot;dataset_path&quot;: os.path.abspath(dataset.file_path),
+            &quot;target_column&quot;: config.target_column,
+            &quot;task_type&quot;: config.task_type,
+            &quot;model_config&quot;: {
+                &quot;models_to_train&quot;: config.models_to_train or [],
+                &quot;model_hyperparams&quot;: config.model_hyperparams or {},
+            },
+            &quot;hyperparameters&quot;: {
+                &quot;test_size&quot;: config.test_size,
+                &quot;cv_folds&quot;: config.cv_folds,
+                &quot;enable_tuning&quot;: config.enable_tuning,
+                &quot;tuning_trials&quot;: config.tuning_trials,
+                &quot;tuning_time_budget_sec&quot;: config.tuning_time_budget_sec,
+            },
+            &quot;output_dir&quot;: output_dir,
+        }
+        job.config = {
+            **(job.config or {}),
+            &quot;local_job_spec&quot;: local_spec,
+        }
+        db.commit()
+        db.refresh(job)
+        logger.info(&quot;Local training job %s prepared (no server training executed)&quot;, job_id)
+        return {
+            **TrainingJobResponse.model_validate(job).model_dump(),
+            &quot;execution_mode&quot;: &quot;local&quot;,
+            &quot;local_job_spec&quot;: local_spec,
+            &quot;message&quot;: &quot;Run this job with the local agent on your machine, then sync results.&quot;,
+        }
+
+    from app.core.config import settings
+    background_tasks.add_task(
+        run_training,
+        job_id=job_id,
+        run_id=run_id,
+        dataset_path=dataset.file_path,
+        config={
+            &quot;target_column&quot;: config.target_column,
+            &quot;task_type&quot;: config.task_type,
+            &quot;test_size&quot;: config.test_size,
+            &quot;cv_folds&quot;: config.cv_folds,
+            &quot;models_to_train&quot;: config.models_to_train,
+            &quot;enable_tuning&quot;: config.enable_tuning,
+            &quot;tuning_trials&quot;: config.tuning_trials,
+            &quot;tuning_time_budget_sec&quot;: config.tuning_time_budget_sec,
+            &quot;model_hyperparams&quot;: config.model_hyperparams,
+        },
+        db_url=settings.DATABASE_URL,
+    )
+
+    logger.info(f&quot;Training job {job_id} queued&quot;)
+    return {
+        **TrainingJobResponse.model_validate(job).model_dump(),
+        &quot;execution_mode&quot;: &quot;remote&quot;,
+        &quot;local_job_spec&quot;: None,
+        &quot;message&quot;: &quot;Remote training queued on server.&quot;,
+    }
+
+
+@router.get(&quot;/training-status/{job_id}&quot;, response_model=TrainingJobResponse)
+def get_training_status(job_id: str, db: Session = Depends(get_db)):
+    &quot;&quot;&quot;Get training job status and progress.&quot;&quot;&quot;
+    job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail=&quot;Training job not found&quot;)
+    return job
+
+
+@router.get(&quot;/training-jobs&quot;)
+def list_training_jobs(db: Session = Depends(get_db)):
+    &quot;&quot;&quot;List all training jobs.&quot;&quot;&quot;
+    jobs = db.query(TrainingJob).order_by(TrainingJob.created_at.desc()).all()
+    return jobs
+
+
+@router.get(&quot;/training/local-job-spec/{job_id}&quot;)
+def get_local_job_spec(job_id: str, db: Session = Depends(get_db)):
+    &quot;&quot;&quot;Return local job spec for a local execution-mode job.&quot;&quot;&quot;
+    job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail=&quot;Training job not found&quot;)
+
+    execution_mode = (job.config or {}).get(&quot;execution_mode&quot;, &quot;remote&quot;)
+    if execution_mode != &quot;local&quot;:
+        raise HTTPException(status_code=400, detail=&quot;Job is not in local execution mode&quot;)
+
+    local_spec = (job.config or {}).get(&quot;local_job_spec&quot;)
+    if not local_spec:
+        raise HTTPException(status_code=404, detail=&quot;Local job spec not found&quot;)
+
+    return local_spec
+
+
+@router.post(&quot;/training/local-sync&quot;)
+def sync_local_training_results(
+    payload: LocalTrainingSyncPayload,
+    db: Session = Depends(get_db),
+):
+    &quot;&quot;&quot;Sync locally trained model metrics/artifacts back to backend.&quot;&quot;&quot;
+    job = db.query(TrainingJob).filter(TrainingJob.job_id == payload.job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail=&quot;Training job not found&quot;)
+
+    run = db.query(ExperimentRun).filter(ExperimentRun.job_id == payload.job_id).first()
+    execution_mode = (job.config or {}).get(&quot;execution_mode&quot;, &quot;remote&quot;)
+    if execution_mode != &quot;local&quot;:
+        raise HTTPException(status_code=400, detail=&quot;Job is not configured for local execution&quot;)
+
+    # Replace previous local model sync records for idempotent retries.
+    db.query(TrainedModel).filter(TrainedModel.job_id == payload.job_id).delete()
+
+    for m in payload.models:
+        metrics = {
+            **(m.metrics or {}),
+            &quot;storage_origin&quot;: &quot;local&quot;,
+            &quot;execution_mode&quot;: &quot;local&quot;,
+            &quot;artifact_ref&quot;: m.artifact_ref,
+        }
+        trained_model = TrainedModel(
+            job_id=payload.job_id,
+            model_name=m.model_name,
+            model_type=m.model_type,
+            task_type=m.task_type or payload.task_type or job.task_type,
+            file_path=(m.artifact_ref or {}).get(&quot;path&quot;) if m.artifact_ref else None,
+            accuracy=metrics.get(&quot;accuracy&quot;),
+            f1_score=metrics.get(&quot;f1_score&quot;) or metrics.get(&quot;f1&quot;),
+            roc_auc=metrics.get(&quot;roc_auc&quot;),
+            rmse=metrics.get(&quot;rmse&quot;),
+            mae=metrics.get(&quot;mae&quot;),
+            r2_score=metrics.get(&quot;r2&quot;) or metrics.get(&quot;r2_score&quot;),
+            metrics=metrics,
+            feature_importance=m.feature_importance,
+            confusion_matrix=m.confusion_matrix,
+            roc_curve_data=m.roc_curve_data,
+            cv_scores=m.cv_scores,
+            training_time=m.training_time,
+        )
+        db.add(trained_model)
+
+    if payload.task_type:
+        job.task_type = payload.task_type
+        if run:
+            run.task_type = payload.task_type
+
+    job.status = payload.status
+    job.progress = 100 if payload.status == &quot;completed&quot; else job.progress
+    job.error_message = payload.error_message
+    job.completed_at = datetime.utcnow() if payload.status in {&quot;completed&quot;, &quot;failed&quot;} else job.completed_at
+
+    job.config = {
+        **(job.config or {}),
+        &quot;local_sync&quot;: {
+            &quot;execution_env&quot;: payload.execution_env,
+            &quot;logs&quot;: payload.logs,
+            &quot;synced_at&quot;: datetime.utcnow().isoformat(),
+        },
+    }
+
+    if run:
+        run.status = payload.status
+        run.error_message = payload.error_message
+        run.completed_at = datetime.utcnow() if payload.status in {&quot;completed&quot;, &quot;failed&quot;} else run.completed_at
+        if payload.models:
+            primary_metric = &quot;accuracy&quot; if (job.task_type or &quot;&quot;) == &quot;classification&quot; else &quot;r2&quot;
+            best = max(
+                payload.models,
+                key=lambda item: float((item.metrics or {}).get(primary_metric, (item.metrics or {}).get(&quot;r2_score&quot;, -1e9)) or -1e9),
+            )
+            best_score = (best.metrics or {}).get(primary_metric, (best.metrics or {}).get(&quot;r2_score&quot;))
+            run.best_model_name = best.model_name
+            run.best_score = float(best_score) if best_score is not None else None
+            run.summary_metrics = {
+                &quot;primary_metric&quot;: primary_metric,
+                &quot;best_model&quot;: best.model_name,
+                &quot;best_score&quot;: best_score,
+                &quot;models_trained&quot;: len(payload.models),
+                &quot;execution_mode&quot;: &quot;local&quot;,
+            }
+
+    db.commit()
+    return {
+        &quot;message&quot;: &quot;Local training results synced successfully&quot;,
+        &quot;job_id&quot;: payload.job_id,
+        &quot;models_received&quot;: len(payload.models),
+    }
+
+
+@router.get(&quot;/training/model-catalog&quot;)
+def training_model_catalog():
+    &quot;&quot;&quot;List trainable models by task type for UI model selection.&quot;&quot;&quot;
+    return _model_catalog_payload()
+
+
+@router.get(&quot;/training/local-agent/download&quot;)
+def download_local_agent():
+    &quot;&quot;&quot;Download the local training agent script.&quot;&quot;&quot;
+    agent_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), &quot;..&quot;, &quot;..&quot;, &quot;..&quot;, &quot;local_agent.py&quot;)
+    )
+    if not os.path.exists(agent_path):
+        raise HTTPException(status_code=404, detail=&quot;local_agent.py not found&quot;)
+    return FileResponse(
+        path=agent_path,
+        filename=&quot;local_agent.py&quot;,
+        media_type=&quot;text/x-python&quot;,
+    )
+
+
+@router.get(&quot;/experiments&quot;, response_model=list[ExperimentRunResponse])
+def list_experiments(db: Session = Depends(get_db), status: Optional[str] = None):
+    &quot;&quot;&quot;List experiment runs with optional status filtering.&quot;&quot;&quot;
+    query = db.query(ExperimentRun)
+    if status:
+        query = query.filter(ExperimentRun.status == status)
+    return query.order_by(ExperimentRun.started_at.desc()).all()
+
+
+@router.get(&quot;/experiments/{run_id}&quot;, response_model=ExperimentRunResponse)
+def get_experiment(run_id: str, db: Session = Depends(get_db)):
+    &quot;&quot;&quot;Get a single experiment run by run_id.&quot;&quot;&quot;
+    run = db.query(ExperimentRun).filter(ExperimentRun.run_id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail=&quot;Experiment run not found&quot;)
+    return run
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>AI</strong>: No official citation linked here.</li><li><strong>API</strong>: No official citation linked here.</li><li><strong>APIRouter</strong>: No official citation linked here.</li><li><strong>AdaBoost</strong>: No official citation linked here.</li><li><strong>AutoML</strong>: No official citation linked here.</li><li><strong>AutoMLPipeline</strong>: No official citation linked here.</li><li><strong>Axiom</strong>: No official citation linked here.</li><li><strong>Background</strong>: No official citation linked here.</li><li><strong>BackgroundTasks</strong>: No official citation linked here.</li><li><strong>Boost</strong>: No official citation linked here.</li><li><strong>Boosting</strong>: No official citation linked here.</li><li><strong>CLASSIFICATION_MODEL_NAMES</strong>: No official citation linked here.</li><li><strong>Celery</strong>: No official citation linked here.</li><li><strong>Cloud</strong>: No official citation linked here.</li><li><strong>Could</strong>: No official citation linked here.</li><li><strong>DATABASE_URL</strong>: No official citation linked here.</li><li><strong>DataFrame</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>Decision</strong>: No official citation linked here.</li><li><strong>Deep</strong>: No official citation linked here.</li><li><strong>Depends</strong>: No official citation linked here.</li><li><strong>Download</strong>: No official citation linked here.</li><li><strong>Exception</strong>: No official citation linked here.</li><li><strong>Experiment</strong>: No official citation linked here.</li><li><strong>ExperimentRun</strong>: No official citation linked here.</li><li><strong>ExperimentRunResponse</strong>: No official citation linked here.</li><li><strong>Extra</strong>: No official citation linked here.</li><li><strong>False</strong>: No official citation linked here.</li><li><strong>FileResponse</strong>: No official citation linked here.</li><li><strong>Firebase</strong>: <a href="https://firebase.google.com/docs">https://firebase.google.com/docs</a></li><li><strong>Forest</strong>: No official citation linked here.</li><li><strong>Get</strong>: No official citation linked here.</li><li><strong>Gradient</strong>: No official citation linked here.</li><li><strong>Graph</strong>: No official citation linked here.</li><li><strong>HTTPException</strong>: No official citation linked here.</li><li><strong>In</strong>: No official citation linked here.</li><li><strong>Job</strong>: No official citation linked here.</li><li><strong>KNN</strong>: No official citation linked here.</li><li><strong>Launch</strong>: No official citation linked here.</li><li><strong>Launches</strong>: No official citation linked here.</li><li><strong>LightGBM</strong>: No official citation linked here.</li><li><strong>Linear</strong>: No official citation linked here.</li><li><strong>List</strong>: No official citation linked here.</li><li><strong>Load</strong>: No official citation linked here.</li><li><strong>Local</strong>: No official citation linked here.</li><li><strong>LocalTrainingSyncPayload</strong>: No official citation linked here.</li><li><strong>Logistic</strong>: No official citation linked here.</li><li><strong>MAX_CV_FOLDS</strong>: No official citation linked here.</li><li><strong>MAX_MODELS_PER_RUN</strong>: No official citation linked here.</li><li><strong>MAX_TRAINING_ROWS</strong>: No official citation linked here.</li><li><strong>MLP</strong>: No official citation linked here.</li><li><strong>MODEL_HYPERPARAMETERS</strong>: No official citation linked here.</li><li><strong>Max</strong>: No official citation linked here.</li><li><strong>Net</strong>: No official citation linked here.</li><li><strong>Network</strong>: No official citation linked here.</li><li><strong>Neural</strong>: No official citation linked here.</li><li><strong>None</strong>: No official citation linked here.</li><li><strong>Optional</strong>: No official citation linked here.</li><li><strong>RBF</strong>: No official citation linked here.</li><li><strong>REGRESSION_MODEL_NAMES</strong>: No official citation linked here.</li><li><strong>Random</strong>: No official citation linked here.</li><li><strong>Redis</strong>: No official citation linked here.</li><li><strong>Regression</strong>: No official citation linked here.</li><li><strong>Remote</strong>: No official citation linked here.</li><li><strong>Replace</strong>: No official citation linked here.</li><li><strong>Requires</strong>: No official citation linked here.</li><li><strong>Return</strong>: No official citation linked here.</li><li><strong>Router</strong>: No official citation linked here.</li><li><strong>Run</strong>: No official citation linked here.</li><li><strong>SVM</strong>: No official citation linked here.</li><li><strong>SVR</strong>: No official citation linked here.</li><li><strong>Save</strong>: No official citation linked here.</li><li><strong>Select</strong>: No official citation linked here.</li><li><strong>Selected</strong>: No official citation linked here.</li><li><strong>Session</strong>: No official citation linked here.</li><li><strong>SessionLocal</strong>: No official citation linked here.</li><li><strong>Sync</strong>: No official citation linked here.</li><li><strong>Target</strong>: No official citation linked here.</li><li><strong>This</strong>: No official citation linked here.</li><li><strong>TrainedModel</strong>: No official citation linked here.</li><li><strong>Training</strong>: No official citation linked here.</li><li><strong>TrainingConfig</strong>: No official citation linked here.</li><li><strong>TrainingJob</strong>: No official citation linked here.</li><li><strong>TrainingJobResponse</strong>: No official citation linked here.</li><li><strong>TrainingLaunchResponse</strong>: No official citation linked here.</li><li><strong>Tree</strong>: No official citation linked here.</li><li><strong>Trees</strong>: No official citation linked here.</li><li><strong>True</strong>: No official citation linked here.</li><li><strong>UI</strong>: No official citation linked here.</li><li><strong>Unsupported</strong>: No official citation linked here.</li><li><strong>Update</strong>: No official citation linked here.</li><li><strong>Validate</strong>: No official citation linked here.</li><li><strong>XGBoost</strong>: No official citation linked here.</li><li><strong>_000</strong>: No official citation linked here.</li><li><strong>__file__</strong>: No official citation linked here.</li><li><strong>__name__</strong>: No official citation linked here.</li><li><strong>_job_progress</strong>: No official citation linked here.</li><li><strong>_model_catalog_payload</strong>: No official citation linked here.</li><li><strong>_read_dataset_file</strong>: No official citation linked here.</li><li><strong>abspath</strong>: No official citation linked here.</li><li><strong>accuracy</strong>: No official citation linked here.</li><li><strong>add</strong>: No official citation linked here.</li><li><strong>add_task</strong>: No official citation linked here.</li><li><strong>agent</strong>: No official citation linked here.</li><li><strong>agent_path</strong>: No official citation linked here.</li><li><strong>all</strong>: No official citation linked here.</li><li><strong>allowed</strong>: No official citation linked here.</li><li><strong>alpha</strong>: No official citation linked here.</li><li><strong>an</strong>: No official citation linked here.</li><li><strong>and</strong>: No official citation linked here.</li><li><strong>api</strong>: No official citation linked here.</li><li><strong>app</strong>: No official citation linked here.</li><li><strong>artifact_ref</strong>: No official citation linked here.</li><li><strong>artifacts</strong>: No official citation linked here.</li><li><strong>as</strong>: No official citation linked here.</li><li><strong>async</strong>: No official citation linked here.</li><li><strong>at</strong>: No official citation linked here.</li><li><strong>authentication</strong>: No official citation linked here.</li><li><strong>back</strong>: No official citation linked here.</li><li><strong>backend</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

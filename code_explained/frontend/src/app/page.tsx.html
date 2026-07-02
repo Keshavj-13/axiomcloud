@@ -1,0 +1,350 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>page.tsx</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>frontend/src/app/page.tsx</span></div>
+        <h1 style="margin:10px 0 6px">page.tsx</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="login.html">Previous</a><a href="../components/layout.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: frontend/src/app/page.tsx</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>frontend/src/app/page.tsx</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-tsx">&quot;use client&quot;;
+import { useEffect } from &quot;react&quot;;
+import { useRouter } from &quot;next/navigation&quot;;
+import { useAuth } from &quot;@/lib/auth-context&quot;;
+import Link from &quot;next/link&quot;;
+import {
+  Activity,
+  BarChart3,
+  BrainCircuit,
+  Database,
+  FlaskConical,
+  Layers,
+  Rocket,
+  SearchCode,
+  ShieldCheck,
+  Upload,
+  WandSparkles,
+} from &quot;lucide-react&quot;;
+
+export default function HomePage() {
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  useEffect(() =&gt; {
+    if (!loading &amp;&amp; user) {
+      router.replace(&quot;/dashboard&quot;);
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return (
+      &lt;div className=&quot;min-h-screen flex items-center justify-center bg-surface&quot;&gt;
+        &lt;div className=&quot;text-center&quot;&gt;
+          &lt;div className=&quot;w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4&quot; /&gt;
+          &lt;p className=&quot;text-text-secondary&quot;&gt;Loading...&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-tsx">&quot;use client&quot;;
+import { useEffect } from &quot;react&quot;;
+import { useRouter } from &quot;next/navigation&quot;;
+import { useAuth } from &quot;@/lib/auth-context&quot;;
+import Link from &quot;next/link&quot;;
+import {
+  Activity,
+  BarChart3,
+  BrainCircuit,
+  Database,
+  FlaskConical,
+  Layers,
+  Rocket,
+  SearchCode,
+  ShieldCheck,
+  Upload,
+  WandSparkles,
+} from &quot;lucide-react&quot;;
+
+export default function HomePage() {
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  useEffect(() =&gt; {
+    if (!loading &amp;&amp; user) {
+      router.replace(&quot;/dashboard&quot;);
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return (
+      &lt;div className=&quot;min-h-screen flex items-center justify-center bg-surface&quot;&gt;
+        &lt;div className=&quot;text-center&quot;&gt;
+          &lt;div className=&quot;w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4&quot; /&gt;
+          &lt;p className=&quot;text-text-secondary&quot;&gt;Loading...&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  if (user) return null;
+
+  return (
+    &lt;main className=&quot;relative min-h-screen overflow-hidden bg-bg text-text-primary&quot;&gt;
+      &lt;div className=&quot;pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(110,59,215,.22),transparent_38%),radial-gradient(circle_at_85%_12%,rgba(208,188,255,.16),transparent_32%)]&quot; /&gt;
+      &lt;div className=&quot;pointer-events-none absolute inset-0 bg-grid-pattern bg-grid-size opacity-30&quot; /&gt;
+
+      &lt;div className=&quot;relative mx-auto max-w-7xl px-6 pb-20 pt-12 lg:px-10&quot;&gt;
+        {/* Hero */}
+        &lt;section className=&quot;grid items-center gap-10 py-10 lg:grid-cols-2 lg:py-16&quot;&gt;
+          &lt;div&gt;
+            &lt;p className=&quot;section-kicker mb-4&quot;&gt;Axiom Cloud AI&lt;/p&gt;
+            &lt;h1 className=&quot;max-w-xl text-4xl font-semibold leading-tight md:text-5xl&quot;&gt;
+              From Raw Data to Deployed Models in Minutes
+            &lt;/h1&gt;
+            &lt;p className=&quot;mt-5 max-w-xl text-sm text-text-muted md:text-base&quot;&gt;
+              A production-grade AutoML platform with experiment tracking, model comparison, and real-time inference APIs.
+            &lt;/p&gt;
+            &lt;div className=&quot;mt-8 flex flex-wrap gap-3&quot;&gt;
+              &lt;Link href=&quot;/login&quot; className=&quot;btn-primary&quot;&gt;
+                Start Building
+              &lt;/Link&gt;
+              &lt;Link href=&quot;#workflow&quot; className=&quot;btn-outline&quot;&gt;
+                View Demo
+              &lt;/Link&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+
+          &lt;div className=&quot;panel-glass void-shadow relative overflow-hidden rounded-2xl p-6&quot;&gt;
+            &lt;div className=&quot;absolute -right-10 -top-10 h-40 w-40 rounded-full bg-primary-deep/20 blur-3xl&quot; /&gt;
+            &lt;div className=&quot;absolute -bottom-10 -left-8 h-36 w-36 rounded-full bg-primary/15 blur-3xl&quot; /&gt;
+            &lt;div className=&quot;relative h-[340px] rounded-xl border border-outline/25 bg-surface/70 p-4&quot;&gt;
+              &lt;div className=&quot;absolute left-8 top-10 flex items-center gap-2 rounded-md border border-outline/30 bg-surface-variant/80 px-2 py-1 text-[11px] text-text-muted&quot;&gt;
+                &lt;Database className=&quot;h-3.5 w-3.5 text-primary&quot; /&gt;
+                Dataset Node
+              &lt;/div&gt;
+              &lt;div className=&quot;absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-md border border-outline/30 bg-surface-variant/80 px-2 py-1 text-[11px] text-text-muted&quot;&gt;
+                &lt;BrainCircuit className=&quot;h-3.5 w-3.5 text-primary&quot; /&gt;
+                AutoML Pipeline
+              &lt;/div&gt;
+              &lt;div className=&quot;absolute bottom-10 right-8 flex items-center gap-2 rounded-md border border-outline/30 bg-surface-variant/80 px-2 py-1 text-[11px] text-text-muted&quot;&gt;
+                &lt;Rocket className=&quot;h-3.5 w-3.5 text-primary&quot; /&gt;
+                Inference API
+              &lt;/div&gt;
+
+              &lt;div className=&quot;absolute left-[22%] top-[20%] h-2 w-2 animate-pulse rounded-full bg-primary&quot; /&gt;
+              &lt;div className=&quot;absolute left-[50%] top-[50%] h-2 w-2 animate-pulse rounded-full bg-primary&quot; /&gt;
+              &lt;div className=&quot;absolute left-[78%] top-[75%] h-2 w-2 animate-pulse rounded-full bg-primary&quot; /&gt;
+
+              &lt;svg className=&quot;absolute inset-0 h-full w-full&quot; viewBox=&quot;0 0 100 100&quot; preserveAspectRatio=&quot;none&quot;&gt;
+                &lt;path d=&quot;M22 23 C34 35, 42 41, 50 50&quot; fill=&quot;none&quot; stroke=&quot;rgba(208,188,255,.45)&quot; strokeWidth=&quot;0.6&quot; /&gt;
+                &lt;path d=&quot;M50 50 C60 60, 68 67, 78 75&quot; fill=&quot;none&quot; stroke=&quot;rgba(208,188,255,.45)&quot; strokeWidth=&quot;0.6&quot; /&gt;
+              &lt;/svg&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/section&gt;
+
+        {/* Trust strip */}
+        &lt;section className=&quot;panel mb-12 flex flex-col items-start justify-between gap-4 rounded-xl px-5 py-4 md:flex-row md:items-center&quot;&gt;
+          &lt;p className=&quot;text-sm text-text-muted&quot;&gt;Inspired by Vertex AI and Kaggle AutoML&lt;/p&gt;
+          &lt;div className=&quot;flex flex-wrap gap-2 text-xs&quot;&gt;
+            &lt;span className=&quot;rounded-full border border-outline/30 bg-surface-variant/60 px-3 py-1 text-text-muted&quot;&gt;Production Workflows&lt;/span&gt;
+            &lt;span className=&quot;rounded-full border border-outline/30 bg-surface-variant/60 px-3 py-1 text-text-muted&quot;&gt;API-First Design&lt;/span&gt;
+            &lt;span className=&quot;rounded-full border border-outline/30 bg-surface-variant/60 px-3 py-1 text-text-muted&quot;&gt;Secure by Default&lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/section&gt;
+
+        {/* Core capabilities */}
+        &lt;section className=&quot;mb-14&quot;&gt;
+          &lt;p className=&quot;section-kicker mb-3&quot;&gt;Core capabilities&lt;/p&gt;
+          &lt;div className=&quot;grid gap-4 md:grid-cols-3&quot;&gt;
+            {[
+              {
+                icon: BrainCircuit,
+                title: &quot;AutoML Engine&quot;,
+                text: &quot;Train multiple models with cross-validation and automatic task detection.&quot;,
+              },
+              {
+                icon: FlaskConical,
+                title: &quot;Experiment Tracking&quot;,
+                text: &quot;Track runs, compare models, and manage experiments with a unified registry.&quot;,
+              },
+              {
+                icon: Rocket,
+                title: &quot;Model Deployment&quot;,
+                text: &quot;Deploy models instantly and access them via clean REST APIs.&quot;,
+              },
+            ].map(({ icon: Icon, title, text }) =&gt; (
+              &lt;article key={title} className=&quot;glass rounded-xl border border-outline/30 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.35)]&quot;&gt;
+                &lt;Icon className=&quot;mb-4 h-5 w-5 text-primary&quot; /&gt;
+                &lt;h3 className=&quot;mb-2 text-lg font-semibold&quot;&gt;{title}&lt;/h3&gt;
+                &lt;p className=&quot;text-sm text-text-muted&quot;&gt;{text}&lt;/p&gt;
+              &lt;/article&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/section&gt;
+
+        {/* Workflow */}
+        &lt;section id=&quot;workflow&quot; className=&quot;mb-14&quot;&gt;
+          &lt;p className=&quot;section-kicker mb-3&quot;&gt;Visual workflow&lt;/p&gt;
+          &lt;div className=&quot;panel rounded-xl p-5&quot;&gt;
+            &lt;div className=&quot;grid gap-5 md:grid-cols-5 md:items-center&quot;&gt;
+              {[
+                { icon: Upload, label: &quot;Upload Dataset&quot; },
+                { icon: BrainCircuit, label: &quot;Train Models&quot; },
+                { icon: BarChart3, label: &quot;Compare&quot; },
+                { icon: Rocket, label: &quot;Deploy&quot; },
+                { icon: Activity, label: &quot;Predict&quot; },
+              ].map(({ icon: Icon, label }, idx, arr) =&gt; (
+                &lt;div key={label} className=&quot;relative&quot;&gt;
+                  &lt;div className=&quot;flex items-center gap-3 rounded-lg border border-outline/25 bg-surface-variant/30 px-3 py-3&quot;&gt;
+                    &lt;Icon className=&quot;h-4 w-4 text-primary&quot; /&gt;
+                    &lt;span className=&quot;text-sm text-text-primary&quot;&gt;{label}&lt;/span&gt;
+                  &lt;/div&gt;
+                  {idx &lt; arr.length - 1 &amp;&amp; (
+                    &lt;div className=&quot;absolute right-[-18px] top-1/2 hidden h-[1px] w-8 -translate-y-1/2 bg-gradient-to-r from-primary/40 to-transparent md:block&quot; /&gt;
+                  )}
+                &lt;/div&gt;
+              ))}
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/section&gt;
+
+        {/* Feature depth */}
+        &lt;section className=&quot;mb-14&quot;&gt;
+          &lt;p className=&quot;section-kicker mb-3&quot;&gt;Feature depth&lt;/p&gt;
+          &lt;div className=&quot;grid gap-4 md:grid-cols-2 lg:grid-cols-3&quot;&gt;
+            {[
+              { icon: Layers, title: &quot;Interactive Leaderboards&quot; },
+              { icon: BarChart3, title: &quot;Feature Importance Visualization&quot; },
+              { icon: Database, title: &quot;Built-in Datasets&quot; },
+              { icon: SearchCode, title: &quot;EDA Reports with leakage detection&quot; },
+              { icon: WandSparkles, title: &quot;Hyperparameter tuning with time budgets&quot; },
+            ].map(({ icon: Icon, title }) =&gt; (
+              &lt;article key={title} className=&quot;panel rounded-xl p-5&quot;&gt;
+                &lt;Icon className=&quot;mb-3 h-4 w-4 text-primary&quot; /&gt;
+                &lt;h3 className=&quot;text-sm font-medium text-text-primary&quot;&gt;{title}&lt;/h3&gt;
+              &lt;/article&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/section&gt;
+
+        {/* Tech credibility */}
+        &lt;section className=&quot;mb-14 grid gap-4 lg:grid-cols-[1.4fr_1fr]&quot;&gt;
+          &lt;div className=&quot;panel-glass rounded-xl p-6&quot;&gt;
+            &lt;p className=&quot;section-kicker mb-3&quot;&gt;Tech credibility&lt;/p&gt;
+            &lt;h2 className=&quot;mb-2 text-2xl font-semibold&quot;&gt;Built with FastAPI, Next.js, and modern ML pipelines&lt;/h2&gt;
+            &lt;p className=&quot;text-sm text-text-muted&quot;&gt;
+              Architecture-first platform design optimized for secure, authenticated model training and low-friction inference operations.
+            &lt;/p&gt;
+          &lt;/div&gt;
+          &lt;div className=&quot;grid gap-3&quot;&gt;
+            &lt;div className=&quot;panel rounded-lg p-4 text-sm text-text-muted&quot;&gt;&lt;span className=&quot;text-text-primary&quot;&gt;Backend:&lt;/span&gt; FastAPI, SQLAlchemy, async job orchestration&lt;/div&gt;
+            &lt;div className=&quot;panel rounded-lg p-4 text-sm text-text-muted&quot;&gt;&lt;span className=&quot;text-text-primary&quot;&gt;Frontend:&lt;/span&gt; Next.js App Router, TypeScript, Tailwind UI system&lt;/div&gt;
+            &lt;div className=&quot;panel rounded-lg p-4 text-sm text-text-muted&quot;&gt;&lt;span className=&quot;text-text-primary&quot;&gt;ML Stack:&lt;/span&gt; scikit-learn, XGBoost, LightGBM, explainability tooling&lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/section&gt;
+
+        {/* Final CTA */}
+        &lt;section className=&quot;panel-glass rounded-2xl p-7 text-center&quot;&gt;
+          &lt;div className=&quot;mx-auto max-w-2xl&quot;&gt;
+            &lt;p className=&quot;section-kicker mb-3&quot;&gt;Final call&lt;/p&gt;
+            &lt;h2 className=&quot;mb-3 text-3xl font-semibold&quot;&gt;Build smarter models, faster.&lt;/h2&gt;
+            &lt;p className=&quot;mb-6 text-sm text-text-muted&quot;&gt;Production-ready workflows for teams that want control, speed, and measurable model quality.&lt;/p&gt;
+            &lt;div className=&quot;flex flex-wrap items-center justify-center gap-3&quot;&gt;
+              &lt;Link href=&quot;/login&quot; className=&quot;btn-primary&quot;&gt;Get Started&lt;/Link&gt;
+              &lt;Link href=&quot;/dashboard&quot; className=&quot;btn-outline&quot;&gt;View Dashboard&lt;/Link&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/section&gt;
+
+        &lt;div className=&quot;mt-10 flex items-center justify-center gap-2 text-xs text-text-muted&quot;&gt;
+          &lt;ShieldCheck className=&quot;h-3.5 w-3.5&quot; /&gt;
+          Authenticated compute · API-level protection · production posture
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/main&gt;
+  );
+}
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>AI</strong>: No official citation linked here.</li><li><strong>API</strong>: No official citation linked here.</li><li><strong>APIs</strong>: No official citation linked here.</li><li><strong>Activity</strong>: No official citation linked here.</li><li><strong>App</strong>: No official citation linked here.</li><li><strong>Architecture</strong>: No official citation linked here.</li><li><strong>Authenticated</strong>: No official citation linked here.</li><li><strong>AutoML</strong>: No official citation linked here.</li><li><strong>Axiom</strong>: No official citation linked here.</li><li><strong>Backend</strong>: No official citation linked here.</li><li><strong>BarChart3</strong>: No official citation linked here.</li><li><strong>BrainCircuit</strong>: No official citation linked here.</li><li><strong>Build</strong>: No official citation linked here.</li><li><strong>Building</strong>: No official citation linked here.</li><li><strong>Built</strong>: No official citation linked here.</li><li><strong>C34</strong>: No official citation linked here.</li><li><strong>C60</strong>: No official citation linked here.</li><li><strong>CTA</strong>: No official citation linked here.</li><li><strong>Cloud</strong>: No official citation linked here.</li><li><strong>Compare</strong>: No official citation linked here.</li><li><strong>Core</strong>: No official citation linked here.</li><li><strong>Dashboard</strong>: No official citation linked here.</li><li><strong>Data</strong>: No official citation linked here.</li><li><strong>Database</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>Datasets</strong>: No official citation linked here.</li><li><strong>Default</strong>: No official citation linked here.</li><li><strong>Demo</strong>: No official citation linked here.</li><li><strong>Deploy</strong>: No official citation linked here.</li><li><strong>Deployed</strong>: No official citation linked here.</li><li><strong>Deployment</strong>: No official citation linked here.</li><li><strong>Design</strong>: No official citation linked here.</li><li><strong>EDA</strong>: No official citation linked here.</li><li><strong>Engine</strong>: No official citation linked here.</li><li><strong>Experiment</strong>: No official citation linked here.</li><li><strong>FastAPI</strong>: <a href="https://fastapi.tiangolo.com/">https://fastapi.tiangolo.com/</a></li><li><strong>Feature</strong>: No official citation linked here.</li><li><strong>Final</strong>: No official citation linked here.</li><li><strong>First</strong>: No official citation linked here.</li><li><strong>FlaskConical</strong>: No official citation linked here.</li><li><strong>From</strong>: No official citation linked here.</li><li><strong>Frontend</strong>: No official citation linked here.</li><li><strong>Get</strong>: No official citation linked here.</li><li><strong>Hero</strong>: No official citation linked here.</li><li><strong>HomePage</strong>: No official citation linked here.</li><li><strong>Hyperparameter</strong>: No official citation linked here.</li><li><strong>Icon</strong>: No official citation linked here.</li><li><strong>Importance</strong>: No official citation linked here.</li><li><strong>Inference</strong>: No official citation linked here.</li><li><strong>Inspired</strong>: No official citation linked here.</li><li><strong>Interactive</strong>: No official citation linked here.</li><li><strong>Kaggle</strong>: No official citation linked here.</li><li><strong>Layers</strong>: No official citation linked here.</li><li><strong>Leaderboards</strong>: No official citation linked here.</li><li><strong>LightGBM</strong>: No official citation linked here.</li><li><strong>Link</strong>: No official citation linked here.</li><li><strong>Loading</strong>: No official citation linked here.</li><li><strong>M22</strong>: No official citation linked here.</li><li><strong>M50</strong>: No official citation linked here.</li><li><strong>ML</strong>: No official citation linked here.</li><li><strong>Minutes</strong>: No official citation linked here.</li><li><strong>Model</strong>: No official citation linked here.</li><li><strong>Models</strong>: No official citation linked here.</li><li><strong>Next</strong>: No official citation linked here.</li><li><strong>Node</strong>: No official citation linked here.</li><li><strong>Pipeline</strong>: No official citation linked here.</li><li><strong>Predict</strong>: No official citation linked here.</li><li><strong>Production</strong>: No official citation linked here.</li><li><strong>REST</strong>: No official citation linked here.</li><li><strong>Raw</strong>: No official citation linked here.</li><li><strong>Reports</strong>: No official citation linked here.</li><li><strong>Rocket</strong>: No official citation linked here.</li><li><strong>Router</strong>: No official citation linked here.</li><li><strong>SQLAlchemy</strong>: <a href="https://docs.sqlalchemy.org/">https://docs.sqlalchemy.org/</a></li><li><strong>SearchCode</strong>: No official citation linked here.</li><li><strong>Secure</strong>: No official citation linked here.</li><li><strong>ShieldCheck</strong>: No official citation linked here.</li><li><strong>Stack</strong>: No official citation linked here.</li><li><strong>Start</strong>: No official citation linked here.</li><li><strong>Started</strong>: No official citation linked here.</li><li><strong>Tailwind</strong>: <a href="https://tailwindcss.com/docs">https://tailwindcss.com/docs</a></li><li><strong>Tech</strong>: No official citation linked here.</li><li><strong>Track</strong>: No official citation linked here.</li><li><strong>Tracking</strong>: No official citation linked here.</li><li><strong>Train</strong>: No official citation linked here.</li><li><strong>Trust</strong>: No official citation linked here.</li><li><strong>TypeScript</strong>: <a href="https://www.typescriptlang.org/docs/">https://www.typescriptlang.org/docs/</a></li><li><strong>UI</strong>: No official citation linked here.</li><li><strong>Upload</strong>: No official citation linked here.</li><li><strong>Vertex</strong>: No official citation linked here.</li><li><strong>View</strong>: No official citation linked here.</li><li><strong>Visual</strong>: No official citation linked here.</li><li><strong>Visualization</strong>: No official citation linked here.</li><li><strong>WandSparkles</strong>: No official citation linked here.</li><li><strong>Workflow</strong>: No official citation linked here.</li><li><strong>Workflows</strong>: No official citation linked here.</li><li><strong>XGBoost</strong>: No official citation linked here.</li><li><strong>_0</strong>: No official citation linked here.</li><li><strong>_12</strong>: No official citation linked here.</li><li><strong>_18px_40px_rgba</strong>: No official citation linked here.</li><li><strong>absolute</strong>: No official citation linked here.</li><li><strong>access</strong>: No official citation linked here.</li><li><strong>and</strong>: No official citation linked here.</li><li><strong>animate</strong>: No official citation linked here.</li><li><strong>arr</strong>: No official citation linked here.</li><li><strong>article</strong>: No official citation linked here.</li><li><strong>async</strong>: No official citation linked here.</li><li><strong>auth</strong>: No official citation linked here.</li><li><strong>authenticated</strong>: No official citation linked here.</li><li><strong>auto</strong>: No official citation linked here.</li><li><strong>automatic</strong>: No official citation linked here.</li><li><strong>base</strong>: No official citation linked here.</li><li><strong>between</strong>: No official citation linked here.</li><li><strong>bg</strong>: No official citation linked here.</li><li><strong>block</strong>: No official citation linked here.</li><li><strong>blur</strong>: No official citation linked here.</li><li><strong>border</strong>: No official citation linked here.</li><li><strong>bottom</strong>: No official citation linked here.</li><li><strong>btn</strong>: No official citation linked here.</li><li><strong>budgets</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

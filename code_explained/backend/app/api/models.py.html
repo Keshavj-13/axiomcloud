@@ -1,0 +1,670 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>models.py</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>backend/app/api/models.py</span></div>
+        <h1 style="margin:10px 0 6px">models.py</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="metrics.py.html">Previous</a><a href="predictions.py.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: backend/app/api/models.py</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>backend/app/api/models.py</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-python">&quot;&quot;&quot;
+Axiom Cloud AI - Models API Router
+List, retrieve, deploy, and download trained models.
+&quot;&quot;&quot;
+import os
+import logging
+import random
+import json
+from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException, Query, Body
+from fastapi.responses import FileResponse, JSONResponse
+from sqlalchemy.orm import Session
+from typing import List
+import numpy as np
+import joblib
+
+from app.core.database import get_db
+from app.models.db_models import TrainedModel, TrainingJob, Dataset
+from app.schemas.schemas import (
+    ModelResponse,
+    APIErrorResponse,
+    ShapSummaryResponse,
+    LimeSummaryResponse,
+    LimeExplainRequest,
+)
+
+import pandas as pd
+
+router = APIRouter()
+logger = logging.getLogger(__name__)
+
+
+def _get_explainability_components():
+    from app.ml.explainability import explainability_service, ExplainabilityError
+
+    return explainability_service, ExplainabilityError
+
+
+def _load_dataset_frame(path: str) -&gt; pd.DataFrame:
+    if path.endswith(&quot;.csv&quot;):
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-python">&quot;&quot;&quot;
+Axiom Cloud AI - Models API Router
+List, retrieve, deploy, and download trained models.
+&quot;&quot;&quot;
+import os
+import logging
+import random
+import json
+from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException, Query, Body
+from fastapi.responses import FileResponse, JSONResponse
+from sqlalchemy.orm import Session
+from typing import List
+import numpy as np
+import joblib
+
+from app.core.database import get_db
+from app.models.db_models import TrainedModel, TrainingJob, Dataset
+from app.schemas.schemas import (
+    ModelResponse,
+    APIErrorResponse,
+    ShapSummaryResponse,
+    LimeSummaryResponse,
+    LimeExplainRequest,
+)
+
+import pandas as pd
+
+router = APIRouter()
+logger = logging.getLogger(__name__)
+
+
+def _get_explainability_components():
+    from app.ml.explainability import explainability_service, ExplainabilityError
+
+    return explainability_service, ExplainabilityError
+
+
+def _load_dataset_frame(path: str) -&gt; pd.DataFrame:
+    if path.endswith(&quot;.csv&quot;):
+        return pd.read_csv(path)
+    return pd.read_excel(path)
+
+
+def _random_default_from_series(series: pd.Series) -&gt; tuple[str, dict, object]:
+    &quot;&quot;&quot;Infer input type, constraints, and randomized default from a series.&quot;&quot;&quot;
+    s = series.dropna()
+    if s.empty:
+        return &quot;text&quot;, {}, &quot;&quot;
+
+    if pd.api.types.is_numeric_dtype(series):
+        min_v = float(s.min())
+        max_v = float(s.max())
+
+        numeric_vals = pd.to_numeric(s, errors=&quot;coerce&quot;).dropna().to_numpy(dtype=float)
+        integer_like = bool(
+            len(numeric_vals) &gt; 0
+            and np.all(np.isfinite(numeric_vals))
+            and np.all(np.isclose(numeric_vals, np.round(numeric_vals), atol=1e-9))
+        )
+
+        if integer_like:
+            min_i = int(np.floor(min_v))
+            max_i = int(np.ceil(max_v))
+            default_v = int(np.random.randint(min_i, max_i + 1)) if min_i != max_i else min_i
+        else:
+            default_v = float(np.random.uniform(min_v, max_v)) if min_v != max_v else min_v
+
+        stats = {
+            &quot;min&quot;: min_v,
+            &quot;max&quot;: max_v,
+            &quot;mean&quot;: float(s.mean()),
+            &quot;std&quot;: float(s.std()) if len(s) &gt; 1 else 0.0,
+            &quot;integer_like&quot;: integer_like,
+        }
+        if integer_like:
+            return &quot;number&quot;, stats, int(default_v)
+        return &quot;number&quot;, stats, round(float(default_v), 6)
+
+    values = [str(v) for v in s.astype(str).value_counts().head(20).index.tolist()]
+    default_v = random.choice(values) if values else &quot;&quot;
+    return &quot;select&quot;, {&quot;options&quot;: values}, default_v
+
+
+@router.get(&quot;/models&quot;)
+def list_models(
+    job_id: str = None,
+    db: Session = Depends(get_db)
+):
+    &quot;&quot;&quot;List trained models, optionally filtered by job.&quot;&quot;&quot;
+    try:
+        query = db.query(TrainedModel)
+        if job_id:
+            query = query.filter(TrainedModel.job_id == job_id)
+        models = query.order_by(TrainedModel.created_at.desc()).all()
+        
+        def clean_value(val):
+            &quot;&quot;&quot;Recursively clean NaN/inf from nested structures.&quot;&quot;&quot;
+            if val is None:
+                return None
+            if isinstance(val, dict):
+                return {k: clean_value(v) for k, v in val.items()}
+            if isinstance(val, list):
+                return [clean_value(v) for v in val]
+            if isinstance(val, float):
+                if np.isnan(val) or np.isinf(val):
+                    return None
+                return val
+            return val
+        
+        # Manually serialize to handle NaN/inf values recursively
+        result = []
+        for m in models:
+            result.append({
+                &quot;id&quot;: m.id,
+                &quot;job_id&quot;: m.job_id,
+                &quot;model_name&quot;: m.model_name,
+                &quot;model_type&quot;: m.model_type,
+                &quot;task_type&quot;: m.task_type,
+                &quot;is_deployed&quot;: m.is_deployed,
+                &quot;accuracy&quot;: clean_value(m.accuracy),
+                &quot;f1_score&quot;: clean_value(m.f1_score),
+                &quot;roc_auc&quot;: clean_value(m.roc_auc),
+                &quot;rmse&quot;: clean_value(m.rmse),
+                &quot;mae&quot;: clean_value(m.mae),
+                &quot;r2_score&quot;: clean_value(m.r2_score),
+                &quot;metrics&quot;: clean_value(m.metrics),
+                &quot;feature_importance&quot;: clean_value(m.feature_importance),
+                &quot;confusion_matrix&quot;: clean_value(m.confusion_matrix),
+                &quot;roc_curve_data&quot;: clean_value(m.roc_curve_data),
+                &quot;cv_scores&quot;: clean_value(m.cv_scores),
+                &quot;training_time&quot;: clean_value(m.training_time),
+                &quot;created_at&quot;: m.created_at.isoformat() if m.created_at else None,
+            })
+        
+        # Use JSONResponse to ensure proper encoding
+        return JSONResponse(content=result)
+    except Exception as exc:
+        logger.error(&quot;Error listing models: %s&quot;, exc, exc_info=True)
+        raise HTTPException(status_code=500, detail=f&quot;Failed to list models: {str(exc)}&quot;)
+
+
+@router.get(&quot;/models/{model_id}&quot;, response_model=ModelResponse)
+def get_model(model_id: int, db: Session = Depends(get_db)):
+    &quot;&quot;&quot;Get a specific model by ID.&quot;&quot;&quot;
+    model = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
+    if not model:
+        raise HTTPException(status_code=404, detail=&quot;Model not found&quot;)
+    return model
+
+
+@router.get(&quot;/models/{model_id}/inference-template&quot;)
+def get_model_inference_template(
+    model_id: int,
+    randomize: bool = Query(default=True),
+    db: Session = Depends(get_db),
+):
+    &quot;&quot;&quot;Return model-aware inference feature template with dataset-bounded defaults.&quot;&quot;&quot;
+    model = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
+    if not model:
+        raise HTTPException(status_code=404, detail=&quot;Model not found&quot;)
+    if not model.file_path or not os.path.exists(model.file_path):
+        raise HTTPException(status_code=404, detail=&quot;Model artifact not found&quot;)
+
+    job = db.query(TrainingJob).filter(TrainingJob.job_id == model.job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail=&quot;Training job not found&quot;)
+
+    dataset = db.query(Dataset).filter(Dataset.id == job.dataset_id).first()
+    dataset_path = (job.config or {}).get(&quot;dataset_path&quot;) if job.config else None
+    if not dataset_path and dataset:
+        dataset_path = dataset.file_path
+    if not dataset_path or not os.path.exists(dataset_path):
+        raise HTTPException(status_code=404, detail=&quot;Training dataset not found&quot;)
+
+    feature_names = []
+    artifact_issue = None
+    try:
+        bundle = joblib.load(model.file_path)
+        feature_names = bundle.get(&quot;feature_names&quot;) or []
+    except Exception as exc:
+        # Keep endpoint functional for older/incompatible artifacts by falling back to dataset/schema.
+        artifact_issue = str(exc)
+        logger.warning(&quot;Inference template fallback for model_id=%s reason=%s&quot;, model_id, exc)
+
+    try:
+        df = _load_dataset_frame(dataset_path)
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=f&quot;Could not parse training dataset: {exc}&quot;)
+
+    target_col = job.target_column
+    if target_col in df.columns:
+        df = df.drop(columns=[target_col], errors=&quot;ignore&quot;)
+
+    if not feature_names:
+        if model.feature_importance and isinstance(model.feature_importance, dict):
+            feature_names = list(model.feature_importance.keys())
+        else:
+            feature_names = list(df.columns)
+
+    features = []
+    for name in feature_names:
+        if name in df.columns:
+            input_type, meta, default_value = _random_default_from_series(df[name])
+            if not randomize and input_type == &quot;number&quot; and isinstance(meta, dict):
+                if bool(meta.get(&quot;integer_like&quot;, False)):
+                    default_value = int(round(float(meta.get(&quot;mean&quot;, 0.0))))
+                else:
+                    default_value = round(float(meta.get(&quot;mean&quot;, 0.0)), 6)
+            features.append(
+                {
+                    &quot;name&quot;: name,
+                    &quot;dtype&quot;: str(df[name].dtype),
+                    &quot;input_type&quot;: input_type,
+                    &quot;default_value&quot;: default_value,
+                    **meta,
+                }
+            )
+        else:
+            features.append(
+                {
+                    &quot;name&quot;: name,
+                    &quot;dtype&quot;: &quot;unknown&quot;,
+                    &quot;input_type&quot;: &quot;text&quot;,
+                    &quot;default_value&quot;: &quot;&quot;,
+                }
+            )
+
+    return {
+        &quot;model_id&quot;: model.id,
+        &quot;model_name&quot;: model.model_name,
+        &quot;task_type&quot;: model.task_type,
+        &quot;job_id&quot;: model.job_id,
+        &quot;dataset_id&quot;: dataset.id if dataset else None,
+        &quot;dataset_name&quot;: dataset.name if dataset else None,
+        &quot;target_column&quot;: job.target_column,
+        &quot;generated_at&quot;: datetime.utcnow().isoformat(),
+        &quot;features&quot;: features,
+        &quot;artifact_compatible&quot;: artifact_issue is None,
+        &quot;artifact_issue&quot;: artifact_issue,
+    }
+
+
+# --- Explainability Endpoints ---
+@router.get(
+    &quot;/models/{model_id}/shap&quot;,
+    response_model=ShapSummaryResponse,
+    responses={400: {&quot;model&quot;: APIErrorResponse}, 404: {&quot;model&quot;: APIErrorResponse}, 500: {&quot;model&quot;: APIErrorResponse}},
+)
+def get_model_shap(
+    model_id: int,
+    sample_index: int = Query(default=0, ge=0),
+    nsamples: int = Query(default=200, ge=1, le=1000),
+    db: Session = Depends(get_db),
+):
+    &quot;&quot;&quot;Return chart-ready SHAP global/local explanations for a selected sample.&quot;&quot;&quot;
+    explainability_service, ExplainabilityError = _get_explainability_components()
+
+    model_obj = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
+    if not model_obj or not model_obj.file_path or not os.path.exists(model_obj.file_path):
+        raise HTTPException(
+            status_code=404,
+            detail={&quot;error&quot;: {&quot;code&quot;: &quot;MODEL_NOT_FOUND&quot;, &quot;message&quot;: &quot;Model not found or file missing&quot;}},
+        )
+
+    job = db.query(TrainingJob).filter(TrainingJob.job_id == model_obj.job_id).first()
+    if not job or not job.config or not job.config.get(&quot;dataset_path&quot;):
+        raise HTTPException(
+            status_code=404,
+            detail={&quot;error&quot;: {&quot;code&quot;: &quot;TRAINING_DATA_NOT_FOUND&quot;, &quot;message&quot;: &quot;Training data not found for SHAP explanation&quot;}},
+        )
+
+    try:
+        dataset_path = job.config.get(&quot;dataset_path&quot;)
+        return explainability_service.build_shap(
+            model=model_obj,
+            dataset_path=dataset_path,
+            target_column=job.target_column,
+            sample_index=sample_index,
+            nsamples=nsamples,
+        )
+    except ExplainabilityError as exc:
+        status = 400
+        if exc.code in {&quot;MODEL_FILE_MISSING&quot;, &quot;DATASET_FILE_MISSING&quot;, &quot;TARGET_COLUMN_MISSING&quot;}:
+            status = 404
+        logger.warning(&quot;SHAP request failed | model_id=%s code=%s msg=%s&quot;, model_id, exc.code, exc.message)
+        raise HTTPException(
+            status_code=status,
+            detail={&quot;error&quot;: {&quot;code&quot;: exc.code, &quot;message&quot;: exc.message, &quot;details&quot;: exc.details}},
+        ) from exc
+    except Exception:
+        logger.exception(&quot;SHAP explanation failed unexpectedly&quot;)
+        raise HTTPException(
+            status_code=500,
+            detail={&quot;error&quot;: {&quot;code&quot;: &quot;SHAP_INTERNAL_ERROR&quot;, &quot;message&quot;: &quot;SHAP explanation failed&quot;}},
+        )
+
+
+@router.post(
+    &quot;/models/{model_id}/lime&quot;,
+    response_model=LimeSummaryResponse,
+    responses={400: {&quot;model&quot;: APIErrorResponse}, 404: {&quot;model&quot;: APIErrorResponse}, 500: {&quot;model&quot;: APIErrorResponse}},
+)
+def get_model_lime(
+    model_id: int,
+    payload: LimeExplainRequest = Body(default_factory=LimeExplainRequest),
+    db: Session = Depends(get_db),
+):
+    &quot;&quot;&quot;Return chart-ready LIME local explanations for a selected sample or custom input.&quot;&quot;&quot;
+    explainability_service, ExplainabilityError = _get_explainability_components()
+
+    model_obj = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
+    if not model_obj or not model_obj.file_path or not os.path.exists(model_obj.file_path):
+        raise HTTPException(
+            status_code=404,
+            detail={&quot;error&quot;: {&quot;code&quot;: &quot;MODEL_NOT_FOUND&quot;, &quot;message&quot;: &quot;Model not found or file missing&quot;}},
+        )
+
+    job = db.query(TrainingJob).filter(TrainingJob.job_id == model_obj.job_id).first()
+    if not job or not job.config or not job.config.get(&quot;dataset_path&quot;):
+        raise HTTPException(
+            status_code=404,
+            detail={&quot;error&quot;: {&quot;code&quot;: &quot;TRAINING_DATA_NOT_FOUND&quot;, &quot;message&quot;: &quot;Training data not found for LIME explanation&quot;}},
+        )
+
+    try:
+        dataset_path = job.config.get(&quot;dataset_path&quot;)
+        return explainability_service.build_lime(
+            model=model_obj,
+            dataset_path=dataset_path,
+            target_column=job.target_column,
+            sample_index=payload.sample_index,
+            num_features=payload.num_features,
+            custom_input=payload.custom_input,
+        )
+    except ExplainabilityError as exc:
+        status = 400
+        if exc.code in {&quot;MODEL_FILE_MISSING&quot;, &quot;DATASET_FILE_MISSING&quot;, &quot;TARGET_COLUMN_MISSING&quot;}:
+            status = 404
+        logger.warning(&quot;LIME request failed | model_id=%s code=%s msg=%s&quot;, model_id, exc.code, exc.message)
+        raise HTTPException(
+            status_code=status,
+            detail={&quot;error&quot;: {&quot;code&quot;: exc.code, &quot;message&quot;: exc.message, &quot;details&quot;: exc.details}},
+        ) from exc
+    except Exception:
+        logger.exception(&quot;LIME explanation failed unexpectedly&quot;)
+        raise HTTPException(
+            status_code=500,
+            detail={&quot;error&quot;: {&quot;code&quot;: &quot;LIME_INTERNAL_ERROR&quot;, &quot;message&quot;: &quot;LIME explanation failed&quot;}},
+        )
+
+
+@router.get(
+    &quot;/models/{model_id}/lime&quot;,
+    response_model=LimeSummaryResponse,
+    responses={400: {&quot;model&quot;: APIErrorResponse}, 404: {&quot;model&quot;: APIErrorResponse}, 500: {&quot;model&quot;: APIErrorResponse}},
+)
+def get_model_lime_compat(
+    model_id: int,
+    sample_index: int = Query(default=0, ge=0),
+    num_features: int = Query(default=12, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    &quot;&quot;&quot;Backward-compatible GET endpoint for LIME explanations.&quot;&quot;&quot;
+    payload = LimeExplainRequest(sample_index=sample_index, num_features=num_features, custom_input=None)
+    return get_model_lime(model_id=model_id, payload=payload, db=db)
+
+
+@router.get(&quot;/models/{model_id}/monitoring&quot;)
+def get_model_monitoring(
+    model_id: int,
+    compare_dataset_id: int | None = None,
+    db: Session = Depends(get_db),
+):
+    &quot;&quot;&quot;Return model monitoring snapshot and optional drift report.&quot;&quot;&quot;
+    model_obj = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
+    if not model_obj:
+        raise HTTPException(status_code=404, detail=&quot;Model not found&quot;)
+
+    job = db.query(TrainingJob).filter(TrainingJob.job_id == model_obj.job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail=&quot;Training job not found for model&quot;)
+
+    cv_scores = model_obj.cv_scores or []
+    cv_mean = float(np.mean(cv_scores)) if cv_scores else None
+    cv_std = float(np.std(cv_scores)) if cv_scores else None
+
+    monitoring_snapshot = {
+        &quot;model_id&quot;: model_obj.id,
+        &quot;model_name&quot;: model_obj.model_name,
+        &quot;task_type&quot;: model_obj.task_type,
+        &quot;is_deployed&quot;: model_obj.is_deployed,
+        &quot;training_time&quot;: model_obj.training_time,
+        &quot;primary_metric&quot;: (
+            model_obj.accuracy
+            if model_obj.task_type == &quot;classification&quot;
+            else model_obj.r2_score
+        ),
+        &quot;cv_mean&quot;: cv_mean,
+        &quot;cv_std&quot;: cv_std,
+        &quot;stability&quot;: (
+            &quot;stable&quot; if (cv_std is not None and cv_std &lt; 0.03)
+            else &quot;moderate&quot; if (cv_std is not None and cv_std &lt; 0.08)
+            else &quot;unstable&quot; if cv_std is not None
+            else &quot;unknown&quot;
+        ),
+    }
+
+    drift_report = None
+    if compare_dataset_id is not None:
+        train_dataset = db.query(Dataset).filter(Dataset.id == job.dataset_id).first()
+        compare_dataset = db.query(Dataset).filter(Dataset.id == compare_dataset_id).first()
+        if not train_dataset or not compare_dataset:
+            raise HTTPException(status_code=404, detail=&quot;Compare dataset or training dataset not found&quot;)
+        if not os.path.exists(train_dataset.file_path) or not os.path.exists(compare_dataset.file_path):
+            raise HTTPException(status_code=404, detail=&quot;Dataset file not found on disk&quot;)
+
+        train_df = _load_dataset_frame(train_dataset.file_path)
+        current_df = _load_dataset_frame(compare_dataset.file_path)
+
+        # Exclude target column if present
+        target_col = job.target_column
+        train_X = train_df.drop(columns=[target_col], errors=&quot;ignore&quot;)
+        current_X = current_df.drop(columns=[target_col], errors=&quot;ignore&quot;)
+
+        shared_numeric = [
+            c for c in train_X.select_dtypes(include=[&quot;int64&quot;, &quot;float64&quot;]).columns
+            if c in current_X.columns
+        ]
+
+        per_feature = []
+        for c in shared_numeric[:30]:
+            train_col = train_X[c].dropna()
+            curr_col = current_X[c].dropna()
+            if train_col.empty or curr_col.empty:
+                continue
+
+            train_mean = float(train_col.mean())
+            curr_mean = float(curr_col.mean())
+            train_std = float(train_col.std()) if float(train_col.std()) &gt; 1e-9 else 1.0
+            z_drift = abs(curr_mean - train_mean) / train_std
+
+            per_feature.append({
+                &quot;feature&quot;: c,
+                &quot;train_mean&quot;: train_mean,
+                &quot;current_mean&quot;: curr_mean,
+                &quot;z_drift&quot;: round(float(z_drift), 4),
+            })
+
+        avg_drift = float(np.mean([f[&quot;z_drift&quot;] for f in per_feature])) if per_feature else 0.0
+        drift_level = &quot;low&quot; if avg_drift &lt; 0.5 else &quot;medium&quot; if avg_drift &lt; 1.0 else &quot;high&quot;
+
+        drift_report = {
+            &quot;train_dataset_id&quot;: train_dataset.id,
+            &quot;compare_dataset_id&quot;: compare_dataset.id,
+            &quot;features_compared&quot;: len(per_feature),
+            &quot;avg_z_drift&quot;: round(avg_drift, 4),
+            &quot;drift_level&quot;: drift_level,
+            &quot;top_drift_features&quot;: sorted(per_feature, key=lambda x: x[&quot;z_drift&quot;], reverse=True)[:10],
+        }
+
+    return {
+        &quot;monitoring&quot;: monitoring_snapshot,
+        &quot;drift&quot;: drift_report,
+    }
+
+
+@router.post(&quot;/models/{model_id}/deploy&quot;)
+def deploy_model(model_id: int, db: Session = Depends(get_db)):
+    &quot;&quot;&quot;Mark a model as deployed (active for predictions).&quot;&quot;&quot;
+    model = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
+    if not model:
+        raise HTTPException(status_code=404, detail=&quot;Model not found&quot;)
+    if not model.file_path or not os.path.exists(model.file_path):
+        raise HTTPException(status_code=404, detail=&quot;Model artifact not found&quot;)
+
+    try:
+        artifact = joblib.load(model.file_path)
+        if not isinstance(artifact, dict) or &quot;pipeline&quot; not in artifact or &quot;feature_names&quot; not in artifact:
+            raise ValueError(&quot;Model artifact missing required keys&quot;)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=f&quot;Model artifact is not runtime-compatible: {exc}. Retrain this model in current environment.&quot;,
+        )
+
+    # Un-deploy other models from same job
+    db.query(TrainedModel).filter(
+        TrainedModel.job_id == model.job_id,
+        TrainedModel.id != model_id
+    ).update({&quot;is_deployed&quot;: False})
+
+    model.is_deployed = True
+    db.commit()
+    logger.info(f&quot;Model {model_id} ({model.model_name}) deployed&quot;)
+    return {&quot;message&quot;: f&quot;Model &#x27;{model.model_name}&#x27; deployed successfully&quot;, &quot;model_id&quot;: model_id}
+
+
+@router.post(&quot;/models/{model_id}/undeploy&quot;)
+def undeploy_model(model_id: int, db: Session = Depends(get_db)):
+    &quot;&quot;&quot;Undeploy a model.&quot;&quot;&quot;
+    model = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
+    if not model:
+        raise HTTPException(status_code=404, detail=&quot;Model not found&quot;)
+    model.is_deployed = False
+    db.commit()
+    return {&quot;message&quot;: &quot;Model undeployed&quot;}
+
+
+@router.get(&quot;/models/{model_id}/download&quot;)
+def download_model(model_id: int, db: Session = Depends(get_db)):
+    &quot;&quot;&quot;Download a trained model file (joblib).&quot;&quot;&quot;
+    model = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
+    if not model:
+        raise HTTPException(status_code=404, detail=&quot;Model not found&quot;)
+    if not model.file_path or not os.path.exists(model.file_path):
+        raise HTTPException(status_code=404, detail=&quot;Model file not found on disk&quot;)
+
+    filename = f&quot;{model.model_name.replace(&#x27; &#x27;, &#x27;_&#x27;)}_{model_id}.joblib&quot;
+    return FileResponse(
+        path=model.file_path,
+        media_type=&quot;application/octet-stream&quot;,
+        filename=filename,
+    )
+
+
+@router.delete(&quot;/models/{model_id}&quot;)
+def delete_model(model_id: int, db: Session = Depends(get_db)):
+    &quot;&quot;&quot;Delete a trained model.&quot;&quot;&quot;
+    model = db.query(TrainedModel).filter(TrainedModel.id == model_id).first()
+    if not model:
+        raise HTTPException(status_code=404, detail=&quot;Model not found&quot;)
+
+    if model.file_path and os.path.exists(model.file_path):
+        os.remove(model.file_path)
+
+    db.delete(model)
+    db.commit()
+    return {&quot;message&quot;: &quot;Model deleted successfully&quot;}
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>AI</strong>: No official citation linked here.</li><li><strong>API</strong>: No official citation linked here.</li><li><strong>APIErrorResponse</strong>: No official citation linked here.</li><li><strong>APIRouter</strong>: No official citation linked here.</li><li><strong>Axiom</strong>: No official citation linked here.</li><li><strong>Backward</strong>: No official citation linked here.</li><li><strong>Body</strong>: No official citation linked here.</li><li><strong>Cloud</strong>: No official citation linked here.</li><li><strong>Compare</strong>: No official citation linked here.</li><li><strong>Could</strong>: No official citation linked here.</li><li><strong>DATASET_FILE_MISSING</strong>: No official citation linked here.</li><li><strong>DataFrame</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>Delete</strong>: No official citation linked here.</li><li><strong>Depends</strong>: No official citation linked here.</li><li><strong>Download</strong>: No official citation linked here.</li><li><strong>Endpoints</strong>: No official citation linked here.</li><li><strong>Error</strong>: No official citation linked here.</li><li><strong>Exception</strong>: No official citation linked here.</li><li><strong>Exclude</strong>: No official citation linked here.</li><li><strong>Explainability</strong>: No official citation linked here.</li><li><strong>ExplainabilityError</strong>: No official citation linked here.</li><li><strong>Failed</strong>: No official citation linked here.</li><li><strong>False</strong>: No official citation linked here.</li><li><strong>FileResponse</strong>: No official citation linked here.</li><li><strong>GET</strong>: No official citation linked here.</li><li><strong>Get</strong>: No official citation linked here.</li><li><strong>HTTPException</strong>: No official citation linked here.</li><li><strong>ID</strong>: No official citation linked here.</li><li><strong>Infer</strong>: No official citation linked here.</li><li><strong>Inference</strong>: No official citation linked here.</li><li><strong>JSONResponse</strong>: No official citation linked here.</li><li><strong>Keep</strong>: No official citation linked here.</li><li><strong>LIME</strong>: No official citation linked here.</li><li><strong>LIME_INTERNAL_ERROR</strong>: No official citation linked here.</li><li><strong>LimeExplainRequest</strong>: No official citation linked here.</li><li><strong>LimeSummaryResponse</strong>: No official citation linked here.</li><li><strong>List</strong>: No official citation linked here.</li><li><strong>MODEL_FILE_MISSING</strong>: No official citation linked here.</li><li><strong>MODEL_NOT_FOUND</strong>: No official citation linked here.</li><li><strong>Manually</strong>: No official citation linked here.</li><li><strong>Mark</strong>: No official citation linked here.</li><li><strong>Model</strong>: No official citation linked here.</li><li><strong>ModelResponse</strong>: No official citation linked here.</li><li><strong>Models</strong>: No official citation linked here.</li><li><strong>NaN</strong>: No official citation linked here.</li><li><strong>None</strong>: No official citation linked here.</li><li><strong>Query</strong>: No official citation linked here.</li><li><strong>Recursively</strong>: No official citation linked here.</li><li><strong>Retrain</strong>: No official citation linked here.</li><li><strong>Return</strong>: No official citation linked here.</li><li><strong>Router</strong>: No official citation linked here.</li><li><strong>SHAP</strong>: No official citation linked here.</li><li><strong>SHAP_INTERNAL_ERROR</strong>: No official citation linked here.</li><li><strong>Series</strong>: No official citation linked here.</li><li><strong>Session</strong>: No official citation linked here.</li><li><strong>ShapSummaryResponse</strong>: No official citation linked here.</li><li><strong>TARGET_COLUMN_MISSING</strong>: No official citation linked here.</li><li><strong>TRAINING_DATA_NOT_FOUND</strong>: No official citation linked here.</li><li><strong>TrainedModel</strong>: No official citation linked here.</li><li><strong>Training</strong>: No official citation linked here.</li><li><strong>TrainingJob</strong>: No official citation linked here.</li><li><strong>True</strong>: No official citation linked here.</li><li><strong>Un</strong>: No official citation linked here.</li><li><strong>Undeploy</strong>: No official citation linked here.</li><li><strong>Use</strong>: No official citation linked here.</li><li><strong>ValueError</strong>: No official citation linked here.</li><li><strong>__name__</strong>: No official citation linked here.</li><li><strong>_get_explainability_components</strong>: No official citation linked here.</li><li><strong>_load_dataset_frame</strong>: No official citation linked here.</li><li><strong>_random_default_from_series</strong>: No official citation linked here.</li><li><strong>abs</strong>: No official citation linked here.</li><li><strong>accuracy</strong>: No official citation linked here.</li><li><strong>active</strong>: No official citation linked here.</li><li><strong>all</strong>: No official citation linked here.</li><li><strong>and</strong>: No official citation linked here.</li><li><strong>api</strong>: No official citation linked here.</li><li><strong>app</strong>: No official citation linked here.</li><li><strong>append</strong>: No official citation linked here.</li><li><strong>application</strong>: No official citation linked here.</li><li><strong>artifact</strong>: No official citation linked here.</li><li><strong>artifact_compatible</strong>: No official citation linked here.</li><li><strong>artifact_issue</strong>: No official citation linked here.</li><li><strong>artifacts</strong>: No official citation linked here.</li><li><strong>as</strong>: No official citation linked here.</li><li><strong>astype</strong>: No official citation linked here.</li><li><strong>atol</strong>: No official citation linked here.</li><li><strong>avg_drift</strong>: No official citation linked here.</li><li><strong>avg_z_drift</strong>: No official citation linked here.</li><li><strong>aware</strong>: No official citation linked here.</li><li><strong>back</strong>: No official citation linked here.</li><li><strong>bool</strong>: No official citation linked here.</li><li><strong>bounded</strong>: No official citation linked here.</li><li><strong>build_lime</strong>: No official citation linked here.</li><li><strong>build_shap</strong>: No official citation linked here.</li><li><strong>bundle</strong>: No official citation linked here.</li><li><strong>by</strong>: No official citation linked here.</li><li><strong>ceil</strong>: No official citation linked here.</li><li><strong>chart</strong>: No official citation linked here.</li><li><strong>choice</strong>: No official citation linked here.</li><li><strong>classification</strong>: No official citation linked here.</li><li><strong>clean</strong>: No official citation linked here.</li><li><strong>clean_value</strong>: No official citation linked here.</li><li><strong>code</strong>: No official citation linked here.</li><li><strong>coerce</strong>: No official citation linked here.</li><li><strong>column</strong>: No official citation linked here.</li><li><strong>columns</strong>: No official citation linked here.</li><li><strong>commit</strong>: No official citation linked here.</li><li><strong>compare_dataset</strong>: No official citation linked here.</li><li><strong>compare_dataset_id</strong>: No official citation linked here.</li><li><strong>compatible</strong>: No official citation linked here.</li><li><strong>config</strong>: No official citation linked here.</li><li><strong>confusion_matrix</strong>: No official citation linked here.</li><li><strong>constraints</strong>: No official citation linked here.</li><li><strong>content</strong>: No official citation linked here.</li><li><strong>continue</strong>: No official citation linked here.</li><li><strong>core</strong>: No official citation linked here.</li><li><strong>created_at</strong>: No official citation linked here.</li><li><strong>csv</strong>: No official citation linked here.</li><li><strong>curr_col</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

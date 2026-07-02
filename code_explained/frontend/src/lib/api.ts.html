@@ -1,0 +1,277 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>api.ts</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>frontend/src/lib/api.ts</span></div>
+        <h1 style="margin:10px 0 6px">api.ts</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="../components/ui.html">Previous</a><a href="auth-context.tsx.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: frontend/src/lib/api.ts</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>frontend/src/lib/api.ts</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-typescript">import axios from &quot;axios&quot;;
+import { logToFile } from &quot;./logger&quot;;
+
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || &quot;&quot;).replace(/\/$/, &quot;&quot;);
+const API_BASE_URL = API_URL ? `${API_URL}/api` : &quot;/api&quot;;
+
+
+export const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },
+  timeout: 120000, // 2 min for training
+});
+
+// Request interceptor: Attach Firebase ID token to all requests
+api.interceptors.request.use(
+  async (config) =&gt; {
+    try {
+      // Dynamically import auth to avoid circular dependencies
+      const { getAuth } = await import(&quot;firebase/auth&quot;);
+      const auth = getAuth();
+      
+      if (auth?.currentUser) {
+        const token = await auth.currentUser.getIdToken();
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch {
+      // Firebase not configured or user not authenticated - skip token injection
+      if (typeof window !== &quot;undefined&quot;) {
+        console.debug(&quot;Token injection skipped (not authenticated or Firebase not configured)&quot;);
+      }
+    }
+    return config;
+  },
+  (error) =&gt; Promise.reject(error)
+);
+
+// Log errors to file (Node.js only)
+if (typeof window === &quot;undefined&quot;) {
+  api.interceptors.response.use(
+    (response) =&gt; response,
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-typescript">import axios from &quot;axios&quot;;
+import { logToFile } from &quot;./logger&quot;;
+
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || &quot;&quot;).replace(/\/$/, &quot;&quot;);
+const API_BASE_URL = API_URL ? `${API_URL}/api` : &quot;/api&quot;;
+
+
+export const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },
+  timeout: 120000, // 2 min for training
+});
+
+// Request interceptor: Attach Firebase ID token to all requests
+api.interceptors.request.use(
+  async (config) =&gt; {
+    try {
+      // Dynamically import auth to avoid circular dependencies
+      const { getAuth } = await import(&quot;firebase/auth&quot;);
+      const auth = getAuth();
+      
+      if (auth?.currentUser) {
+        const token = await auth.currentUser.getIdToken();
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch {
+      // Firebase not configured or user not authenticated - skip token injection
+      if (typeof window !== &quot;undefined&quot;) {
+        console.debug(&quot;Token injection skipped (not authenticated or Firebase not configured)&quot;);
+      }
+    }
+    return config;
+  },
+  (error) =&gt; Promise.reject(error)
+);
+
+// Log errors to file (Node.js only)
+if (typeof window === &quot;undefined&quot;) {
+  api.interceptors.response.use(
+    (response) =&gt; response,
+    (error) =&gt; {
+      const msg = error?.message || &quot;Unknown error&quot;;
+      const url = error?.config?.url || &quot;unknown&quot;;
+      const method = error?.config?.method || &quot;unknown&quot;;
+      const status = error?.response?.status || &quot;no-status&quot;;
+      logToFile(`API error: [${method}] ${url} status=${status} msg=${msg}`,&#x27;error&#x27;);
+      return Promise.reject(error);
+    }
+  );
+}
+
+// ─── Dataset APIs ─────────────────────────────────────────────────────────────
+export const datasetsAPI = {
+  upload: (formData: FormData) =&gt;
+    api.post(&quot;/upload-dataset&quot;, formData, { headers: { &quot;Content-Type&quot;: &quot;multipart/form-data&quot; } }),
+  list: () =&gt; api.get(&quot;/datasets&quot;),
+  get: (id: number) =&gt; api.get(`/datasets/${id}`),
+  qualityReport: (id: number) =&gt; api.get(`/datasets/${id}/quality-report`),
+  edaReport: (id: number) =&gt; api.get(`/datasets/${id}/eda-report`),
+  leakageReport: (id: number) =&gt; api.get(`/datasets/${id}/leakage-report`),
+  driftBaseline: (id: number) =&gt; api.get(`/datasets/${id}/drift-baseline`),
+  cleanPreview: (id: number, previewRows: number = 10) =&gt;
+    api.get(`/datasets/${id}/clean-preview`, { params: { preview_rows: previewRows } }),
+  profile: (id: number) =&gt; api.get(`/datasets/${id}/profile`),
+  analyticsReport: (id: number, params?: { target_column?: string; model_type?: string; model_id?: number }) =&gt;
+    api.get(`/datasets/${id}/analytics-report`, { params: params || {} }),
+  cleanAndSave: (id: number, nameSuffix: string = &quot;cleaned&quot;) =&gt;
+    api.post(`/datasets/${id}/clean-and-save`, null, { params: { name_suffix: nameSuffix } }),
+  delete: (id: number) =&gt; api.delete(`/datasets/${id}`),
+  loadExample: (key: string) =&gt; api.post(`/load-example/${key}`),
+  listExamples: () =&gt; api.get(&quot;/example-datasets&quot;),
+};
+
+// ─── Training APIs ────────────────────────────────────────────────────────────
+export const trainingAPI = {
+  train: (config: {
+    dataset_id: number;
+    target_column: string;
+    execution_mode?: &quot;remote&quot; | &quot;local&quot;;
+    task_type?: string;
+    test_size?: number;
+    cv_folds?: number;
+    models_to_train?: string[];
+    model_hyperparams?: Record&lt;string, Record&lt;string, string | number | boolean&gt;&gt;;
+    enable_tuning?: boolean;
+    tuning_trials?: number;
+    tuning_time_budget_sec?: number;
+  }) =&gt; api.post(&quot;/train-model&quot;, config),
+  getStatus: (jobId: string) =&gt; api.get(`/training-status/${jobId}`),
+  getLocalJobSpec: (jobId: string) =&gt; api.get(`/training/local-job-spec/${jobId}`),
+  localSync: (payload: Record&lt;string, unknown&gt;) =&gt; api.post(&quot;/training/local-sync&quot;, payload),
+  downloadLocalAgent: () =&gt; api.get(&quot;/training/local-agent/download&quot;, { responseType: &quot;blob&quot; }),
+  listJobs: () =&gt; api.get(&quot;/training-jobs&quot;),
+  modelCatalog: () =&gt; api.get(&quot;/training/model-catalog&quot;),
+};
+
+export const experimentsAPI = {
+  list: (status?: string) =&gt; api.get(&quot;/experiments&quot;, { params: status ? { status } : {} }),
+  get: (runId: string) =&gt; api.get(`/experiments/${runId}`),
+};
+
+// ─── Model APIs ───────────────────────────────────────────────────────────────
+export const modelsAPI = {
+  list: (jobId?: string) =&gt; api.get(&quot;/models&quot;, { params: jobId ? { job_id: jobId } : {} }),
+  get: (id: number) =&gt; api.get(`/models/${id}`),
+  shap: (id: number, params?: { nsamples?: number; sample_index?: number }) =&gt;
+    api.get(`/models/${id}/shap`, { params: { nsamples: params?.nsamples ?? 200, sample_index: params?.sample_index ?? 0 } }),
+  lime: (
+    id: number,
+    payload?: { sample_index?: number; num_features?: number; custom_input?: Record&lt;string, unknown&gt; }
+  ) =&gt;
+    api.post(`/models/${id}/lime`, {
+      sample_index: payload?.sample_index ?? 0,
+      num_features: payload?.num_features ?? 12,
+      custom_input: payload?.custom_input,
+    }),
+  monitoring: (id: number, compareDatasetId?: number) =&gt;
+    api.get(`/models/${id}/monitoring`, { params: compareDatasetId ? { compare_dataset_id: compareDatasetId } : {} }),
+  inferenceTemplate: (id: number, randomize: boolean = true) =&gt;
+    api.get(`/models/${id}/inference-template`, { params: { randomize } }),
+  deploy: (id: number) =&gt; api.post(`/models/${id}/deploy`),
+  undeploy: (id: number) =&gt; api.post(`/models/${id}/undeploy`),
+  download: (id: number) =&gt; API_URL ? `${API_URL}/api/models/${id}/download` : `/api/models/${id}/download`,
+  delete: (id: number) =&gt; api.delete(`/models/${id}`),
+  listDeployed: () =&gt; api.get(&quot;/deployed-models&quot;),
+};
+
+// ─── Metrics APIs ─────────────────────────────────────────────────────────────
+export const metricsAPI = {
+  getJobMetrics: (jobId: string) =&gt; api.get(`/metrics/${jobId}`),
+  getDashboardSummary: () =&gt; api.get(&quot;/dashboard/summary&quot;),
+};
+
+// ─── Prediction APIs ──────────────────────────────────────────────────────────
+export const predictionsAPI = {
+  predict: (modelId: number, features: Record&lt;string, unknown&gt;) =&gt;
+    api.post(&quot;/predict&quot;, { model_id: modelId, features }),
+};
+
+export const authAPI = {
+  syncUser: (payload: { firebase_uid: string; email: string; display_name?: string }) =&gt;
+    api.post(&quot;/auth/user&quot;, null, { params: payload }),
+  getUser: (firebaseUid: string) =&gt; api.get(`/auth/user/${firebaseUid}`),
+};
+
+export default api;
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>API</strong>: No official citation linked here.</li><li><strong>API_BASE_URL</strong>: No official citation linked here.</li><li><strong>API_URL</strong>: No official citation linked here.</li><li><strong>APIs</strong>: No official citation linked here.</li><li><strong>Attach</strong>: No official citation linked here.</li><li><strong>Authorization</strong>: No official citation linked here.</li><li><strong>Bearer</strong>: No official citation linked here.</li><li><strong>Content</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>Dynamically</strong>: No official citation linked here.</li><li><strong>Firebase</strong>: <a href="https://firebase.google.com/docs">https://firebase.google.com/docs</a></li><li><strong>FormData</strong>: No official citation linked here.</li><li><strong>ID</strong>: No official citation linked here.</li><li><strong>Log</strong>: No official citation linked here.</li><li><strong>Metrics</strong>: No official citation linked here.</li><li><strong>Model</strong>: No official citation linked here.</li><li><strong>NEXT_PUBLIC_API_URL</strong>: No official citation linked here.</li><li><strong>Node</strong>: No official citation linked here.</li><li><strong>Prediction</strong>: No official citation linked here.</li><li><strong>Promise</strong>: No official citation linked here.</li><li><strong>Record</strong>: No official citation linked here.</li><li><strong>Request</strong>: No official citation linked here.</li><li><strong>Token</strong>: No official citation linked here.</li><li><strong>Training</strong>: No official citation linked here.</li><li><strong>Type</strong>: No official citation linked here.</li><li><strong>Unknown</strong>: No official citation linked here.</li><li><strong>agent</strong>: No official citation linked here.</li><li><strong>all</strong>: No official citation linked here.</li><li><strong>analytics</strong>: No official citation linked here.</li><li><strong>analyticsReport</strong>: No official citation linked here.</li><li><strong>and</strong>: No official citation linked here.</li><li><strong>api</strong>: No official citation linked here.</li><li><strong>application</strong>: No official citation linked here.</li><li><strong>async</strong>: No official citation linked here.</li><li><strong>auth</strong>: No official citation linked here.</li><li><strong>authAPI</strong>: No official citation linked here.</li><li><strong>authenticated</strong>: No official citation linked here.</li><li><strong>avoid</strong>: No official citation linked here.</li><li><strong>await</strong>: No official citation linked here.</li><li><strong>axios</strong>: No official citation linked here.</li><li><strong>baseURL</strong>: No official citation linked here.</li><li><strong>baseline</strong>: No official citation linked here.</li><li><strong>blob</strong>: No official citation linked here.</li><li><strong>boolean</strong>: No official citation linked here.</li><li><strong>catalog</strong>: No official citation linked here.</li><li><strong>catch</strong>: No official citation linked here.</li><li><strong>circular</strong>: No official citation linked here.</li><li><strong>clean</strong>: No official citation linked here.</li><li><strong>cleanAndSave</strong>: No official citation linked here.</li><li><strong>cleanPreview</strong>: No official citation linked here.</li><li><strong>cleaned</strong>: No official citation linked here.</li><li><strong>compareDatasetId</strong>: No official citation linked here.</li><li><strong>compare_dataset_id</strong>: No official citation linked here.</li><li><strong>config</strong>: No official citation linked here.</li><li><strong>configured</strong>: No official citation linked here.</li><li><strong>console</strong>: No official citation linked here.</li><li><strong>const</strong>: No official citation linked here.</li><li><strong>create</strong>: No official citation linked here.</li><li><strong>currentUser</strong>: No official citation linked here.</li><li><strong>custom_input</strong>: No official citation linked here.</li><li><strong>cv_folds</strong>: No official citation linked here.</li><li><strong>dashboard</strong>: No official citation linked here.</li><li><strong>data</strong>: No official citation linked here.</li><li><strong>dataset</strong>: No official citation linked here.</li><li><strong>dataset_id</strong>: No official citation linked here.</li><li><strong>datasets</strong>: No official citation linked here.</li><li><strong>datasetsAPI</strong>: No official citation linked here.</li><li><strong>debug</strong>: No official citation linked here.</li><li><strong>default</strong>: No official citation linked here.</li><li><strong>delete</strong>: No official citation linked here.</li><li><strong>dependencies</strong>: No official citation linked here.</li><li><strong>deploy</strong>: No official citation linked here.</li><li><strong>deployed</strong>: No official citation linked here.</li><li><strong>display_name</strong>: No official citation linked here.</li><li><strong>download</strong>: No official citation linked here.</li><li><strong>downloadLocalAgent</strong>: No official citation linked here.</li><li><strong>drift</strong>: No official citation linked here.</li><li><strong>driftBaseline</strong>: No official citation linked here.</li><li><strong>eda</strong>: No official citation linked here.</li><li><strong>edaReport</strong>: No official citation linked here.</li><li><strong>email</strong>: No official citation linked here.</li><li><strong>enable_tuning</strong>: No official citation linked here.</li><li><strong>env</strong>: No official citation linked here.</li><li><strong>error</strong>: No official citation linked here.</li><li><strong>errors</strong>: No official citation linked here.</li><li><strong>example</strong>: No official citation linked here.</li><li><strong>execution_mode</strong>: No official citation linked here.</li><li><strong>experiments</strong>: No official citation linked here.</li><li><strong>experimentsAPI</strong>: No official citation linked here.</li><li><strong>export</strong>: No official citation linked here.</li><li><strong>features</strong>: No official citation linked here.</li><li><strong>file</strong>: No official citation linked here.</li><li><strong>firebase</strong>: No official citation linked here.</li><li><strong>firebaseUid</strong>: No official citation linked here.</li><li><strong>firebase_uid</strong>: No official citation linked here.</li><li><strong>for</strong>: No official citation linked here.</li><li><strong>form</strong>: No official citation linked here.</li><li><strong>formData</strong>: No official citation linked here.</li><li><strong>from</strong>: No official citation linked here.</li><li><strong>get</strong>: No official citation linked here.</li><li><strong>getAuth</strong>: No official citation linked here.</li><li><strong>getDashboardSummary</strong>: No official citation linked here.</li><li><strong>getIdToken</strong>: No official citation linked here.</li><li><strong>getJobMetrics</strong>: No official citation linked here.</li><li><strong>getLocalJobSpec</strong>: No official citation linked here.</li><li><strong>getStatus</strong>: No official citation linked here.</li><li><strong>getUser</strong>: No official citation linked here.</li><li><strong>headers</strong>: No official citation linked here.</li><li><strong>id</strong>: No official citation linked here.</li><li><strong>if</strong>: No official citation linked here.</li><li><strong>import</strong>: No official citation linked here.</li><li><strong>inference</strong>: No official citation linked here.</li><li><strong>inferenceTemplate</strong>: No official citation linked here.</li><li><strong>injection</strong>: No official citation linked here.</li><li><strong>interceptor</strong>: No official citation linked here.</li><li><strong>interceptors</strong>: No official citation linked here.</li><li><strong>job</strong>: No official citation linked here.</li><li><strong>jobId</strong>: No official citation linked here.</li><li><strong>job_id</strong>: No official citation linked here.</li><li><strong>jobs</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>page.tsx</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>frontend/src/app/dashboard/predict/page.tsx</span></div>
+        <h1 style="margin:10px 0 6px">page.tsx</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="../models/page.tsx.html">Previous</a><a href="../search/page.tsx.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: frontend/src/app/dashboard/predict/page.tsx</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>frontend/src/app/dashboard/predict/page.tsx</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-tsx">&quot;use client&quot;;
+import { useState, useEffect } from &quot;react&quot;;
+import { modelsAPI, predictionsAPI } from &quot;@/lib/api&quot;;
+import { InferenceFeatureTemplate, InferenceTemplate, PredictionResult, TrainedModel } from &quot;@/types&quot;;
+import toast from &quot;react-hot-toast&quot;;
+import { Zap, Loader2, CheckCircle, BarChart2, Shuffle, RotateCcw } from &quot;lucide-react&quot;;
+import PanelHeader from &quot;@/components/ui/PanelHeader&quot;;
+import StatusBadge from &quot;@/components/ui/StatusBadge&quot;;
+
+export default function PredictPage() {
+  const [deployedModels, setDeployedModels] = useState&lt;TrainedModel[]&gt;([]);
+  const [selectedModelId, setSelectedModelId] = useState&lt;number | null&gt;(null);
+  const [selectedModel, setSelectedModel] = useState&lt;TrainedModel | null&gt;(null);
+  const [template, setTemplate] = useState&lt;InferenceTemplate | null&gt;(null);
+  const [features, setFeatures] = useState&lt;Record&lt;string, string&gt;&gt;({});
+  const [result, setResult] = useState&lt;PredictionResult | null&gt;(null);
+  const [loadingTemplate, setLoadingTemplate] = useState(false);
+  const [predicting, setPredicting] = useState(false);
+
+  useEffect(() =&gt; {
+    modelsAPI.listDeployed().then(r =&gt; {
+      setDeployedModels(r.data);
+    }).catch(() =&gt; {});
+  }, []);
+
+  useEffect(() =&gt; {
+    if (!selectedModelId) return;
+    const loadSelection = async () =&gt; {
+      setLoadingTemplate(true);
+      try {
+        const modelRes = await modelsAPI.get(selectedModelId);
+        setSelectedModel(modelRes.data);
+
+        try {
+          const templateRes = await modelsAPI.inferenceTemplate(selectedModelId, true);
+          setTemplate(templateRes.data);
+          const init: Record&lt;string, string&gt; = {};
+          (templateRes.data.features || []).forEach((f: InferenceFeatureTemplate) =&gt; {
+            init[f.name] = String(f.default_value ?? &quot;&quot;);
+          });
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-tsx">&quot;use client&quot;;
+import { useState, useEffect } from &quot;react&quot;;
+import { modelsAPI, predictionsAPI } from &quot;@/lib/api&quot;;
+import { InferenceFeatureTemplate, InferenceTemplate, PredictionResult, TrainedModel } from &quot;@/types&quot;;
+import toast from &quot;react-hot-toast&quot;;
+import { Zap, Loader2, CheckCircle, BarChart2, Shuffle, RotateCcw } from &quot;lucide-react&quot;;
+import PanelHeader from &quot;@/components/ui/PanelHeader&quot;;
+import StatusBadge from &quot;@/components/ui/StatusBadge&quot;;
+
+export default function PredictPage() {
+  const [deployedModels, setDeployedModels] = useState&lt;TrainedModel[]&gt;([]);
+  const [selectedModelId, setSelectedModelId] = useState&lt;number | null&gt;(null);
+  const [selectedModel, setSelectedModel] = useState&lt;TrainedModel | null&gt;(null);
+  const [template, setTemplate] = useState&lt;InferenceTemplate | null&gt;(null);
+  const [features, setFeatures] = useState&lt;Record&lt;string, string&gt;&gt;({});
+  const [result, setResult] = useState&lt;PredictionResult | null&gt;(null);
+  const [loadingTemplate, setLoadingTemplate] = useState(false);
+  const [predicting, setPredicting] = useState(false);
+
+  useEffect(() =&gt; {
+    modelsAPI.listDeployed().then(r =&gt; {
+      setDeployedModels(r.data);
+    }).catch(() =&gt; {});
+  }, []);
+
+  useEffect(() =&gt; {
+    if (!selectedModelId) return;
+    const loadSelection = async () =&gt; {
+      setLoadingTemplate(true);
+      try {
+        const modelRes = await modelsAPI.get(selectedModelId);
+        setSelectedModel(modelRes.data);
+
+        try {
+          const templateRes = await modelsAPI.inferenceTemplate(selectedModelId, true);
+          setTemplate(templateRes.data);
+          const init: Record&lt;string, string&gt; = {};
+          (templateRes.data.features || []).forEach((f: InferenceFeatureTemplate) =&gt; {
+            init[f.name] = String(f.default_value ?? &quot;&quot;);
+          });
+          setFeatures(init);
+        } catch {
+          const fi = modelRes.data.feature_importance || {};
+          const fallbackFeatures = Object.keys(fi);
+          const fallbackTemplate: InferenceTemplate = {
+            model_id: modelRes.data.id,
+            model_name: modelRes.data.model_name,
+            task_type: modelRes.data.task_type,
+            job_id: modelRes.data.job_id,
+            generated_at: new Date().toISOString(),
+            features: fallbackFeatures.map((name) =&gt; ({
+              name,
+              dtype: &quot;unknown&quot;,
+              input_type: &quot;text&quot;,
+              default_value: &quot;&quot;,
+            })),
+          };
+          setTemplate(fallbackTemplate);
+          const init: Record&lt;string, string&gt; = {};
+          fallbackFeatures.forEach((name) =&gt; {
+            init[name] = &quot;&quot;;
+          });
+          setFeatures(init);
+          toast.error(&quot;Using basic feature inputs; dataset defaults unavailable for this model&quot;);
+        }
+
+        setResult(null);
+      } catch {
+        toast.error(&quot;Failed to load selected model&quot;);
+      } finally {
+        setLoadingTemplate(false);
+      }
+    };
+    loadSelection();
+  }, [selectedModelId]);
+
+  const randomizeDefaults = async () =&gt; {
+    if (!selectedModelId) return;
+    setLoadingTemplate(true);
+    try {
+      const templateRes = await modelsAPI.inferenceTemplate(selectedModelId, true);
+      setTemplate(templateRes.data);
+      const randomized: Record&lt;string, string&gt; = {};
+      (templateRes.data.features || []).forEach((f: InferenceFeatureTemplate) =&gt; {
+        randomized[f.name] = String(f.default_value ?? &quot;&quot;);
+      });
+      setFeatures(randomized);
+      toast.success(&quot;Feature defaults randomized&quot;);
+    } catch {
+      toast.error(&quot;Could not randomize defaults&quot;);
+    } finally {
+      setLoadingTemplate(false);
+    }
+  };
+
+  const resetToMeanDefaults = async () =&gt; {
+    if (!selectedModelId) return;
+    setLoadingTemplate(true);
+    try {
+      const templateRes = await modelsAPI.inferenceTemplate(selectedModelId, false);
+      setTemplate(templateRes.data);
+      const centered: Record&lt;string, string&gt; = {};
+      (templateRes.data.features || []).forEach((f: InferenceFeatureTemplate) =&gt; {
+        centered[f.name] = String(f.default_value ?? &quot;&quot;);
+      });
+      setFeatures(centered);
+      toast.success(&quot;Defaults reset from dataset profile&quot;);
+    } catch {
+      toast.error(&quot;Could not reset defaults&quot;);
+    } finally {
+      setLoadingTemplate(false);
+    }
+  };
+
+  const runPrediction = async () =&gt; {
+    if (!selectedModelId) return toast.error(&quot;Select a model&quot;);
+    const parsedFeatures: Record&lt;string, unknown&gt; = {};
+    for (const [k, v] of Object.entries(features)) {
+      const num = Number(v);
+      parsedFeatures[k] = isNaN(num) || v === &quot;&quot; ? v || null : num;
+    }
+    setPredicting(true);
+    try {
+      const res = await predictionsAPI.predict(selectedModelId, parsedFeatures);
+      setResult(res.data);
+      toast.success(&quot;Prediction complete!&quot;);
+    } catch (e: any) {
+      toast.error(e.response?.data?.detail || &quot;Prediction failed&quot;);
+    } finally { setPredicting(false); }
+  };
+
+  const featureSpecs = template?.features || [];
+
+  return (
+    &lt;div className=&quot;mx-auto max-w-7xl&quot;&gt;
+      &lt;div className=&quot;mb-8&quot;&gt;
+        &lt;div className=&quot;section-kicker mb-2&quot;&gt;Inference&lt;/div&gt;
+        &lt;h1 className=&quot;font-display mb-1 text-4xl font-semibold text-text-primary&quot;&gt;Inference Sandbox&lt;/h1&gt;
+        &lt;p className=&quot;text-text-muted&quot;&gt;Run ad-hoc predictions against active deployed models.&lt;/p&gt;
+      &lt;/div&gt;
+
+      {/* Model selector */}
+      &lt;div className=&quot;panel mb-6 rounded-xl p-6&quot;&gt;
+        &lt;PanelHeader title=&quot;Model Selection&quot; subtitle=&quot;Only deployed models are available for inference.&quot; icon={Zap} className=&quot;mb-4&quot; /&gt;
+        {deployedModels.length === 0 ? (
+          &lt;div className=&quot;rounded-lg bg-surface-variant/30 p-4 text-sm text-text-muted&quot;&gt;
+            No deployed models yet. Go to the &lt;a href=&quot;/dashboard/models&quot; className=&quot;text-primary underline&quot;&gt;Leaderboard&lt;/a&gt; and deploy a model first.
+          &lt;/div&gt;
+        ) : (
+          &lt;div className=&quot;grid md:grid-cols-2 lg:grid-cols-3 gap-3&quot;&gt;
+            {deployedModels.map(m =&gt; (
+              &lt;button
+                key={m.id}
+                onClick={() =&gt; setSelectedModelId(m.id)}
+                className={`p-3 rounded-lg border text-left transition-all
+                  ${selectedModelId === m.id
+                    ? &quot;border-primary/60 bg-primary/10 text-text-primary&quot;
+                    : &quot;border-outline/25 bg-surface-variant/30 text-text-muted hover:border-primary/45&quot;
+                  }`}
+              &gt;
+                &lt;div className=&quot;font-medium text-sm&quot;&gt;{m.model_name}&lt;/div&gt;
+                &lt;div className=&quot;mt-1 text-xs&quot;&gt;&lt;StatusBadge label={m.task_type} tone=&quot;idle&quot; /&gt;&lt;/div&gt;
+              &lt;/button&gt;
+            ))}
+          &lt;/div&gt;
+        )}
+      &lt;/div&gt;
+
+      {selectedModel &amp;&amp; featureSpecs.length &gt; 0 &amp;&amp; (
+        &lt;div className=&quot;grid lg:grid-cols-2 gap-6&quot;&gt;
+          {/* Feature inputs */}
+          &lt;div className=&quot;panel p-6&quot;&gt;
+            &lt;PanelHeader title=&quot;Feature Input&quot; subtitle=&quot;Defaults are sampled from the model&#x27;s training dataset.&quot; className=&quot;mb-4&quot; /&gt;
+            &lt;div className=&quot;mb-4 rounded-lg border border-outline/20 bg-surface-variant/30 p-3 text-xs text-text-muted&quot;&gt;
+              &lt;div&gt;&lt;span className=&quot;text-text-primary&quot;&gt;Model:&lt;/span&gt; {selectedModel.model_name}&lt;/div&gt;
+              &lt;div&gt;&lt;span className=&quot;text-text-primary&quot;&gt;Dataset:&lt;/span&gt; {template?.dataset_name || &quot;Unknown&quot;}&lt;/div&gt;
+              {template?.target_column &amp;&amp; &lt;div&gt;&lt;span className=&quot;text-text-primary&quot;&gt;Target:&lt;/span&gt; {template.target_column}&lt;/div&gt;}
+            &lt;/div&gt;
+            &lt;div className=&quot;mb-4 flex gap-2&quot;&gt;
+              &lt;button
+                onClick={randomizeDefaults}
+                disabled={loadingTemplate}
+                className=&quot;btn-ghost px-3 py-2 text-xs disabled:opacity-60&quot;
+              &gt;
+                {loadingTemplate ? &lt;Loader2 className=&quot;h-3.5 w-3.5 animate-spin&quot; /&gt; : &lt;Shuffle className=&quot;h-3.5 w-3.5&quot; /&gt;}
+                Randomize Defaults
+              &lt;/button&gt;
+              &lt;button
+                onClick={resetToMeanDefaults}
+                disabled={loadingTemplate}
+                className=&quot;btn-ghost px-3 py-2 text-xs disabled:opacity-60&quot;
+              &gt;
+                &lt;RotateCcw className=&quot;h-3.5 w-3.5&quot; /&gt;
+                Reset to Stable Defaults
+              &lt;/button&gt;
+            &lt;/div&gt;
+            &lt;div className=&quot;space-y-3 max-h-[400px] overflow-y-auto pr-1&quot;&gt;
+              {featureSpecs.map((spec) =&gt; (
+                &lt;div key={spec.name}&gt;
+                  &lt;label className=&quot;mb-1 block font-mono text-xs text-text-muted&quot;&gt;{spec.name}&lt;/label&gt;
+                  {spec.input_type === &quot;select&quot; ? (
+                    (spec.options &amp;&amp; spec.options.length &gt; 0) ? (
+                    &lt;select
+                      value={features[spec.name] ?? &quot;&quot;}
+                      onChange={e =&gt; setFeatures(prev =&gt; ({ ...prev, [spec.name]: e.target.value }))}
+                      className=&quot;w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 font-mono text-sm text-text-primary focus:outline-none focus:border-primary/50&quot;
+                    &gt;
+                      {(spec.options || []).map(option =&gt; (
+                        &lt;option key={option} value={option}&gt;{option}&lt;/option&gt;
+                      ))}
+                    &lt;/select&gt;
+                    ) : (
+                      &lt;input
+                        type=&quot;text&quot;
+                        value={features[spec.name] ?? &quot;&quot;}
+                        onChange={e =&gt; setFeatures(prev =&gt; ({ ...prev, [spec.name]: e.target.value }))}
+                        placeholder=&quot;Enter category value...&quot;
+                        className=&quot;w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 font-mono text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary/50&quot;
+                      /&gt;
+                    )
+                  ) : (
+                    &lt;input
+                      type={spec.input_type === &quot;number&quot; ? &quot;number&quot; : &quot;text&quot;}
+                      value={features[spec.name] ?? &quot;&quot;}
+                      onChange={e =&gt; setFeatures(prev =&gt; ({ ...prev, [spec.name]: e.target.value }))}
+                      min={spec.min}
+                      max={spec.max}
+                      step={spec.input_type === &quot;number&quot; ? (spec.integer_like ? 1 : &quot;any&quot;) : undefined}
+                      placeholder={spec.input_type === &quot;number&quot;
+                        ? `Range ${spec.min ?? &quot;?&quot;} to ${spec.max ?? &quot;?&quot;}`
+                        : &quot;Enter value...&quot;}
+                      className=&quot;w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 font-mono text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary/50&quot;
+                    /&gt;
+                  )}
+                  {spec.input_type === &quot;number&quot; &amp;&amp; spec.min !== undefined &amp;&amp; spec.max !== undefined &amp;&amp; (
+                    &lt;div className=&quot;mt-1 text-[11px] text-text-muted&quot;&gt;
+                      observed min/max: {spec.min.toFixed(4)} / {spec.max.toFixed(4)}
+                    &lt;/div&gt;
+                  )}
+                &lt;/div&gt;
+              ))}
+            &lt;/div&gt;
+            &lt;button
+              onClick={runPrediction}
+              disabled={predicting}
+              className=&quot;btn-primary w-full justify-center mt-5 disabled:opacity-50&quot;
+            &gt;
+              {predicting ? &lt;Loader2 className=&quot;w-4 h-4 animate-spin&quot; /&gt; : &lt;Zap className=&quot;w-4 h-4&quot; /&gt;}
+              {predicting ? &quot;Predicting...&quot; : &quot;Run Prediction&quot;}
+            &lt;/button&gt;
+          &lt;/div&gt;
+
+          {/* Result */}
+          &lt;div className=&quot;panel p-6&quot;&gt;
+            &lt;PanelHeader title=&quot;Inference Result&quot; icon={BarChart2} className=&quot;mb-4&quot; /&gt;
+            {!result ? (
+              &lt;div className=&quot;py-16 text-center text-text-muted&quot;&gt;
+                &lt;Zap className=&quot;mx-auto mb-3 h-10 w-10 opacity-20&quot; /&gt;
+                &lt;p className=&quot;text-sm&quot;&gt;Fill features and click Predict&lt;/p&gt;
+              &lt;/div&gt;
+            ) : (
+              &lt;div&gt;
+                &lt;div className=&quot;flex items-center gap-3 mb-6&quot;&gt;
+                  &lt;CheckCircle className=&quot;h-8 w-8 text-emerald-300&quot; /&gt;
+                  &lt;div&gt;
+                    &lt;div className=&quot;text-xs text-text-muted&quot;&gt;Prediction&lt;/div&gt;
+                    &lt;div className=&quot;font-display text-2xl font-bold gradient-text&quot;&gt;
+                      {String(result.prediction)}
+                    &lt;/div&gt;
+                  &lt;/div&gt;
+                &lt;/div&gt;
+
+                {result.confidence !== undefined &amp;&amp; result.confidence !== null &amp;&amp; (
+                  &lt;div className=&quot;mb-4&quot;&gt;
+                    &lt;div className=&quot;mb-1.5 flex justify-between text-xs text-text-muted&quot;&gt;
+                      &lt;span&gt;Confidence&lt;/span&gt;
+                      &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{(result.confidence * 100).toFixed(1)}%&lt;/span&gt;
+                    &lt;/div&gt;
+                    &lt;div className=&quot;h-2 overflow-hidden rounded-full bg-surface-variant&quot;&gt;
+                      &lt;div
+                        className=&quot;h-full rounded-full bg-gradient-to-r from-primary-deep to-primary&quot;
+                        style={{ width: `${(result.confidence * 100).toFixed(0)}%` }}
+                      /&gt;
+                    &lt;/div&gt;
+                  &lt;/div&gt;
+                )}
+
+                {result.probability &amp;&amp; (
+                  &lt;div&gt;
+                    &lt;div className=&quot;mb-2 text-xs text-text-muted&quot;&gt;Class Probabilities&lt;/div&gt;
+                    &lt;div className=&quot;space-y-2&quot;&gt;
+                      {Object.entries(result.probability)
+                        .sort((a, b) =&gt; b[1] - a[1])
+                        .map(([cls, prob]) =&gt; (
+                          &lt;div key={cls}&gt;
+                            &lt;div className=&quot;flex justify-between text-xs mb-1&quot;&gt;
+                              &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{cls}&lt;/span&gt;
+                              &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{(prob * 100).toFixed(1)}%&lt;/span&gt;
+                            &lt;/div&gt;
+                            &lt;div className=&quot;h-1.5 overflow-hidden rounded-full bg-surface-variant&quot;&gt;
+                              &lt;div
+                                className=&quot;h-full rounded-full bg-primary-deep transition-all&quot;
+                                style={{ width: `${(prob * 100).toFixed(0)}%` }}
+                              /&gt;
+                            &lt;/div&gt;
+                          &lt;/div&gt;
+                        ))}
+                    &lt;/div&gt;
+                  &lt;/div&gt;
+                )}
+
+                &lt;div className=&quot;mt-4 rounded bg-surface-variant/35 p-3 text-xs font-mono text-text-muted&quot;&gt;
+                  Model: {result.model_name}
+                &lt;/div&gt;
+              &lt;/div&gt;
+            )}
+          &lt;/div&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>BarChart2</strong>: No official citation linked here.</li><li><strong>CheckCircle</strong>: No official citation linked here.</li><li><strong>Class</strong>: No official citation linked here.</li><li><strong>Confidence</strong>: No official citation linked here.</li><li><strong>Could</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>Date</strong>: No official citation linked here.</li><li><strong>Defaults</strong>: No official citation linked here.</li><li><strong>Enter</strong>: No official citation linked here.</li><li><strong>Failed</strong>: No official citation linked here.</li><li><strong>Feature</strong>: No official citation linked here.</li><li><strong>Fill</strong>: No official citation linked here.</li><li><strong>Go</strong>: No official citation linked here.</li><li><strong>Inference</strong>: No official citation linked here.</li><li><strong>InferenceFeatureTemplate</strong>: No official citation linked here.</li><li><strong>InferenceTemplate</strong>: No official citation linked here.</li><li><strong>Input</strong>: No official citation linked here.</li><li><strong>Leaderboard</strong>: No official citation linked here.</li><li><strong>Loader2</strong>: No official citation linked here.</li><li><strong>Model</strong>: No official citation linked here.</li><li><strong>No</strong>: No official citation linked here.</li><li><strong>Number</strong>: No official citation linked here.</li><li><strong>Object</strong>: No official citation linked here.</li><li><strong>Only</strong>: No official citation linked here.</li><li><strong>PanelHeader</strong>: No official citation linked here.</li><li><strong>Predict</strong>: No official citation linked here.</li><li><strong>PredictPage</strong>: No official citation linked here.</li><li><strong>Predicting</strong>: No official citation linked here.</li><li><strong>Prediction</strong>: No official citation linked here.</li><li><strong>PredictionResult</strong>: No official citation linked here.</li><li><strong>Probabilities</strong>: No official citation linked here.</li><li><strong>Randomize</strong>: No official citation linked here.</li><li><strong>Range</strong>: No official citation linked here.</li><li><strong>Record</strong>: No official citation linked here.</li><li><strong>Reset</strong>: No official citation linked here.</li><li><strong>Result</strong>: No official citation linked here.</li><li><strong>RotateCcw</strong>: No official citation linked here.</li><li><strong>Run</strong>: No official citation linked here.</li><li><strong>Sandbox</strong>: No official citation linked here.</li><li><strong>Select</strong>: No official citation linked here.</li><li><strong>Selection</strong>: No official citation linked here.</li><li><strong>Shuffle</strong>: No official citation linked here.</li><li><strong>Stable</strong>: No official citation linked here.</li><li><strong>StatusBadge</strong>: No official citation linked here.</li><li><strong>String</strong>: No official citation linked here.</li><li><strong>Target</strong>: No official citation linked here.</li><li><strong>TrainedModel</strong>: No official citation linked here.</li><li><strong>Unknown</strong>: No official citation linked here.</li><li><strong>Using</strong>: No official citation linked here.</li><li><strong>Zap</strong>: No official citation linked here.</li><li><strong>active</strong>: No official citation linked here.</li><li><strong>ad</strong>: No official citation linked here.</li><li><strong>against</strong>: No official citation linked here.</li><li><strong>all</strong>: No official citation linked here.</li><li><strong>and</strong>: No official citation linked here.</li><li><strong>animate</strong>: No official citation linked here.</li><li><strong>any</strong>: No official citation linked here.</li><li><strong>api</strong>: No official citation linked here.</li><li><strong>are</strong>: No official citation linked here.</li><li><strong>async</strong>: No official citation linked here.</li><li><strong>auto</strong>: No official citation linked here.</li><li><strong>available</strong>: No official citation linked here.</li><li><strong>await</strong>: No official citation linked here.</li><li><strong>basic</strong>: No official citation linked here.</li><li><strong>between</strong>: No official citation linked here.</li><li><strong>bg</strong>: No official citation linked here.</li><li><strong>block</strong>: No official citation linked here.</li><li><strong>bold</strong>: No official citation linked here.</li><li><strong>border</strong>: No official citation linked here.</li><li><strong>btn</strong>: No official citation linked here.</li><li><strong>button</strong>: No official citation linked here.</li><li><strong>catch</strong>: No official citation linked here.</li><li><strong>category</strong>: No official citation linked here.</li><li><strong>center</strong>: No official citation linked here.</li><li><strong>centered</strong>: No official citation linked here.</li><li><strong>className</strong>: No official citation linked here.</li><li><strong>click</strong>: No official citation linked here.</li><li><strong>client</strong>: No official citation linked here.</li><li><strong>cls</strong>: No official citation linked here.</li><li><strong>cols</strong>: No official citation linked here.</li><li><strong>complete</strong>: No official citation linked here.</li><li><strong>components</strong>: No official citation linked here.</li><li><strong>confidence</strong>: No official citation linked here.</li><li><strong>const</strong>: No official citation linked here.</li><li><strong>dashboard</strong>: No official citation linked here.</li><li><strong>data</strong>: No official citation linked here.</li><li><strong>dataset</strong>: No official citation linked here.</li><li><strong>dataset_name</strong>: No official citation linked here.</li><li><strong>deep</strong>: No official citation linked here.</li><li><strong>default</strong>: No official citation linked here.</li><li><strong>default_value</strong>: No official citation linked here.</li><li><strong>defaults</strong>: No official citation linked here.</li><li><strong>deploy</strong>: No official citation linked here.</li><li><strong>deployed</strong>: No official citation linked here.</li><li><strong>deployedModels</strong>: No official citation linked here.</li><li><strong>detail</strong>: No official citation linked here.</li><li><strong>disabled</strong>: No official citation linked here.</li><li><strong>display</strong>: No official citation linked here.</li><li><strong>div</strong>: No official citation linked here.</li><li><strong>dtype</strong>: No official citation linked here.</li><li><strong>emerald</strong>: No official citation linked here.</li><li><strong>entries</strong>: No official citation linked here.</li><li><strong>error</strong>: No official citation linked here.</li><li><strong>export</strong>: No official citation linked here.</li><li><strong>failed</strong>: No official citation linked here.</li><li><strong>fallbackFeatures</strong>: No official citation linked here.</li><li><strong>fallbackTemplate</strong>: No official citation linked here.</li><li><strong>false</strong>: No official citation linked here.</li><li><strong>feature</strong>: No official citation linked here.</li><li><strong>featureSpecs</strong>: No official citation linked here.</li><li><strong>feature_importance</strong>: No official citation linked here.</li><li><strong>features</strong>: No official citation linked here.</li><li><strong>fi</strong>: No official citation linked here.</li><li><strong>finally</strong>: No official citation linked here.</li><li><strong>first</strong>: No official citation linked here.</li><li><strong>flex</strong>: No official citation linked here.</li><li><strong>focus</strong>: No official citation linked here.</li><li><strong>font</strong>: No official citation linked here.</li><li><strong>for</strong>: No official citation linked here.</li><li><strong>forEach</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

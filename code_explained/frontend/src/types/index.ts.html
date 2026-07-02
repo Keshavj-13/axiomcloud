@@ -1,0 +1,602 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>index.ts</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>frontend/src/types/index.ts</span></div>
+        <h1 style="margin:10px 0 6px">index.ts</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="../lib/logger.ts.html">Previous</a><a href="vitest.d.ts.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: frontend/src/types/index.ts</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>frontend/src/types/index.ts</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-typescript">export interface ColumnInfo {
+  name: string;
+  dtype: string;
+  null_count: number;
+  unique_count: number;
+  sample_values: unknown[];
+  stats?: {
+    min: number; max: number; mean: number; std: number; median: number;
+  };
+}
+
+export interface Dataset {
+  id: number;
+  name: string;
+  filename: string;
+  file_size?: number;
+  num_rows?: number;
+  num_columns?: number;
+  columns_info?: ColumnInfo[];
+  target_column?: string;
+  task_type?: string;
+  is_example: boolean;
+  preview_data?: Record&lt;string, unknown&gt;[];
+  created_at?: string;
+}
+
+export interface TrainingJob {
+  id: number;
+  job_id: string;
+  dataset_id: number;
+  task_type?: string;
+  target_column: string;
+  status: &quot;pending&quot; | &quot;running&quot; | &quot;completed&quot; | &quot;failed&quot; | &quot;local_pending&quot; | &quot;local_running&quot; | string;
+  progress: number;
+  error_message?: string;
+  config?: Record&lt;string, unknown&gt;;
+  created_at: string;
+  completed_at?: string;
+}
+
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-typescript">export interface ColumnInfo {
+  name: string;
+  dtype: string;
+  null_count: number;
+  unique_count: number;
+  sample_values: unknown[];
+  stats?: {
+    min: number; max: number; mean: number; std: number; median: number;
+  };
+}
+
+export interface Dataset {
+  id: number;
+  name: string;
+  filename: string;
+  file_size?: number;
+  num_rows?: number;
+  num_columns?: number;
+  columns_info?: ColumnInfo[];
+  target_column?: string;
+  task_type?: string;
+  is_example: boolean;
+  preview_data?: Record&lt;string, unknown&gt;[];
+  created_at?: string;
+}
+
+export interface TrainingJob {
+  id: number;
+  job_id: string;
+  dataset_id: number;
+  task_type?: string;
+  target_column: string;
+  status: &quot;pending&quot; | &quot;running&quot; | &quot;completed&quot; | &quot;failed&quot; | &quot;local_pending&quot; | &quot;local_running&quot; | string;
+  progress: number;
+  error_message?: string;
+  config?: Record&lt;string, unknown&gt;;
+  created_at: string;
+  completed_at?: string;
+}
+
+export interface LocalTrainingJobSpec {
+  job_id: string;
+  run_id: string;
+  dataset_id: number;
+  dataset_name: string;
+  dataset_path: string;
+  target_column: string;
+  task_type?: string;
+  model_config: Record&lt;string, unknown&gt;;
+  hyperparameters: Record&lt;string, unknown&gt;;
+  output_dir?: string;
+}
+
+export interface TrainingLaunchResponse extends TrainingJob {
+  execution_mode: &quot;remote&quot; | &quot;local&quot;;
+  local_job_spec?: LocalTrainingJobSpec | null;
+  message?: string;
+}
+
+export interface TrainingModelCatalog {
+  classification: string[];
+  regression: string[];
+  all: string[];
+  details?: Record&lt;string, {
+    family?: string;
+    cost_tier?: &quot;low&quot; | &quot;medium&quot; | &quot;high&quot;;
+    warning?: string | null;
+    experimental?: boolean;
+    hyperparameters?: Record&lt;string, {
+      type?: &quot;number&quot; | &quot;integer&quot; | &quot;boolean&quot; | &quot;select&quot; | &quot;text&quot;;
+      min?: number;
+      max?: number;
+      step?: number;
+      default?: number | string | boolean;
+      options?: Array&lt;string | number&gt;;
+    }&gt;;
+  }&gt;;
+}
+
+export interface ExperimentRun {
+  id: number;
+  run_id: string;
+  job_id: string;
+  dataset_id: number;
+  target_column: string;
+  task_type?: string;
+  status: &quot;pending&quot; | &quot;running&quot; | &quot;completed&quot; | &quot;failed&quot;;
+  config?: Record&lt;string, unknown&gt;;
+  summary_metrics?: {
+    primary_metric?: string;
+    best_model?: string;
+    best_score?: number;
+    models_trained?: number;
+    failed_models?: number;
+  };
+  best_model_name?: string;
+  best_score?: number;
+  error_message?: string;
+  started_at: string;
+  completed_at?: string;
+}
+
+export interface TrainedModel {
+  id: number;
+  job_id: string;
+  model_name: string;
+  model_type: string;
+  task_type: string;
+  is_deployed: boolean;
+  accuracy?: number;
+  f1_score?: number;
+  roc_auc?: number;
+  precision?: number;
+  recall?: number;
+  balanced_accuracy?: number;
+  rmse?: number;
+  mae?: number;
+  r2_score?: number;
+  mape?: number;
+  explained_variance?: number;
+  median_ae?: number;
+  metrics?: Record&lt;string, unknown&gt;;
+  feature_importance?: Record&lt;string, number&gt;;
+  confusion_matrix?: number[][];
+  roc_curve_data?: { fpr: number[]; tpr: number[] };
+  cv_scores?: number[];
+  per_fold?: { fold: number; score: number }[];
+  per_class?: Record&lt;string, unknown&gt;;
+  confusion_matrix_chart?: {
+    labels: string[];
+    matrix: number[][];
+    normalized_matrix?: number[][];
+  };
+  roc_curve_chart?: {
+    fpr: number[];
+    tpr: number[];
+    thresholds?: number[];
+  };
+  training_time?: number;
+  created_at: string;
+}
+
+export interface MetricsData {
+  job_id: string;
+  task_type: string;
+  status: string;
+  models: TrainedModel[];
+  best_model?: TrainedModel;
+  best_model_id?: number;
+  metric_catalog?: string[];
+  chart_data?: {
+    metric_comparison: {
+      labels: string[];
+      series: Record&lt;string, Array&lt;number | null&gt;&gt;;
+    };
+    roc_curves: Array&lt;{
+      model_id: number;
+      model_name: string;
+      curve?: { fpr: number[]; tpr: number[]; thresholds?: number[] };
+    }&gt;;
+    confusion_matrices: Array&lt;{
+      model_id: number;
+      model_name: string;
+      matrix?: { labels: string[]; matrix: number[][]; normalized_matrix?: number[][] };
+    }&gt;;
+  };
+  dataset_profile?: DatasetProfile;
+  leaderboard: {
+    rank: number;
+    model_id?: number;
+    model_name: string;
+    primary_metric?: number;
+    metric_name: string;
+    training_time?: number;
+    is_deployed?: boolean;
+  }[];
+}
+
+export interface PredictionResult {
+  model_id: number;
+  model_name: string;
+  prediction: unknown;
+  probability?: Record&lt;string, number&gt;;
+  confidence?: number;
+}
+
+export interface InferenceFeatureTemplate {
+  name: string;
+  dtype: string;
+  input_type: &quot;number&quot; | &quot;select&quot; | &quot;text&quot;;
+  default_value: string | number;
+  min?: number;
+  max?: number;
+  mean?: number;
+  std?: number;
+  integer_like?: boolean;
+  options?: string[];
+}
+
+export interface InferenceTemplate {
+  model_id: number;
+  model_name: string;
+  task_type: string;
+  job_id: string;
+  dataset_id?: number;
+  dataset_name?: string;
+  target_column?: string;
+  generated_at: string;
+  artifact_compatible?: boolean;
+  artifact_issue?: string | null;
+  features: InferenceFeatureTemplate[];
+}
+
+export interface ExampleDataset {
+  key: string;
+  name: string;
+  description: string;
+  target: string;
+  task_type: string;
+}
+
+export interface DatasetQualityReport {
+  dataset_id: number;
+  dataset_name: string;
+  rows: number;
+  columns: number;
+  quality_score: number;
+  missing_cells: number;
+  duplicate_rows: number;
+  missing_by_column: Record&lt;string, number&gt;;
+  outliers_by_column: Record&lt;string, number&gt;;
+  recommendations: string[];
+}
+
+export interface LeakageReport {
+  dataset_id: number;
+  dataset_name: string;
+  target_column?: string;
+  leakage_risks: Array&lt;{
+    feature: string;
+    risk_score: number;
+    reasons: string[];
+  }&gt;;
+}
+
+export interface CleanPreview {
+  dataset_id: number;
+  dataset_name: string;
+  preview_rows: number;
+  rows_after_cleaning: number;
+  applied_fixes: string[];
+  clean_preview: Record&lt;string, unknown&gt;[];
+}
+
+export interface EDAReport {
+  dataset_id: number;
+  dataset_name: string;
+  overview: {
+    rows: number;
+    columns: number;
+    missing_total: number;
+    duplicate_rows: number;
+    numeric_columns: number;
+    categorical_columns: number;
+    target_column?: string;
+  };
+  high_correlations: Array&lt;{
+    feature_a: string;
+    feature_b: string;
+    correlation: number;
+  }&gt;;
+  leakage_risks: Array&lt;{
+    feature: string;
+    risk_score: number;
+    reasons: string[];
+  }&gt;;
+  recommendations: string[];
+}
+
+export interface AnalyticsChart {
+  id: string;
+  section: &quot;exploratory&quot; | &quot;model_evaluation&quot;;
+  title: string;
+  description: string;
+  purpose: string;
+  insight: string;
+  chart_type: &quot;bar&quot; | &quot;line&quot; | &quot;scatter&quot; | &quot;heatmap&quot; | &quot;table&quot; | string;
+  fallback_used: boolean;
+  output_reference: {
+    path: string;
+    relative_path: string;
+    url: string;
+  };
+  artifact_ref: {
+    path: string;
+    relative_path: string;
+    url: string;
+  };
+  spec: Record&lt;string, unknown&gt;;
+}
+
+export interface AnalyticsReport {
+  dataset_id: number;
+  dataset_name: string;
+  target_column: string;
+  task_type: &quot;classification&quot; | &quot;regression&quot; | string;
+  detected_task_type: &quot;classification&quot; | &quot;regression&quot; | string;
+  minimum_required_charts: number;
+  chart_count: number;
+  report_id: string;
+  created_at: string;
+  exploratory_charts: AnalyticsChart[];
+  evaluation_charts: AnalyticsChart[];
+  evaluation_status: &quot;ready&quot; | &quot;pending&quot; | string;
+  evaluation_metrics: Record&lt;string, number | string | null&gt;;
+  model_id?: number | null;
+  model_type?: string | null;
+  predictions_available?: boolean;
+}
+
+export interface ShapResult {
+  metadata: {
+    model_id: number;
+    model_name: string;
+    model_type: string;
+    task_type: string;
+    job_id: string;
+    artifact_hash: string;
+    dataset_hash: string;
+    cache_key: string;
+    used_fallback: boolean;
+    explainer: string;
+  };
+  feature_names: string[];
+  expected_value?: number[] | number | null;
+  global_importance: { feature: string; mean_abs_contribution: number; rank: number }[];
+  local_contributions: { feature: string; value: number; abs_value: number; rank: number }[];
+  sample_prediction: {
+    sample_index: number;
+    prediction: number | string;
+    prediction_label?: string;
+    confidence?: number;
+    class_probabilities?: Record&lt;string, number&gt;;
+  };
+  chart?: {
+    global_bar?: { labels: string[]; values: number[] };
+    local_bar?: { labels: string[]; values: number[] };
+  };
+  model_metadata?: Record&lt;string, unknown&gt;;
+}
+
+export interface LimeResult {
+  metadata: {
+    model_id: number;
+    model_name: string;
+    model_type: string;
+    task_type: string;
+    job_id: string;
+    artifact_hash: string;
+    dataset_hash: string;
+    cache_key: string;
+    used_fallback: boolean;
+    explainer: string;
+  };
+  feature_names: string[];
+  sample_prediction: {
+    sample_index: number;
+    prediction: number | string;
+    prediction_label?: string;
+    confidence?: number;
+    class_probabilities?: Record&lt;string, number&gt;;
+  };
+  weights: { feature: string; weight: number; abs_weight: number; direction: &quot;positive&quot; | &quot;negative&quot;; rank: number }[];
+  top_positive: { feature: string; weight: number; abs_weight: number; direction: &quot;positive&quot; | &quot;negative&quot;; rank: number }[];
+  top_negative: { feature: string; weight: number; abs_weight: number; direction: &quot;positive&quot; | &quot;negative&quot;; rank: number }[];
+  class_context: Record&lt;string, unknown&gt;;
+  chart?: {
+    local_bar?: { labels: string[]; values: number[] };
+  };
+}
+
+export interface DatasetProfile {
+  dataset_id: number;
+  dataset_name: string;
+  total_rows: number;
+  total_columns: number;
+  memory_usage_mb: number;
+  missing_total: number;
+  missing_rate: number;
+  duplicate_rows: number;
+  columns: Array&lt;{
+    name: string;
+    dtype: string;
+    dtype_group: string;
+    semantic_type?: string;
+    datetime_parse_ratio?: number;
+    missing: number;
+    missing_rate: number;
+    unique: number;
+    unique_rate: number;
+    sample_values: string[];
+    summary?: Record&lt;string, number | null&gt;;
+  }&gt;;
+  summary_cards: Array&lt;{ label: string; value: number | string }&gt;;
+  target_distribution?: {
+    type: &quot;numeric&quot; | &quot;categorical&quot;;
+    column: string;
+    labels: string[];
+    counts: number[];
+  };
+  correlation_heatmap?: {
+    labels: string[];
+    matrix: number[][];
+  };
+  typing_intelligence?: {
+    numeric: number;
+    categorical: number;
+    datetime: number;
+    boolean: number;
+    high_cardinality_candidates: string[];
+  };
+  leakage_risks?: Array&lt;{
+    feature: string;
+    risk_score: number;
+    reasons: string[];
+  }&gt;;
+  drift_baseline?: {
+    rows: number;
+    columns: number;
+    target_column?: string;
+    numeric?: Record&lt;string, unknown&gt;;
+    categorical?: Record&lt;string, unknown&gt;;
+  };
+  missing_by_column: Array&lt;{ column: string; missing: number }&gt;;
+  histograms: Array&lt;{ column: string; labels: string[]; counts: number[] }&gt;;
+}
+
+export interface APIErrorPayload {
+  error?: {
+    code: string;
+    message: string;
+    details?: Record&lt;string, unknown&gt;;
+  };
+}
+
+export interface ModelMonitoring {
+  monitoring: {
+    model_id: number;
+    model_name: string;
+    task_type: string;
+    is_deployed: boolean;
+    training_time?: number;
+    primary_metric?: number;
+    cv_mean?: number;
+    cv_std?: number;
+    stability: &quot;stable&quot; | &quot;moderate&quot; | &quot;unstable&quot; | &quot;unknown&quot;;
+  };
+  drift?: {
+    train_dataset_id: number;
+    compare_dataset_id: number;
+    features_compared: number;
+    avg_z_drift: number;
+    drift_level: &quot;low&quot; | &quot;medium&quot; | &quot;high&quot;;
+    top_drift_features: {
+      feature: string;
+      train_mean: number;
+      current_mean: number;
+      z_drift: number;
+    }[];
+  } | null;
+}
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>APIErrorPayload</strong>: No official citation linked here.</li><li><strong>AnalyticsChart</strong>: No official citation linked here.</li><li><strong>AnalyticsReport</strong>: No official citation linked here.</li><li><strong>Array</strong>: No official citation linked here.</li><li><strong>CleanPreview</strong>: No official citation linked here.</li><li><strong>ColumnInfo</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>DatasetProfile</strong>: No official citation linked here.</li><li><strong>DatasetQualityReport</strong>: No official citation linked here.</li><li><strong>EDAReport</strong>: No official citation linked here.</li><li><strong>ExampleDataset</strong>: No official citation linked here.</li><li><strong>ExperimentRun</strong>: No official citation linked here.</li><li><strong>InferenceFeatureTemplate</strong>: No official citation linked here.</li><li><strong>InferenceTemplate</strong>: No official citation linked here.</li><li><strong>LeakageReport</strong>: No official citation linked here.</li><li><strong>LimeResult</strong>: No official citation linked here.</li><li><strong>LocalTrainingJobSpec</strong>: No official citation linked here.</li><li><strong>MetricsData</strong>: No official citation linked here.</li><li><strong>ModelMonitoring</strong>: No official citation linked here.</li><li><strong>PredictionResult</strong>: No official citation linked here.</li><li><strong>Record</strong>: No official citation linked here.</li><li><strong>ShapResult</strong>: No official citation linked here.</li><li><strong>TrainedModel</strong>: No official citation linked here.</li><li><strong>TrainingJob</strong>: No official citation linked here.</li><li><strong>TrainingLaunchResponse</strong>: No official citation linked here.</li><li><strong>TrainingModelCatalog</strong>: No official citation linked here.</li><li><strong>abs_value</strong>: No official citation linked here.</li><li><strong>abs_weight</strong>: No official citation linked here.</li><li><strong>accuracy</strong>: No official citation linked here.</li><li><strong>all</strong>: No official citation linked here.</li><li><strong>applied_fixes</strong>: No official citation linked here.</li><li><strong>artifact_compatible</strong>: No official citation linked here.</li><li><strong>artifact_hash</strong>: No official citation linked here.</li><li><strong>artifact_issue</strong>: No official citation linked here.</li><li><strong>artifact_ref</strong>: No official citation linked here.</li><li><strong>avg_z_drift</strong>: No official citation linked here.</li><li><strong>balanced_accuracy</strong>: No official citation linked here.</li><li><strong>bar</strong>: No official citation linked here.</li><li><strong>best_model</strong>: No official citation linked here.</li><li><strong>best_model_id</strong>: No official citation linked here.</li><li><strong>best_model_name</strong>: No official citation linked here.</li><li><strong>best_score</strong>: No official citation linked here.</li><li><strong>boolean</strong>: No official citation linked here.</li><li><strong>cache_key</strong>: No official citation linked here.</li><li><strong>categorical</strong>: No official citation linked here.</li><li><strong>categorical_columns</strong>: No official citation linked here.</li><li><strong>chart</strong>: No official citation linked here.</li><li><strong>chart_count</strong>: No official citation linked here.</li><li><strong>chart_data</strong>: No official citation linked here.</li><li><strong>chart_type</strong>: No official citation linked here.</li><li><strong>class_context</strong>: No official citation linked here.</li><li><strong>class_probabilities</strong>: No official citation linked here.</li><li><strong>classification</strong>: No official citation linked here.</li><li><strong>clean_preview</strong>: No official citation linked here.</li><li><strong>code</strong>: No official citation linked here.</li><li><strong>column</strong>: No official citation linked here.</li><li><strong>columns</strong>: No official citation linked here.</li><li><strong>columns_info</strong>: No official citation linked here.</li><li><strong>compare_dataset_id</strong>: No official citation linked here.</li><li><strong>completed</strong>: No official citation linked here.</li><li><strong>completed_at</strong>: No official citation linked here.</li><li><strong>confidence</strong>: No official citation linked here.</li><li><strong>config</strong>: No official citation linked here.</li><li><strong>confusion_matrices</strong>: No official citation linked here.</li><li><strong>confusion_matrix</strong>: No official citation linked here.</li><li><strong>confusion_matrix_chart</strong>: No official citation linked here.</li><li><strong>correlation</strong>: No official citation linked here.</li><li><strong>correlation_heatmap</strong>: No official citation linked here.</li><li><strong>cost_tier</strong>: No official citation linked here.</li><li><strong>counts</strong>: No official citation linked here.</li><li><strong>created_at</strong>: No official citation linked here.</li><li><strong>current_mean</strong>: No official citation linked here.</li><li><strong>curve</strong>: No official citation linked here.</li><li><strong>cv_mean</strong>: No official citation linked here.</li><li><strong>cv_scores</strong>: No official citation linked here.</li><li><strong>cv_std</strong>: No official citation linked here.</li><li><strong>dataset_hash</strong>: No official citation linked here.</li><li><strong>dataset_id</strong>: No official citation linked here.</li><li><strong>dataset_name</strong>: No official citation linked here.</li><li><strong>dataset_path</strong>: No official citation linked here.</li><li><strong>dataset_profile</strong>: No official citation linked here.</li><li><strong>datetime</strong>: No official citation linked here.</li><li><strong>datetime_parse_ratio</strong>: No official citation linked here.</li><li><strong>default</strong>: No official citation linked here.</li><li><strong>default_value</strong>: No official citation linked here.</li><li><strong>description</strong>: No official citation linked here.</li><li><strong>details</strong>: No official citation linked here.</li><li><strong>detected_task_type</strong>: No official citation linked here.</li><li><strong>direction</strong>: No official citation linked here.</li><li><strong>drift</strong>: No official citation linked here.</li><li><strong>drift_baseline</strong>: No official citation linked here.</li><li><strong>drift_level</strong>: No official citation linked here.</li><li><strong>dtype</strong>: No official citation linked here.</li><li><strong>dtype_group</strong>: No official citation linked here.</li><li><strong>duplicate_rows</strong>: No official citation linked here.</li><li><strong>error</strong>: No official citation linked here.</li><li><strong>error_message</strong>: No official citation linked here.</li><li><strong>evaluation_charts</strong>: No official citation linked here.</li><li><strong>evaluation_metrics</strong>: No official citation linked here.</li><li><strong>evaluation_status</strong>: No official citation linked here.</li><li><strong>execution_mode</strong>: No official citation linked here.</li><li><strong>expected_value</strong>: No official citation linked here.</li><li><strong>experimental</strong>: No official citation linked here.</li><li><strong>explained_variance</strong>: No official citation linked here.</li><li><strong>explainer</strong>: No official citation linked here.</li><li><strong>exploratory</strong>: No official citation linked here.</li><li><strong>exploratory_charts</strong>: No official citation linked here.</li><li><strong>export</strong>: No official citation linked here.</li><li><strong>extends</strong>: No official citation linked here.</li><li><strong>f1_score</strong>: No official citation linked here.</li><li><strong>failed</strong>: No official citation linked here.</li><li><strong>failed_models</strong>: No official citation linked here.</li><li><strong>fallback_used</strong>: No official citation linked here.</li><li><strong>family</strong>: No official citation linked here.</li><li><strong>feature</strong>: No official citation linked here.</li><li><strong>feature_a</strong>: No official citation linked here.</li><li><strong>feature_b</strong>: No official citation linked here.</li><li><strong>feature_importance</strong>: No official citation linked here.</li><li><strong>feature_names</strong>: No official citation linked here.</li><li><strong>features</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

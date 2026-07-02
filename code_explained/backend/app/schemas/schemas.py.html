@@ -1,0 +1,490 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>schemas.py</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>backend/app/schemas/schemas.py</span></div>
+        <h1 style="margin:10px 0 6px">schemas.py</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="__init__.py.html">Previous</a><a href="../../../frontend/src/app/dashboard.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: backend/app/schemas/schemas.py</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>backend/app/schemas/schemas.py</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-python">&quot;&quot;&quot;
+Axiom Cloud AI - Pydantic Schemas for API validation
+&quot;&quot;&quot;
+from pydantic import BaseModel, Field, ConfigDict
+from typing import Optional, List, Dict, Any, Literal
+from datetime import datetime
+
+
+# ─── Dataset Schemas ──────────────────────────────────────────────────────────
+
+class ColumnInfo(BaseModel):
+    name: str
+    dtype: str
+    null_count: int
+    unique_count: int
+    sample_values: List[Any]
+    stats: Optional[Dict[str, Any]] = None
+
+
+class DatasetBase(BaseModel):
+    name: str
+    target_column: Optional[str] = None
+    task_type: Optional[str] = None
+
+
+class DatasetCreate(DatasetBase):
+    pass
+
+
+class DatasetResponse(DatasetBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    filename: str
+    file_size: Optional[int]
+    num_rows: Optional[int]
+    num_columns: Optional[int]
+    columns_info: Optional[List[Dict[str, Any]]]
+    is_example: bool
+    preview_data: Optional[List[Dict[str, Any]]]
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-python">&quot;&quot;&quot;
+Axiom Cloud AI - Pydantic Schemas for API validation
+&quot;&quot;&quot;
+from pydantic import BaseModel, Field, ConfigDict
+from typing import Optional, List, Dict, Any, Literal
+from datetime import datetime
+
+
+# ─── Dataset Schemas ──────────────────────────────────────────────────────────
+
+class ColumnInfo(BaseModel):
+    name: str
+    dtype: str
+    null_count: int
+    unique_count: int
+    sample_values: List[Any]
+    stats: Optional[Dict[str, Any]] = None
+
+
+class DatasetBase(BaseModel):
+    name: str
+    target_column: Optional[str] = None
+    task_type: Optional[str] = None
+
+
+class DatasetCreate(DatasetBase):
+    pass
+
+
+class DatasetResponse(DatasetBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    filename: str
+    file_size: Optional[int]
+    num_rows: Optional[int]
+    num_columns: Optional[int]
+    columns_info: Optional[List[Dict[str, Any]]]
+    is_example: bool
+    preview_data: Optional[List[Dict[str, Any]]]
+    created_at: datetime
+
+
+# ─── Training Schemas ─────────────────────────────────────────────────────────
+
+class TrainingConfig(BaseModel):
+    dataset_id: int
+    target_column: str
+    execution_mode: Literal[&quot;remote&quot;, &quot;local&quot;] = &quot;remote&quot;
+    task_type: Optional[str] = None  # auto-detect if None
+    models_to_train: Optional[List[str]] = None  # train all if None
+    model_hyperparams: Optional[Dict[str, Dict[str, Any]]] = None
+    test_size: float = Field(default=0.2, ge=0.1, le=0.4)
+    cv_folds: int = Field(default=5, ge=2, le=5)
+    enable_tuning: bool = False
+    tuning_trials: int = Field(default=12, ge=3, le=200)
+    tuning_time_budget_sec: int = Field(default=180, ge=30, le=3600)
+
+
+class TrainingJobResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    job_id: str
+    dataset_id: int
+    task_type: Optional[str]
+    target_column: str
+    status: str
+    progress: int
+    error_message: Optional[str]
+    created_at: datetime
+    completed_at: Optional[datetime]
+
+
+class LocalTrainingJobSpec(BaseModel):
+    job_id: str
+    run_id: str
+    dataset_id: int
+    dataset_name: str
+    dataset_path: str
+    target_column: str
+    task_type: Optional[str] = None
+    model_settings: Dict[str, Any] = Field(default_factory=dict, alias=&quot;model_config&quot;)
+    hyperparameters: Dict[str, Any] = Field(default_factory=dict)
+    output_dir: Optional[str] = None
+
+
+class TrainingLaunchResponse(TrainingJobResponse):
+    execution_mode: Literal[&quot;remote&quot;, &quot;local&quot;] = &quot;remote&quot;
+    local_job_spec: Optional[LocalTrainingJobSpec] = None
+    message: Optional[str] = None
+
+
+class LocalModelSync(BaseModel):
+    model_name: str
+    model_type: str = &quot;local_torch&quot;
+    task_type: Optional[str] = None
+    metrics: Dict[str, Any] = Field(default_factory=dict)
+    feature_importance: Optional[Dict[str, float]] = None
+    confusion_matrix: Optional[List[List[int]]] = None
+    roc_curve_data: Optional[Dict[str, Any]] = None
+    cv_scores: Optional[List[float]] = None
+    training_time: Optional[float] = None
+    artifact_ref: Optional[Dict[str, Any]] = None
+
+
+class LocalTrainingSyncPayload(BaseModel):
+    job_id: str
+    status: Literal[&quot;completed&quot;, &quot;failed&quot;] = &quot;completed&quot;
+    task_type: Optional[str] = None
+    error_message: Optional[str] = None
+    execution_env: Optional[Dict[str, Any]] = None
+    logs: Optional[List[str]] = None
+    models: List[LocalModelSync] = Field(default_factory=list)
+
+
+class ExperimentRunResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    run_id: str
+    job_id: str
+    dataset_id: int
+    target_column: str
+    task_type: Optional[str]
+    status: str
+    config: Optional[Dict[str, Any]]
+    summary_metrics: Optional[Dict[str, Any]]
+    best_model_name: Optional[str]
+    best_score: Optional[float]
+    error_message: Optional[str]
+    started_at: datetime
+    completed_at: Optional[datetime]
+
+
+# ─── Model Schemas ────────────────────────────────────────────────────────────
+
+class ModelResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True, protected_namespaces=())
+
+    id: int
+    job_id: str
+    model_name: str
+    model_type: str
+    task_type: str
+    is_deployed: bool
+    accuracy: Optional[float]
+    f1_score: Optional[float]
+    roc_auc: Optional[float]
+    rmse: Optional[float]
+    mae: Optional[float]
+    r2_score: Optional[float]
+    metrics: Optional[Dict[str, Any]]
+    feature_importance: Optional[Dict[str, float]]
+    confusion_matrix: Optional[List[List[int]]]
+    roc_curve_data: Optional[Dict[str, List[float]]]
+    cv_scores: Optional[List[float]]
+    training_time: Optional[float]
+    created_at: datetime
+
+
+# ─── Prediction Schemas ───────────────────────────────────────────────────────
+
+class PredictionRequest(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
+    model_id: int
+    features: Dict[str, Any]
+
+
+class PredictionResponse(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
+    model_id: int
+    model_name: str
+    prediction: Any
+    probability: Optional[Dict[str, float]] = None
+    confidence: Optional[float] = None
+
+
+# ─── Metrics Schemas ──────────────────────────────────────────────────────────
+
+class MetricsResponse(BaseModel):
+    job_id: str
+    models: List[ModelResponse]
+    best_model: Optional[ModelResponse]
+    task_type: str
+
+
+# ─── Structured Error Schemas ────────────────────────────────────────────────
+
+class APIError(BaseModel):
+    code: str
+    message: str
+    details: Optional[Dict[str, Any]] = None
+
+
+class APIErrorResponse(BaseModel):
+    error: APIError
+
+
+# ─── Explainability Schemas ─────────────────────────────────────────────────
+
+class ExplainabilityMetadata(BaseModel):
+    model_id: int
+    model_name: str
+    model_type: str
+    task_type: Literal[&quot;classification&quot;, &quot;regression&quot;, &quot;unknown&quot;]
+    job_id: str
+    artifact_hash: str
+    dataset_hash: str
+    cache_key: str
+    used_fallback: bool = False
+    explainer: str
+
+
+class ExplainabilitySamplePrediction(BaseModel):
+    sample_index: int
+    prediction: float | int | str
+    prediction_label: Optional[str] = None
+    confidence: Optional[float] = None
+    class_probabilities: Optional[Dict[str, float]] = None
+
+
+class FeatureContribution(BaseModel):
+    feature: str
+    value: float
+    abs_value: float
+    rank: int
+
+
+class ShapGlobalFeatureImportance(BaseModel):
+    feature: str
+    mean_abs_contribution: float
+    rank: int
+
+
+class ShapSummaryResponse(BaseModel):
+    metadata: ExplainabilityMetadata
+    feature_names: List[str]
+    expected_value: float | List[float] | None
+    global_importance: List[ShapGlobalFeatureImportance]
+    local_contributions: List[FeatureContribution]
+    sample_prediction: ExplainabilitySamplePrediction
+    chart: Dict[str, Any]
+    model_metadata: Dict[str, Any]
+
+
+class ShapExplainRequest(BaseModel):
+    sample_index: int = Field(default=0, ge=0)
+    nsamples: int = Field(default=200, ge=1, le=1000)
+
+
+class LimeContribution(BaseModel):
+    feature: str
+    weight: float
+    abs_weight: float
+    direction: Literal[&quot;positive&quot;, &quot;negative&quot;]
+    rank: int
+
+
+class LimeSummaryResponse(BaseModel):
+    metadata: ExplainabilityMetadata
+    feature_names: List[str]
+    sample_prediction: ExplainabilitySamplePrediction
+    weights: List[LimeContribution]
+    top_positive: List[LimeContribution]
+    top_negative: List[LimeContribution]
+    class_context: Dict[str, Any]
+    chart: Dict[str, Any]
+
+
+class LimeExplainRequest(BaseModel):
+    sample_index: int = Field(default=0, ge=0)
+    num_features: int = Field(default=12, ge=1, le=100)
+    custom_input: Optional[Dict[str, Any]] = None
+
+
+# ─── Metrics Payload Schemas ────────────────────────────────────────────────
+
+class ChartSeries(BaseModel):
+    labels: List[str]
+    series: Dict[str, List[float | int | None]]
+
+
+class ConfusionMatrixChart(BaseModel):
+    labels: List[str]
+    matrix: List[List[int]]
+    normalized_matrix: Optional[List[List[float]]] = None
+
+
+class RocCurveChart(BaseModel):
+    fpr: List[float]
+    tpr: List[float]
+    thresholds: Optional[List[float]] = None
+
+
+class ModelMetricsExtended(BaseModel):
+    id: int
+    model_name: str
+    model_type: str
+    task_type: str
+    training_time: Optional[float] = None
+    is_deployed: bool
+    metrics: Dict[str, Any] = Field(default_factory=dict)
+    cv_scores: Optional[List[float]] = None
+    per_fold: Optional[List[Dict[str, Any]]] = None
+    per_class: Optional[Dict[str, Any]] = None
+    feature_importance: Optional[Dict[str, float]] = None
+    confusion_matrix_chart: Optional[ConfusionMatrixChart] = None
+    roc_curve_chart: Optional[RocCurveChart] = None
+    # Backward-compatible flattened metrics
+    accuracy: Optional[float] = None
+    f1_score: Optional[float] = None
+    roc_auc: Optional[float] = None
+    precision: Optional[float] = None
+    recall: Optional[float] = None
+    balanced_accuracy: Optional[float] = None
+    rmse: Optional[float] = None
+    mae: Optional[float] = None
+    r2_score: Optional[float] = None
+    mape: Optional[float] = None
+    explained_variance: Optional[float] = None
+    median_ae: Optional[float] = None
+    confusion_matrix: Optional[List[List[int]]] = None
+    roc_curve_data: Optional[Dict[str, Any]] = None
+
+
+class DatasetProfileCompact(BaseModel):
+    dataset_id: int
+    dataset_name: str
+    total_rows: int
+    total_columns: int
+    memory_usage_mb: float
+    missing_total: int
+    missing_rate: float
+    duplicate_rows: int
+    columns: List[Dict[str, Any]]
+    summary_cards: List[Dict[str, Any]]
+    target_distribution: Optional[Dict[str, Any]] = None
+    correlation_heatmap: Optional[Dict[str, Any]] = None
+    typing_intelligence: Optional[Dict[str, Any]] = None
+    leakage_risks: Optional[List[Dict[str, Any]]] = None
+    drift_baseline: Optional[Dict[str, Any]] = None
+    missing_by_column: List[Dict[str, Any]]
+    histograms: List[Dict[str, Any]]
+
+
+class MetricsResponseV2(BaseModel):
+    job_id: str
+    task_type: str
+    status: str
+    metric_catalog: List[str]
+    models: List[ModelMetricsExtended]
+    best_model_id: Optional[int] = None
+    best_model: Optional[ModelMetricsExtended] = None
+    leaderboard: List[Dict[str, Any]]
+    chart_data: Dict[str, Any]
+    dataset_profile: Optional[DatasetProfileCompact] = None
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>AI</strong>: No official citation linked here.</li><li><strong>API</strong>: No official citation linked here.</li><li><strong>APIError</strong>: No official citation linked here.</li><li><strong>APIErrorResponse</strong>: No official citation linked here.</li><li><strong>Any</strong>: No official citation linked here.</li><li><strong>Axiom</strong>: No official citation linked here.</li><li><strong>Backward</strong>: No official citation linked here.</li><li><strong>BaseModel</strong>: No official citation linked here.</li><li><strong>ChartSeries</strong>: No official citation linked here.</li><li><strong>Cloud</strong>: No official citation linked here.</li><li><strong>ColumnInfo</strong>: No official citation linked here.</li><li><strong>ConfigDict</strong>: No official citation linked here.</li><li><strong>ConfusionMatrixChart</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>DatasetBase</strong>: No official citation linked here.</li><li><strong>DatasetCreate</strong>: No official citation linked here.</li><li><strong>DatasetProfileCompact</strong>: No official citation linked here.</li><li><strong>DatasetResponse</strong>: No official citation linked here.</li><li><strong>Dict</strong>: No official citation linked here.</li><li><strong>Error</strong>: No official citation linked here.</li><li><strong>ExperimentRunResponse</strong>: No official citation linked here.</li><li><strong>Explainability</strong>: No official citation linked here.</li><li><strong>ExplainabilityMetadata</strong>: No official citation linked here.</li><li><strong>ExplainabilitySamplePrediction</strong>: No official citation linked here.</li><li><strong>False</strong>: No official citation linked here.</li><li><strong>FeatureContribution</strong>: No official citation linked here.</li><li><strong>Field</strong>: No official citation linked here.</li><li><strong>LimeContribution</strong>: No official citation linked here.</li><li><strong>LimeExplainRequest</strong>: No official citation linked here.</li><li><strong>LimeSummaryResponse</strong>: No official citation linked here.</li><li><strong>List</strong>: No official citation linked here.</li><li><strong>Literal</strong>: No official citation linked here.</li><li><strong>LocalModelSync</strong>: No official citation linked here.</li><li><strong>LocalTrainingJobSpec</strong>: No official citation linked here.</li><li><strong>LocalTrainingSyncPayload</strong>: No official citation linked here.</li><li><strong>Metrics</strong>: No official citation linked here.</li><li><strong>MetricsResponse</strong>: No official citation linked here.</li><li><strong>MetricsResponseV2</strong>: No official citation linked here.</li><li><strong>Model</strong>: No official citation linked here.</li><li><strong>ModelMetricsExtended</strong>: No official citation linked here.</li><li><strong>ModelResponse</strong>: No official citation linked here.</li><li><strong>None</strong>: No official citation linked here.</li><li><strong>Optional</strong>: No official citation linked here.</li><li><strong>Payload</strong>: No official citation linked here.</li><li><strong>Prediction</strong>: No official citation linked here.</li><li><strong>PredictionRequest</strong>: No official citation linked here.</li><li><strong>PredictionResponse</strong>: No official citation linked here.</li><li><strong>Pydantic</strong>: <a href="https://docs.pydantic.dev/">https://docs.pydantic.dev/</a></li><li><strong>RocCurveChart</strong>: No official citation linked here.</li><li><strong>Schemas</strong>: No official citation linked here.</li><li><strong>ShapExplainRequest</strong>: No official citation linked here.</li><li><strong>ShapGlobalFeatureImportance</strong>: No official citation linked here.</li><li><strong>ShapSummaryResponse</strong>: No official citation linked here.</li><li><strong>Structured</strong>: No official citation linked here.</li><li><strong>Training</strong>: No official citation linked here.</li><li><strong>TrainingConfig</strong>: No official citation linked here.</li><li><strong>TrainingJobResponse</strong>: No official citation linked here.</li><li><strong>TrainingLaunchResponse</strong>: No official citation linked here.</li><li><strong>True</strong>: No official citation linked here.</li><li><strong>abs_value</strong>: No official citation linked here.</li><li><strong>abs_weight</strong>: No official citation linked here.</li><li><strong>accuracy</strong>: No official citation linked here.</li><li><strong>alias</strong>: No official citation linked here.</li><li><strong>all</strong>: No official citation linked here.</li><li><strong>artifact_hash</strong>: No official citation linked here.</li><li><strong>artifact_ref</strong>: No official citation linked here.</li><li><strong>auto</strong>: No official citation linked here.</li><li><strong>balanced_accuracy</strong>: No official citation linked here.</li><li><strong>best_model</strong>: No official citation linked here.</li><li><strong>best_model_id</strong>: No official citation linked here.</li><li><strong>best_model_name</strong>: No official citation linked here.</li><li><strong>best_score</strong>: No official citation linked here.</li><li><strong>bool</strong>: No official citation linked here.</li><li><strong>cache_key</strong>: No official citation linked here.</li><li><strong>chart</strong>: No official citation linked here.</li><li><strong>chart_data</strong>: No official citation linked here.</li><li><strong>class</strong>: No official citation linked here.</li><li><strong>class_context</strong>: No official citation linked here.</li><li><strong>class_probabilities</strong>: No official citation linked here.</li><li><strong>classification</strong>: No official citation linked here.</li><li><strong>code</strong>: No official citation linked here.</li><li><strong>columns</strong>: No official citation linked here.</li><li><strong>columns_info</strong>: No official citation linked here.</li><li><strong>compatible</strong>: No official citation linked here.</li><li><strong>completed</strong>: No official citation linked here.</li><li><strong>completed_at</strong>: No official citation linked here.</li><li><strong>confidence</strong>: No official citation linked here.</li><li><strong>config</strong>: No official citation linked here.</li><li><strong>confusion_matrix</strong>: No official citation linked here.</li><li><strong>confusion_matrix_chart</strong>: No official citation linked here.</li><li><strong>correlation_heatmap</strong>: No official citation linked here.</li><li><strong>created_at</strong>: No official citation linked here.</li><li><strong>custom_input</strong>: No official citation linked here.</li><li><strong>cv_folds</strong>: No official citation linked here.</li><li><strong>cv_scores</strong>: No official citation linked here.</li><li><strong>dataset_hash</strong>: No official citation linked here.</li><li><strong>dataset_id</strong>: No official citation linked here.</li><li><strong>dataset_name</strong>: No official citation linked here.</li><li><strong>dataset_path</strong>: No official citation linked here.</li><li><strong>dataset_profile</strong>: No official citation linked here.</li><li><strong>datetime</strong>: No official citation linked here.</li><li><strong>default</strong>: No official citation linked here.</li><li><strong>default_factory</strong>: No official citation linked here.</li><li><strong>details</strong>: No official citation linked here.</li><li><strong>detect</strong>: No official citation linked here.</li><li><strong>dict</strong>: No official citation linked here.</li><li><strong>direction</strong>: No official citation linked here.</li><li><strong>drift_baseline</strong>: No official citation linked here.</li><li><strong>dtype</strong>: No official citation linked here.</li><li><strong>duplicate_rows</strong>: No official citation linked here.</li><li><strong>enable_tuning</strong>: No official citation linked here.</li><li><strong>error</strong>: No official citation linked here.</li><li><strong>error_message</strong>: No official citation linked here.</li><li><strong>execution_env</strong>: No official citation linked here.</li><li><strong>execution_mode</strong>: No official citation linked here.</li><li><strong>expected_value</strong>: No official citation linked here.</li><li><strong>explained_variance</strong>: No official citation linked here.</li><li><strong>explainer</strong>: No official citation linked here.</li><li><strong>f1_score</strong>: No official citation linked here.</li><li><strong>failed</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

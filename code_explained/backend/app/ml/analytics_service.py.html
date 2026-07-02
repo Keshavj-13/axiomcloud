@@ -1,0 +1,1307 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>analytics_service.py</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>backend/app/ml/analytics_service.py</span></div>
+        <h1 style="margin:10px 0 6px">analytics_service.py</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="__init__.py.html">Previous</a><a href="dataset_profiling.py.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: backend/app/ml/analytics_service.py</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>backend/app/ml/analytics_service.py</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-python">&quot;&quot;&quot;Analytics report service for EDA + model evaluation diagnostics.
+
+Generates chart metadata (with persisted artifact files) for:
+1) Exploratory data analysis
+2) Model evaluation
+
+Rules enforced:
+- At least 10 charts per report
+- Task auto-detection from target dtype/profile
+- Fallback chart generated when a required chart fails
+&quot;&quot;&quot;
+from __future__ import annotations
+
+from dataclasses import dataclass
+from datetime import datetime
+import json
+import os
+from typing import Any, Dict, List, Optional, Sequence, Tuple
+
+import numpy as np
+import pandas as pd
+from sklearn.feature_selection import mutual_info_classif, mutual_info_regression
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    f1_score,
+    mean_absolute_error,
+    mean_squared_error,
+    precision_score,
+    r2_score,
+    recall_score,
+)
+
+from app.core.config import settings
+
+
+MIN_CHARTS = 10
+
+
+@dataclass
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-python">&quot;&quot;&quot;Analytics report service for EDA + model evaluation diagnostics.
+
+Generates chart metadata (with persisted artifact files) for:
+1) Exploratory data analysis
+2) Model evaluation
+
+Rules enforced:
+- At least 10 charts per report
+- Task auto-detection from target dtype/profile
+- Fallback chart generated when a required chart fails
+&quot;&quot;&quot;
+from __future__ import annotations
+
+from dataclasses import dataclass
+from datetime import datetime
+import json
+import os
+from typing import Any, Dict, List, Optional, Sequence, Tuple
+
+import numpy as np
+import pandas as pd
+from sklearn.feature_selection import mutual_info_classif, mutual_info_regression
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    f1_score,
+    mean_absolute_error,
+    mean_squared_error,
+    precision_score,
+    r2_score,
+    recall_score,
+)
+
+from app.core.config import settings
+
+
+MIN_CHARTS = 10
+
+
+@dataclass
+class ChartContext:
+    dataset_id: int
+    report_id: str
+    reports_root: str
+
+
+class AnalyticsReportService:
+    def __init__(self) -&gt; None:
+        self.reports_root = os.path.abspath(os.path.join(settings.BASE_STORAGE_PATH, &quot;reports&quot;))
+        os.makedirs(self.reports_root, exist_ok=True)
+
+    def detect_task_type(self, target: pd.Series) -&gt; str:
+        &quot;&quot;&quot;Rule-based task detection.
+
+        - categorical target =&gt; classification
+        - continuous numeric target =&gt; regression
+        &quot;&quot;&quot;
+        if not pd.api.types.is_numeric_dtype(target):
+            return &quot;classification&quot;
+
+        clean = target.dropna()
+        unique = int(clean.nunique())
+        unique_rate = float(unique / max(len(clean), 1))
+
+        # Numeric but low-cardinality target usually means encoded classes.
+        if unique &lt;= 20 and unique_rate &lt;= 0.2:
+            return &quot;classification&quot;
+        return &quot;regression&quot;
+
+    def generate_report(
+        self,
+        *,
+        dataset_id: int,
+        dataset_name: str,
+        df: pd.DataFrame,
+        target_column: str,
+        model_type: Optional[str] = None,
+        predictions: Optional[Dict[str, Any]] = None,
+    ) -&gt; Dict[str, Any]:
+        if target_column not in df.columns:
+            raise ValueError(f&quot;Target column &#x27;{target_column}&#x27; not found in dataset&quot;)
+
+        report_id = f&quot;{dataset_id}_{datetime.utcnow().strftime(&#x27;%Y%m%d%H%M%S%f&#x27;)}&quot;
+        ctx = ChartContext(
+            dataset_id=dataset_id,
+            report_id=report_id,
+            reports_root=self.reports_root,
+        )
+
+        target = df[target_column]
+        detected_task = self.detect_task_type(target)
+        task_type = detected_task if model_type in {None, &quot;&quot;, &quot;auto&quot;} else model_type
+
+        exploratory: List[Dict[str, Any]] = []
+        evaluation: List[Dict[str, Any]] = []
+        evaluation_metrics: Dict[str, Any] = {}
+        evaluation_status = &quot;pending&quot;
+
+        if task_type == &quot;classification&quot;:
+            exploratory = self._build_classification_eda(ctx, df, target_column)
+            if predictions and predictions.get(&quot;y_true&quot;) is not None and predictions.get(&quot;y_pred&quot;) is not None:
+                evaluation, evaluation_metrics = self._build_classification_eval(
+                    ctx,
+                    np.asarray(predictions[&quot;y_true&quot;]),
+                    np.asarray(predictions[&quot;y_pred&quot;]),
+                )
+                evaluation_status = &quot;ready&quot;
+            else:
+                evaluation = [
+                    self._fallback_chart(
+                        ctx,
+                        chart_id=&quot;classification_evaluation_pending&quot;,
+                        section=&quot;model_evaluation&quot;,
+                        title=&quot;Classification evaluation pending&quot;,
+                        purpose=&quot;Model-level class evaluation charts require predictions.&quot;,
+                        insight=&quot;Predictions are not available yet, so evaluation is pending.&quot;,
+                        fallback_payload={
+                            &quot;rows&quot;: [
+                                {&quot;label&quot;: &quot;status&quot;, &quot;value&quot;: &quot;pending&quot;},
+                                {&quot;label&quot;: &quot;required&quot;, &quot;value&quot;: &quot;y_true and y_pred&quot;},
+                            ]
+                        },
+                    )
+                ]
+        else:
+            exploratory = self._build_regression_eda(ctx, df, target_column)
+            if predictions and predictions.get(&quot;y_true&quot;) is not None and predictions.get(&quot;y_pred&quot;) is not None:
+                y_true = np.asarray(predictions[&quot;y_true&quot;], dtype=float)
+                y_pred = np.asarray(predictions[&quot;y_pred&quot;], dtype=float)
+                evaluation, evaluation_metrics = self._build_regression_eval(ctx, y_true, y_pred)
+                evaluation_status = &quot;ready&quot;
+            else:
+                evaluation = [
+                    self._fallback_chart(
+                        ctx,
+                        chart_id=&quot;regression_evaluation_pending&quot;,
+                        section=&quot;model_evaluation&quot;,
+                        title=&quot;Regression evaluation pending&quot;,
+                        purpose=&quot;Residual and parity plots require predictions.&quot;,
+                        insight=&quot;Predictions are not available yet, so evaluation charts are pending.&quot;,
+                        fallback_payload={
+                            &quot;rows&quot;: [
+                                {&quot;label&quot;: &quot;status&quot;, &quot;value&quot;: &quot;pending&quot;},
+                                {&quot;label&quot;: &quot;required&quot;, &quot;value&quot;: &quot;y_true and y_pred&quot;},
+                            ]
+                        },
+                    )
+                ]
+
+        charts = exploratory + evaluation
+        if len(charts) &lt; MIN_CHARTS:
+            charts.extend(self._padding_charts(ctx, MIN_CHARTS - len(charts)))
+
+        # Keep sections separated for frontend.
+        exploratory_final = [c for c in charts if c[&quot;section&quot;] == &quot;exploratory&quot;]
+        evaluation_final = [c for c in charts if c[&quot;section&quot;] == &quot;model_evaluation&quot;]
+
+        return {
+            &quot;dataset_id&quot;: dataset_id,
+            &quot;dataset_name&quot;: dataset_name,
+            &quot;target_column&quot;: target_column,
+            &quot;task_type&quot;: task_type,
+            &quot;detected_task_type&quot;: detected_task,
+            &quot;minimum_required_charts&quot;: MIN_CHARTS,
+            &quot;chart_count&quot;: len(charts),
+            &quot;report_id&quot;: report_id,
+            &quot;created_at&quot;: datetime.utcnow().isoformat(),
+            &quot;exploratory_charts&quot;: exploratory_final,
+            &quot;evaluation_charts&quot;: evaluation_final,
+            &quot;evaluation_status&quot;: evaluation_status,
+            &quot;evaluation_metrics&quot;: evaluation_metrics,
+        }
+
+    # ---- Classification builders -------------------------------------------------
+
+    def _build_classification_eda(self, ctx: ChartContext, df: pd.DataFrame, target_column: str) -&gt; List[Dict[str, Any]]:
+        charts: List[Dict[str, Any]] = []
+        target = df[target_column]
+
+        charts.append(self._chart_data_type_composition(ctx, df))
+        charts.append(self._chart_unique_value_density(ctx, df, target_column))
+        charts.append(self._chart_numeric_skewness_profile(ctx, df, target_column))
+        charts.append(self._chart_numeric_variance_profile(ctx, df, target_column))
+        charts.append(self._chart_categorical_concentration(ctx, df, target_column))
+        charts.append(self._chart_target_class_distribution(ctx, target))
+        charts.append(self._chart_missing_values(ctx, df))
+        charts.append(self._chart_numeric_distributions(ctx, df, target_column))
+        charts.append(self._chart_boxplot_by_class(ctx, df, target_column))
+        charts.append(self._chart_correlation_heatmap(ctx, df, target_column))
+        charts.append(self._chart_pairplot_top_numeric(ctx, df, target_column))
+        charts.append(self._chart_categorical_vs_class_rate(ctx, df, target_column))
+        charts.append(self._chart_feature_ranking(ctx, df, target_column, task_type=&quot;classification&quot;))
+        charts.append(self._chart_outlier_analysis(ctx, df, target_column))
+
+        return charts
+
+    def _build_classification_eval(
+        self,
+        ctx: ChartContext,
+        y_true: np.ndarray,
+        y_pred: np.ndarray,
+    ) -&gt; Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+        labels = sorted([str(v) for v in np.unique(np.concatenate([y_true.astype(str), y_pred.astype(str)]))])
+        cm = confusion_matrix(y_true.astype(str), y_pred.astype(str), labels=labels)
+
+        accuracy = float(accuracy_score(y_true.astype(str), y_pred.astype(str)))
+        precision = float(precision_score(y_true.astype(str), y_pred.astype(str), average=&quot;weighted&quot;, zero_division=0))
+        recall = float(recall_score(y_true.astype(str), y_pred.astype(str), average=&quot;weighted&quot;, zero_division=0))
+        f1 = float(f1_score(y_true.astype(str), y_pred.astype(str), average=&quot;weighted&quot;, zero_division=0))
+
+        per_class_rows = []
+        for idx, label in enumerate(labels):
+            tp = float(cm[idx, idx])
+            support = float(cm[idx, :].sum())
+            predicted = float(cm[:, idx].sum())
+            cls_recall = tp / support if support &gt; 0 else 0.0
+            cls_precision = tp / predicted if predicted &gt; 0 else 0.0
+            per_class_rows.append(
+                {
+                    &quot;class&quot;: label,
+                    &quot;precision&quot;: round(cls_precision, 6),
+                    &quot;recall&quot;: round(cls_recall, 6),
+                    &quot;support&quot;: int(support),
+                }
+            )
+
+        charts = [
+            self._save_chart(
+                ctx,
+                chart_id=&quot;classification_confusion_matrix&quot;,
+                section=&quot;model_evaluation&quot;,
+                title=&quot;Confusion matrix&quot;,
+                purpose=&quot;Shows class-level prediction outcomes.&quot;,
+                insight=&quot;Use off-diagonal cells to identify confused classes.&quot;,
+                chart_type=&quot;heatmap&quot;,
+                payload={
+                    &quot;xLabels&quot;: labels,
+                    &quot;yLabels&quot;: labels,
+                    &quot;matrix&quot;: [[int(v) for v in row] for row in cm.tolist()],
+                },
+            ),
+            self._save_chart(
+                ctx,
+                chart_id=&quot;classification_per_class_metrics&quot;,
+                section=&quot;model_evaluation&quot;,
+                title=&quot;Per-class precision and recall&quot;,
+                purpose=&quot;Validates class-level performance consistency.&quot;,
+                insight=&quot;Classes with low recall are frequently missed.&quot;,
+                chart_type=&quot;bar&quot;,
+                payload={
+                    &quot;xKey&quot;: &quot;class&quot;,
+                    &quot;rows&quot;: per_class_rows,
+                    &quot;series&quot;: [
+                        {&quot;key&quot;: &quot;precision&quot;, &quot;name&quot;: &quot;Precision&quot;, &quot;color&quot;: &quot;#d0bcff&quot;},
+                        {&quot;key&quot;: &quot;recall&quot;, &quot;name&quot;: &quot;Recall&quot;, &quot;color&quot;: &quot;#6e3bd7&quot;},
+                    ],
+                },
+            ),
+        ]
+
+        metrics = {
+            &quot;accuracy&quot;: round(accuracy, 6),
+            &quot;precision_weighted&quot;: round(precision, 6),
+            &quot;recall_weighted&quot;: round(recall, 6),
+            &quot;f1_weighted&quot;: round(f1, 6),
+        }
+        return charts, metrics
+
+    # ---- Regression builders -----------------------------------------------------
+
+    def _build_regression_eda(self, ctx: ChartContext, df: pd.DataFrame, target_column: str) -&gt; List[Dict[str, Any]]:
+        charts: List[Dict[str, Any]] = []
+        target = pd.to_numeric(df[target_column], errors=&quot;coerce&quot;)
+
+        charts.append(self._chart_data_type_composition(ctx, df))
+        charts.append(self._chart_unique_value_density(ctx, df, target_column))
+        charts.append(self._chart_numeric_skewness_profile(ctx, df, target_column))
+        charts.append(self._chart_numeric_variance_profile(ctx, df, target_column))
+        charts.append(self._chart_categorical_concentration(ctx, df, target_column))
+        charts.append(self._chart_target_distribution(ctx, target))
+        charts.append(self._chart_missing_values(ctx, df))
+        charts.append(self._chart_numeric_distributions(ctx, df, target_column))
+        charts.append(self._chart_feature_vs_target_scatter(ctx, df, target_column))
+        charts.append(self._chart_correlation_heatmap(ctx, df, target_column))
+        charts.append(self._chart_pairplot_top_numeric(ctx, df, target_column))
+        charts.append(self._chart_binned_target_by_category(ctx, df, target_column))
+        charts.append(self._chart_feature_ranking(ctx, df, target_column, task_type=&quot;regression&quot;))
+        charts.append(self._chart_outlier_analysis(ctx, df, target_column))
+
+        return charts
+
+    def _build_regression_eval(
+        self,
+        ctx: ChartContext,
+        y_true: np.ndarray,
+        y_pred: np.ndarray,
+    ) -&gt; Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+        residuals = y_true - y_pred
+
+        mae = float(mean_absolute_error(y_true, y_pred))
+        mse = float(mean_squared_error(y_true, y_pred))
+        rmse = float(np.sqrt(mse))
+        r2 = float(r2_score(y_true, y_pred))
+
+        abs_res = np.abs(residuals)
+        bias = float(np.mean(residuals))
+        large_threshold = float(np.percentile(abs_res, 95)) if len(abs_res) &gt; 0 else 0.0
+        large_residual_count = int((abs_res &gt;= large_threshold).sum()) if len(abs_res) &gt; 0 else 0
+
+        charts = [
+            self._chart_residual_distribution(ctx, residuals),
+            self._chart_residuals_vs_predicted(ctx, y_pred, residuals),
+            self._chart_actual_vs_predicted(ctx, y_true, y_pred),
+            self._save_chart(
+                ctx,
+                chart_id=&quot;regression_error_metrics&quot;,
+                section=&quot;model_evaluation&quot;,
+                title=&quot;Regression error metrics&quot;,
+                purpose=&quot;Summarizes absolute, squared, and explained error.&quot;,
+                insight=f&quot;Bias={bias:.4f}; large residual points={large_residual_count} (p95 threshold={large_threshold:.4f}).&quot;,
+                chart_type=&quot;table&quot;,
+                payload={
+                    &quot;rows&quot;: [
+                        {&quot;label&quot;: &quot;MAE&quot;, &quot;value&quot;: round(mae, 6)},
+                        {&quot;label&quot;: &quot;MSE&quot;, &quot;value&quot;: round(mse, 6)},
+                        {&quot;label&quot;: &quot;RMSE&quot;, &quot;value&quot;: round(rmse, 6)},
+                        {&quot;label&quot;: &quot;R²&quot;, &quot;value&quot;: round(r2, 6)},
+                        {&quot;label&quot;: &quot;Mean residual bias&quot;, &quot;value&quot;: round(bias, 6)},
+                        {&quot;label&quot;: &quot;Large residual count&quot;, &quot;value&quot;: large_residual_count},
+                    ]
+                },
+            ),
+        ]
+
+        metrics = {
+            &quot;mae&quot;: round(mae, 6),
+            &quot;mse&quot;: round(mse, 6),
+            &quot;rmse&quot;: round(rmse, 6),
+            &quot;r2&quot;: round(r2, 6),
+            &quot;mean_residual_bias&quot;: round(bias, 6),
+            &quot;large_residual_count&quot;: large_residual_count,
+        }
+        return charts, metrics
+
+    # ---- Shared chart builders ---------------------------------------------------
+
+    def _chart_data_type_composition(self, ctx: ChartContext, df: pd.DataFrame) -&gt; Dict[str, Any]:
+        numeric_count = int(len(df.select_dtypes(include=[&quot;number&quot;]).columns))
+        categorical_count = int(len(df.columns) - numeric_count)
+        total_columns = int(df.shape[1])
+        rows = [
+            {&quot;type&quot;: &quot;numeric&quot;, &quot;count&quot;: numeric_count},
+            {&quot;type&quot;: &quot;categorical&quot;, &quot;count&quot;: categorical_count},
+            {&quot;type&quot;: &quot;total&quot;, &quot;count&quot;: total_columns},
+        ]
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;data_type_composition&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Feature data type composition&quot;,
+            purpose=&quot;Summarizes numeric and categorical coverage before diagnostics.&quot;,
+            insight=&quot;Balanced feature types help diversify model signal and diagnostics.&quot;,
+            chart_type=&quot;bar&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;type&quot;,
+                &quot;rows&quot;: rows,
+                &quot;series&quot;: [{&quot;key&quot;: &quot;count&quot;, &quot;name&quot;: &quot;Count&quot;, &quot;color&quot;: &quot;#8ddcc2&quot;}],
+            },
+        )
+
+    def _chart_unique_value_density(self, ctx: ChartContext, df: pd.DataFrame, target_column: str) -&gt; Dict[str, Any]:
+        features = [c for c in df.columns if c != target_column]
+        if not features:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;unique_value_density&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Unique value density by feature&quot;,
+                purpose=&quot;Identifies near-constant and high-cardinality features.&quot;,
+                insight=&quot;Fallback used because no predictor features are available.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;no predictor features&quot;}]},
+            )
+
+        sampled = features[:20]
+        rows: List[Dict[str, Any]] = []
+        total_rows = max(int(len(df)), 1)
+        for col in sampled:
+            nunique = int(df[col].nunique(dropna=True))
+            density = float(nunique / total_rows)
+            rows.append({
+                &quot;feature&quot;: col,
+                &quot;unique_values&quot;: nunique,
+                &quot;unique_ratio&quot;: round(density, 6),
+            })
+
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;unique_value_density&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Unique value density by feature&quot;,
+            purpose=&quot;Highlights low-variance and potentially high-cardinality columns.&quot;,
+            insight=&quot;Very low ratios can indicate weak signal; very high ratios may imply sparse patterns.&quot;,
+            chart_type=&quot;bar&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;feature&quot;,
+                &quot;rows&quot;: rows,
+                &quot;series&quot;: [
+                    {&quot;key&quot;: &quot;unique_values&quot;, &quot;name&quot;: &quot;Unique values&quot;, &quot;color&quot;: &quot;#6e3bd7&quot;},
+                    {&quot;key&quot;: &quot;unique_ratio&quot;, &quot;name&quot;: &quot;Unique ratio&quot;, &quot;color&quot;: &quot;#d0bcff&quot;},
+                ],
+            },
+        )
+
+    def _chart_numeric_skewness_profile(self, ctx: ChartContext, df: pd.DataFrame, target_column: str) -&gt; Dict[str, Any]:
+        numeric = [c for c in df.select_dtypes(include=[&quot;number&quot;]).columns.tolist() if c != target_column]
+        if not numeric:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;numeric_skewness_profile&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Numeric skewness profile&quot;,
+                purpose=&quot;Measures asymmetry of numeric feature distributions.&quot;,
+                insight=&quot;Fallback used because no numeric feature exists.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;no numeric columns&quot;}]},
+            )
+
+        rows: List[Dict[str, Any]] = []
+        for col in numeric[:15]:
+            s = pd.to_numeric(df[col], errors=&quot;coerce&quot;).dropna()
+            if len(s) &lt; 3:
+                continue
+            rows.append({&quot;feature&quot;: col, &quot;skewness&quot;: float(s.skew())})
+
+        if not rows:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;numeric_skewness_profile&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Numeric skewness profile&quot;,
+                purpose=&quot;Measures asymmetry of numeric feature distributions.&quot;,
+                insight=&quot;Fallback used because there are not enough valid numeric rows.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;insufficient numeric rows&quot;}]},
+            )
+
+        rows = sorted(rows, key=lambda r: abs(r[&quot;skewness&quot;]), reverse=True)
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;numeric_skewness_profile&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Numeric skewness profile&quot;,
+            purpose=&quot;Highlights features with strong skew that can impact model fit.&quot;,
+            insight=&quot;Highly skewed features may benefit from transforms like log or Box-Cox.&quot;,
+            chart_type=&quot;bar&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;feature&quot;,
+                &quot;rows&quot;: rows,
+                &quot;series&quot;: [{&quot;key&quot;: &quot;skewness&quot;, &quot;name&quot;: &quot;Skewness&quot;, &quot;color&quot;: &quot;#8ddcc2&quot;}],
+            },
+        )
+
+    def _chart_numeric_variance_profile(self, ctx: ChartContext, df: pd.DataFrame, target_column: str) -&gt; Dict[str, Any]:
+        numeric = [c for c in df.select_dtypes(include=[&quot;number&quot;]).columns.tolist() if c != target_column]
+        if not numeric:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;numeric_variance_profile&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Numeric variance profile&quot;,
+                purpose=&quot;Compares spread of numeric predictors.&quot;,
+                insight=&quot;Fallback used because no numeric feature exists.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;no numeric columns&quot;}]},
+            )
+
+        rows: List[Dict[str, Any]] = []
+        for col in numeric[:15]:
+            s = pd.to_numeric(df[col], errors=&quot;coerce&quot;).dropna()
+            if len(s) &lt; 2:
+                continue
+            rows.append({&quot;feature&quot;: col, &quot;variance&quot;: float(np.var(s.to_numpy(dtype=float)))})
+
+        if not rows:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;numeric_variance_profile&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Numeric variance profile&quot;,
+                purpose=&quot;Compares spread of numeric predictors.&quot;,
+                insight=&quot;Fallback used because there are not enough valid numeric rows.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;insufficient numeric rows&quot;}]},
+            )
+
+        rows = sorted(rows, key=lambda r: r[&quot;variance&quot;], reverse=True)
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;numeric_variance_profile&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Numeric variance profile&quot;,
+            purpose=&quot;Identifies low-variance and high-dispersion predictors.&quot;,
+            insight=&quot;Near-zero variance features may add little predictive value.&quot;,
+            chart_type=&quot;bar&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;feature&quot;,
+                &quot;rows&quot;: rows,
+                &quot;series&quot;: [{&quot;key&quot;: &quot;variance&quot;, &quot;name&quot;: &quot;Variance&quot;, &quot;color&quot;: &quot;#d0bcff&quot;}],
+            },
+        )
+
+    def _chart_categorical_concentration(self, ctx: ChartContext, df: pd.DataFrame, target_column: str) -&gt; Dict[str, Any]:
+        categorical = [
+            c for c in df.columns
+            if c != target_column and not pd.api.types.is_numeric_dtype(df[c])
+        ]
+        if not categorical:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;categorical_concentration&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Categorical concentration profile&quot;,
+                purpose=&quot;Shows dominance of top categories across categorical features.&quot;,
+                insight=&quot;Fallback used because no categorical feature exists.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;no categorical columns&quot;}]},
+            )
+
+        rows: List[Dict[str, Any]] = []
+        for col in categorical[:12]:
+            s = df[col].dropna().astype(str)
+            total = max(len(s), 1)
+            top_share = float(s.value_counts(normalize=True).iloc[0]) if len(s) &gt; 0 else 0.0
+            rows.append({
+                &quot;feature&quot;: col,
+                &quot;top_category_share&quot;: round(top_share, 6),
+                &quot;distinct_categories&quot;: int(s.nunique()),
+                &quot;non_null_rows&quot;: int(total),
+            })
+
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;categorical_concentration&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Categorical concentration profile&quot;,
+            purpose=&quot;Flags categorical columns dominated by a single level.&quot;,
+            insight=&quot;High top-category share can signal weak categorical diversity.&quot;,
+            chart_type=&quot;bar&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;feature&quot;,
+                &quot;rows&quot;: rows,
+                &quot;series&quot;: [
+                    {&quot;key&quot;: &quot;top_category_share&quot;, &quot;name&quot;: &quot;Top category share&quot;, &quot;color&quot;: &quot;#6e3bd7&quot;},
+                    {&quot;key&quot;: &quot;distinct_categories&quot;, &quot;name&quot;: &quot;Distinct categories&quot;, &quot;color&quot;: &quot;#8ddcc2&quot;},
+                ],
+            },
+        )
+
+    def _chart_target_class_distribution(self, ctx: ChartContext, target: pd.Series) -&gt; Dict[str, Any]:
+        vc = target.astype(str).fillna(&quot;&lt;missing&gt;&quot;).value_counts().head(25)
+        rows = [{&quot;label&quot;: str(k), &quot;count&quot;: int(v)} for k, v in vc.items()]
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;target_class_distribution&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Target class distribution&quot;,
+            purpose=&quot;Checks class balance before model training.&quot;,
+            insight=&quot;Strong imbalance may require stratification or class weighting.&quot;,
+            chart_type=&quot;bar&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;label&quot;,
+                &quot;rows&quot;: rows,
+                &quot;series&quot;: [{&quot;key&quot;: &quot;count&quot;, &quot;name&quot;: &quot;Count&quot;, &quot;color&quot;: &quot;#d0bcff&quot;}],
+            },
+        )
+
+    def _chart_target_distribution(self, ctx: ChartContext, target_numeric: pd.Series) -&gt; Dict[str, Any]:
+        s = target_numeric.dropna()
+        counts, edges = np.histogram(s.to_numpy(dtype=float), bins=min(max(len(s) // 50, 8), 25)) if len(s) &gt; 0 else ([], [])
+        rows = []
+        for i in range(len(counts)):
+            rows.append({&quot;label&quot;: f&quot;{edges[i]:.3f}..{edges[i+1]:.3f}&quot;, &quot;count&quot;: int(counts[i])})
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;target_distribution&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Target distribution&quot;,
+            purpose=&quot;Shows response variable spread and skew.&quot;,
+            insight=&quot;Heavy skew may benefit from transforms or robust models.&quot;,
+            chart_type=&quot;bar&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;label&quot;,
+                &quot;rows&quot;: rows,
+                &quot;series&quot;: [{&quot;key&quot;: &quot;count&quot;, &quot;name&quot;: &quot;Count&quot;, &quot;color&quot;: &quot;#6e3bd7&quot;}],
+            },
+        )
+
+    def _chart_missing_values(self, ctx: ChartContext, df: pd.DataFrame) -&gt; Dict[str, Any]:
+        rows = (
+            df.isna().sum()
+            .sort_values(ascending=False)
+            .head(20)
+            .reset_index()
+            .rename(columns={&quot;index&quot;: &quot;column&quot;, 0: &quot;missing&quot;})
+            .to_dict(orient=&quot;records&quot;)
+        )
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;missing_values_per_column&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Missing values per column&quot;,
+            purpose=&quot;Identifies columns requiring imputation or removal.&quot;,
+            insight=&quot;Columns with high missingness can degrade model stability.&quot;,
+            chart_type=&quot;bar&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;column&quot;,
+                &quot;rows&quot;: rows,
+                &quot;series&quot;: [{&quot;key&quot;: &quot;missing&quot;, &quot;name&quot;: &quot;Missing&quot;, &quot;color&quot;: &quot;#d0bcff&quot;}],
+            },
+        )
+
+    def _chart_numeric_distributions(self, ctx: ChartContext, df: pd.DataFrame, target_column: str) -&gt; Dict[str, Any]:
+        numeric = [c for c in df.select_dtypes(include=[&quot;number&quot;]).columns.tolist() if c != target_column]
+        if not numeric:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;numeric_feature_distributions&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Numeric feature distributions&quot;,
+                purpose=&quot;Distribution diagnostics for numeric features.&quot;,
+                insight=&quot;No numeric features available; fallback summary generated.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;numeric_features&quot;, &quot;value&quot;: 0}]},
+            )
+
+        selected = numeric[:3]
+        bins = 15
+        rows: List[Dict[str, Any]] = []
+        for col in selected:
+            s = pd.to_numeric(df[col], errors=&quot;coerce&quot;).dropna()
+            if len(s) == 0:
+                continue
+            counts, edges = np.histogram(s.to_numpy(dtype=float), bins=bins)
+            for i in range(len(counts)):
+                rows.append({
+                    &quot;bin&quot;: f&quot;{edges[i]:.3f}..{edges[i+1]:.3f}&quot;,
+                    &quot;feature&quot;: col,
+                    &quot;count&quot;: int(counts[i]),
+                })
+
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;numeric_feature_distributions&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Numeric feature distributions&quot;,
+            purpose=&quot;Highlights skewness and spread in key numeric features.&quot;,
+            insight=&quot;Distribution anomalies often correlate with unstable training behavior.&quot;,
+            chart_type=&quot;bar&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;bin&quot;,
+                &quot;rows&quot;: rows,
+                &quot;series&quot;: [{&quot;key&quot;: &quot;count&quot;, &quot;name&quot;: &quot;Count&quot;, &quot;color&quot;: &quot;#6e3bd7&quot;}],
+                &quot;groupKey&quot;: &quot;feature&quot;,
+            },
+        )
+
+    def _chart_boxplot_by_class(self, ctx: ChartContext, df: pd.DataFrame, target_column: str) -&gt; Dict[str, Any]:
+        numeric = [c for c in df.select_dtypes(include=[&quot;number&quot;]).columns.tolist() if c != target_column]
+        if not numeric:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;box_plots_by_class&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Box plots of numeric features by class&quot;,
+                purpose=&quot;Compares class-conditioned feature spread.&quot;,
+                insight=&quot;Fallback used because no numeric feature exists.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;no numeric feature&quot;}]},
+            )
+
+        feature = numeric[0]
+        rows = []
+        grp = df[[feature, target_column]].dropna().groupby(target_column)
+        for cls, sub in grp:
+            s = pd.to_numeric(sub[feature], errors=&quot;coerce&quot;).dropna()
+            if len(s) == 0:
+                continue
+            rows.append(
+                {
+                    &quot;class&quot;: str(cls),
+                    &quot;q1&quot;: float(s.quantile(0.25)),
+                    &quot;median&quot;: float(s.quantile(0.50)),
+                    &quot;q3&quot;: float(s.quantile(0.75)),
+                }
+            )
+
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;box_plots_by_class&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Box plots of numeric features by class&quot;,
+            purpose=&quot;Shows class-wise central tendency and spread.&quot;,
+            insight=f&quot;Using &#x27;{feature}&#x27; as representative numeric feature.&quot;,
+            chart_type=&quot;bar&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;class&quot;,
+                &quot;rows&quot;: rows,
+                &quot;series&quot;: [
+                    {&quot;key&quot;: &quot;q1&quot;, &quot;name&quot;: &quot;Q1&quot;, &quot;color&quot;: &quot;#d0bcff&quot;},
+                    {&quot;key&quot;: &quot;median&quot;, &quot;name&quot;: &quot;Median&quot;, &quot;color&quot;: &quot;#6e3bd7&quot;},
+                    {&quot;key&quot;: &quot;q3&quot;, &quot;name&quot;: &quot;Q3&quot;, &quot;color&quot;: &quot;#8ddcc2&quot;},
+                ],
+            },
+        )
+
+    def _chart_correlation_heatmap(self, ctx: ChartContext, df: pd.DataFrame, target_column: str) -&gt; Dict[str, Any]:
+        numeric = [c for c in df.select_dtypes(include=[&quot;number&quot;]).columns.tolist() if c != target_column]
+        if len(numeric) &lt; 2:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;correlation_heatmap&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Correlation heatmap&quot;,
+                purpose=&quot;Shows linear correlation among numeric features.&quot;,
+                insight=&quot;Fallback used because at least two numeric features are required.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;insufficient numeric columns&quot;}]},
+            )
+
+        selected = numeric[:8]
+        corr = df[selected].corr(numeric_only=True).fillna(0.0)
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;correlation_heatmap&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Correlation heatmap&quot;,
+            purpose=&quot;Highlights collinearity and redundancy.&quot;,
+            insight=&quot;High absolute correlations may indicate redundant features.&quot;,
+            chart_type=&quot;heatmap&quot;,
+            payload={
+                &quot;xLabels&quot;: selected,
+                &quot;yLabels&quot;: selected,
+                &quot;matrix&quot;: [[float(v) for v in row] for row in corr.to_numpy().tolist()],
+            },
+        )
+
+    def _chart_pairplot_top_numeric(self, ctx: ChartContext, df: pd.DataFrame, target_column: str) -&gt; Dict[str, Any]:
+        numeric = [c for c in df.select_dtypes(include=[&quot;number&quot;]).columns.tolist() if c != target_column]
+        if len(numeric) &lt; 2:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;pairplot_top_numeric&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Pairplot for top numeric features&quot;,
+                purpose=&quot;Visualizes pairwise relationships.&quot;,
+                insight=&quot;Fallback used because at least two numeric features are required.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;insufficient numeric columns&quot;}]},
+            )
+
+        f1, f2 = numeric[0], numeric[1]
+        sample = df[[f1, f2, target_column]].dropna().head(800)
+        rows = [
+            {&quot;x&quot;: float(r[f1]), &quot;y&quot;: float(r[f2]), &quot;group&quot;: str(r[target_column])}
+            for _, r in sample.iterrows()
+            if np.isfinite(float(r[f1])) and np.isfinite(float(r[f2]))
+        ]
+
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;pairplot_top_numeric&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Pairplot for top numeric features&quot;,
+            purpose=&quot;Shows pairwise separation trend for leading numeric features.&quot;,
+            insight=f&quot;Rendered as scatter for &#x27;{f1}&#x27; vs &#x27;{f2}&#x27;.&quot;,
+            chart_type=&quot;scatter&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;x&quot;,
+                &quot;yKey&quot;: &quot;y&quot;,
+                &quot;rows&quot;: rows,
+            },
+        )
+
+    def _chart_categorical_vs_class_rate(self, ctx: ChartContext, df: pd.DataFrame, target_column: str) -&gt; Dict[str, Any]:
+        categorical = [
+            c for c in df.columns
+            if c != target_column and not pd.api.types.is_numeric_dtype(df[c])
+        ]
+        if not categorical:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;categorical_vs_class_rate&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Categorical feature versus class rate comparison&quot;,
+                purpose=&quot;Compares class behavior across categorical levels.&quot;,
+                insight=&quot;Fallback used because no categorical feature exists.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;no categorical columns&quot;}]},
+            )
+
+        feature = categorical[0]
+        tmp = df[[feature, target_column]].dropna().copy()
+        tmp[feature] = tmp[feature].astype(str)
+        top_values = tmp[feature].value_counts().head(8).index.tolist()
+        tmp = tmp[tmp[feature].isin(top_values)]
+
+        rows: List[Dict[str, Any]] = []
+        for val, group in tmp.groupby(feature):
+            total = max(len(group), 1)
+            class_rates = group[target_column].astype(str).value_counts(normalize=True)
+            row: Dict[str, Any] = {&quot;category&quot;: str(val), &quot;total&quot;: int(total)}
+            for cls, rate in class_rates.items():
+                row[f&quot;rate_{cls}&quot;] = float(rate)
+            rows.append(row)
+
+        series_keys = sorted({k for r in rows for k in r.keys() if k.startswith(&quot;rate_&quot;)})
+        series = [{&quot;key&quot;: key, &quot;name&quot;: key.replace(&quot;rate_&quot;, &quot;&quot;), &quot;color&quot;: &quot;#d0bcff&quot;} for key in series_keys]
+
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;categorical_vs_class_rate&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Categorical feature versus class rate comparison&quot;,
+            purpose=&quot;Identifies categories associated with class concentration.&quot;,
+            insight=f&quot;Using &#x27;{feature}&#x27; as primary categorical feature.&quot;,
+            chart_type=&quot;bar&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;category&quot;,
+                &quot;rows&quot;: rows,
+                &quot;series&quot;: series,
+            },
+        )
+
+    def _chart_feature_ranking(self, ctx: ChartContext, df: pd.DataFrame, target_column: str, task_type: str) -&gt; Dict[str, Any]:
+        X = df.drop(columns=[target_column]).copy()
+        y = df[target_column]
+
+        # Numeric encoding fallback for categoricals.
+        X_enc = pd.get_dummies(X, drop_first=True)
+        if X_enc.empty:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;feature_ranking&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Feature importance / mutual information ranking&quot;,
+                purpose=&quot;Ranks signal strength of features.&quot;,
+                insight=&quot;Fallback used because no modelable feature remained after encoding.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;no encoded features&quot;}]},
+            )
+
+        # Trim to manageable width.
+        X_enc = X_enc.iloc[:, :80]
+        valid = X_enc.notna().all(axis=1) &amp; y.notna()
+        X_arr = X_enc.loc[valid]
+        y_arr = y.loc[valid]
+        if len(X_arr) &lt; 5:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;feature_ranking&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Feature importance / mutual information ranking&quot;,
+                purpose=&quot;Ranks signal strength of features.&quot;,
+                insight=&quot;Fallback used because too few valid rows are available.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;insufficient valid rows&quot;}]},
+            )
+
+        try:
+            if task_type == &quot;classification&quot;:
+                scores = mutual_info_classif(X_arr, y_arr.astype(str), discrete_features=False, random_state=42)
+            else:
+                scores = mutual_info_regression(X_arr, pd.to_numeric(y_arr, errors=&quot;coerce&quot;).fillna(0.0), random_state=42)
+            rows = [
+                {&quot;feature&quot;: col, &quot;score&quot;: float(score)}
+                for col, score in zip(X_arr.columns.tolist(), scores.tolist())
+            ]
+            rows = sorted(rows, key=lambda r: r[&quot;score&quot;], reverse=True)[:15]
+            return self._save_chart(
+                ctx,
+                chart_id=&quot;feature_ranking&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Feature importance / mutual information ranking&quot;,
+                purpose=&quot;Ranks strongest predictive signals before model interpretation.&quot;,
+                insight=&quot;Higher mutual information implies stronger nonlinear dependency with target.&quot;,
+                chart_type=&quot;bar&quot;,
+                payload={
+                    &quot;xKey&quot;: &quot;feature&quot;,
+                    &quot;rows&quot;: rows,
+                    &quot;series&quot;: [{&quot;key&quot;: &quot;score&quot;, &quot;name&quot;: &quot;MI Score&quot;, &quot;color&quot;: &quot;#6e3bd7&quot;}],
+                },
+            )
+        except Exception as exc:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;feature_ranking&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Feature importance / mutual information ranking&quot;,
+                purpose=&quot;Ranks strongest predictive signals.&quot;,
+                insight=f&quot;Fallback used due to MI computation error: {exc}&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;mutual information failed&quot;}]},
+            )
+
+    def _chart_outlier_analysis(self, ctx: ChartContext, df: pd.DataFrame, target_column: str) -&gt; Dict[str, Any]:
+        numeric = [c for c in df.select_dtypes(include=[&quot;number&quot;]).columns.tolist() if c != target_column]
+        if not numeric:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;outlier_analysis&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Outlier analysis for key numeric features&quot;,
+                purpose=&quot;Detects extreme-value concentration using IQR bounds.&quot;,
+                insight=&quot;Fallback used because no numeric feature exists.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;no numeric columns&quot;}]},
+            )
+
+        rows = []
+        for col in numeric[:12]:
+            s = pd.to_numeric(df[col], errors=&quot;coerce&quot;).dropna()
+            if len(s) &lt; 5:
+                continue
+            q1 = float(s.quantile(0.25))
+            q3 = float(s.quantile(0.75))
+            iqr = q3 - q1
+            if iqr == 0:
+                outliers = 0
+            else:
+                lower = q1 - 1.5 * iqr
+                upper = q3 + 1.5 * iqr
+                outliers = int(((s &lt; lower) | (s &gt; upper)).sum())
+            rows.append({&quot;feature&quot;: col, &quot;outliers&quot;: outliers})
+
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;outlier_analysis&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Outlier analysis for key numeric features&quot;,
+            purpose=&quot;Flags potential instability due to extreme values.&quot;,
+            insight=&quot;Features with high outlier counts may need clipping or robust scaling.&quot;,
+            chart_type=&quot;bar&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;feature&quot;,
+                &quot;rows&quot;: rows,
+                &quot;series&quot;: [{&quot;key&quot;: &quot;outliers&quot;, &quot;name&quot;: &quot;Outliers&quot;, &quot;color&quot;: &quot;#d0bcff&quot;}],
+            },
+        )
+
+    def _chart_feature_vs_target_scatter(self, ctx: ChartContext, df: pd.DataFrame, target_column: str) -&gt; Dict[str, Any]:
+        numeric = [c for c in df.select_dtypes(include=[&quot;number&quot;]).columns.tolist() if c != target_column]
+        if not numeric:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;feature_vs_target_scatter&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Scatter plots of key features versus target&quot;,
+                purpose=&quot;Shows monotonic and nonlinear associations with target.&quot;,
+                insight=&quot;Fallback used because no numeric feature exists.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;no numeric columns&quot;}]},
+            )
+
+        feature = numeric[0]
+        sample = df[[feature, target_column]].dropna().head(1200)
+        rows = [{&quot;x&quot;: float(r[feature]), &quot;y&quot;: float(r[target_column])} for _, r in sample.iterrows()]
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;feature_vs_target_scatter&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Scatter plots of key features versus target&quot;,
+            purpose=&quot;Reveals slope, heteroscedasticity, and nonlinear response behavior.&quot;,
+            insight=f&quot;Using &#x27;{feature}&#x27; as representative predictor.&quot;,
+            chart_type=&quot;scatter&quot;,
+            payload={&quot;xKey&quot;: &quot;x&quot;, &quot;yKey&quot;: &quot;y&quot;, &quot;rows&quot;: rows},
+        )
+
+    def _chart_binned_target_by_category(self, ctx: ChartContext, df: pd.DataFrame, target_column: str) -&gt; Dict[str, Any]:
+        categorical = [
+            c for c in df.columns
+            if c != target_column and not pd.api.types.is_numeric_dtype(df[c])
+        ]
+        if not categorical:
+            return self._fallback_chart(
+                ctx,
+                chart_id=&quot;binned_target_analysis&quot;,
+                section=&quot;exploratory&quot;,
+                title=&quot;Binned target analysis for categorical features&quot;,
+                purpose=&quot;Compares mean target values across category bins.&quot;,
+                insight=&quot;Fallback used because no categorical feature exists.&quot;,
+                fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;reason&quot;, &quot;value&quot;: &quot;no categorical columns&quot;}]},
+            )
+
+        feature = categorical[0]
+        tmp = df[[feature, target_column]].dropna().copy()
+        tmp[feature] = tmp[feature].astype(str)
+        top_values = tmp[feature].value_counts().head(12).index.tolist()
+        tmp = tmp[tmp[feature].isin(top_values)]
+        rows = (
+            tmp.groupby(feature)[target_column]
+            .mean()
+            .reset_index()
+            .rename(columns={feature: &quot;category&quot;, target_column: &quot;target_mean&quot;})
+            .to_dict(orient=&quot;records&quot;)
+        )
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;binned_target_analysis&quot;,
+            section=&quot;exploratory&quot;,
+            title=&quot;Binned target analysis for important categorical features&quot;,
+            purpose=&quot;Highlights target drift across category buckets.&quot;,
+            insight=f&quot;Using &#x27;{feature}&#x27; categories with highest support.&quot;,
+            chart_type=&quot;bar&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;category&quot;,
+                &quot;rows&quot;: rows,
+                &quot;series&quot;: [{&quot;key&quot;: &quot;target_mean&quot;, &quot;name&quot;: &quot;Mean target&quot;, &quot;color&quot;: &quot;#6e3bd7&quot;}],
+            },
+        )
+
+    def _chart_residual_distribution(self, ctx: ChartContext, residuals: np.ndarray) -&gt; Dict[str, Any]:
+        counts, edges = np.histogram(residuals, bins=min(max(len(residuals) // 50, 10), 25)) if len(residuals) &gt; 0 else ([], [])
+        rows = [
+            {&quot;label&quot;: f&quot;{edges[i]:.3f}..{edges[i+1]:.3f}&quot;, &quot;count&quot;: int(counts[i])}
+            for i in range(len(counts))
+        ]
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;residual_distribution&quot;,
+            section=&quot;model_evaluation&quot;,
+            title=&quot;Residual distribution&quot;,
+            purpose=&quot;Checks error centering and heavy-tail behavior.&quot;,
+            insight=&quot;Residuals should center near zero with limited heavy tails.&quot;,
+            chart_type=&quot;bar&quot;,
+            payload={
+                &quot;xKey&quot;: &quot;label&quot;,
+                &quot;rows&quot;: rows,
+                &quot;series&quot;: [{&quot;key&quot;: &quot;count&quot;, &quot;name&quot;: &quot;Count&quot;, &quot;color&quot;: &quot;#d0bcff&quot;}],
+            },
+        )
+
+    def _chart_residuals_vs_predicted(self, ctx: ChartContext, y_pred: np.ndarray, residuals: np.ndarray) -&gt; Dict[str, Any]:
+        rows = [{&quot;x&quot;: float(p), &quot;y&quot;: float(r)} for p, r in zip(y_pred.tolist(), residuals.tolist())][:2000]
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;residuals_vs_predicted&quot;,
+            section=&quot;model_evaluation&quot;,
+            title=&quot;Residuals versus predicted values&quot;,
+            purpose=&quot;Detects systematic bias and heteroscedasticity.&quot;,
+            insight=&quot;Patterns or funnel shapes indicate model misspecification.&quot;,
+            chart_type=&quot;scatter&quot;,
+            payload={&quot;xKey&quot;: &quot;x&quot;, &quot;yKey&quot;: &quot;y&quot;, &quot;rows&quot;: rows},
+        )
+
+    def _chart_actual_vs_predicted(self, ctx: ChartContext, y_true: np.ndarray, y_pred: np.ndarray) -&gt; Dict[str, Any]:
+        rows = [{&quot;x&quot;: float(t), &quot;y&quot;: float(p)} for t, p in zip(y_true.tolist(), y_pred.tolist())][:2000]
+        return self._save_chart(
+            ctx,
+            chart_id=&quot;actual_vs_predicted_parity&quot;,
+            section=&quot;model_evaluation&quot;,
+            title=&quot;Actual versus predicted scatter (parity)&quot;,
+            purpose=&quot;Measures agreement between predictions and ground truth.&quot;,
+            insight=&quot;Points closer to diagonal indicate stronger fit.&quot;,
+            chart_type=&quot;scatter&quot;,
+            payload={&quot;xKey&quot;: &quot;x&quot;, &quot;yKey&quot;: &quot;y&quot;, &quot;rows&quot;: rows},
+        )
+
+    # ---- Artifact + fallback -----------------------------------------------------
+
+    def _save_chart(
+        self,
+        ctx: ChartContext,
+        *,
+        chart_id: str,
+        section: str,
+        title: str,
+        purpose: str,
+        insight: str,
+        chart_type: str,
+        payload: Dict[str, Any],
+        fallback_used: bool = False,
+    ) -&gt; Dict[str, Any]:
+        artifact_dir = os.path.join(ctx.reports_root, str(ctx.dataset_id), ctx.report_id)
+        os.makedirs(artifact_dir, exist_ok=True)
+
+        safe_chart_id = chart_id.replace(&quot; &quot;, &quot;_&quot;).lower()
+        filename = f&quot;{safe_chart_id}.json&quot;
+        file_path = os.path.join(artifact_dir, filename)
+
+        with open(file_path, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+            json.dump(payload, f, ensure_ascii=False)
+
+        rel = os.path.relpath(file_path, self.reports_root).replace(&quot;\\&quot;, &quot;/&quot;)
+        return {
+            &quot;id&quot;: safe_chart_id,
+            &quot;section&quot;: section,
+            &quot;title&quot;: title,
+            &quot;description&quot;: purpose,
+            &quot;purpose&quot;: purpose,
+            &quot;insight&quot;: insight,
+            &quot;chart_type&quot;: chart_type,
+            &quot;fallback_used&quot;: fallback_used,
+            &quot;output_reference&quot;: {
+                &quot;path&quot;: file_path,
+                &quot;relative_path&quot;: rel,
+                &quot;url&quot;: f&quot;/static/reports/{rel}&quot;,
+            },
+            &quot;artifact_ref&quot;: {
+                &quot;path&quot;: file_path,
+                &quot;relative_path&quot;: rel,
+                &quot;url&quot;: f&quot;/static/reports/{rel}&quot;,
+            },
+            &quot;spec&quot;: payload,
+        }
+
+    def _fallback_chart(
+        self,
+        ctx: ChartContext,
+        *,
+        chart_id: str,
+        section: str,
+        title: str,
+        purpose: str,
+        insight: str,
+        fallback_payload: Dict[str, Any],
+    ) -&gt; Dict[str, Any]:
+        return self._save_chart(
+            ctx,
+            chart_id=chart_id,
+            section=section,
+            title=title,
+            purpose=purpose,
+            insight=insight,
+            chart_type=&quot;table&quot;,
+            payload=fallback_payload,
+            fallback_used=True,
+        )
+
+    def _padding_charts(self, ctx: ChartContext, missing: int) -&gt; List[Dict[str, Any]]:
+        pads: List[Dict[str, Any]] = []
+        for i in range(missing):
+            pads.append(
+                self._fallback_chart(
+                    ctx,
+                    chart_id=f&quot;fallback_padding_{i+1}&quot;,
+                    section=&quot;exploratory&quot;,
+                    title=f&quot;Fallback diagnostic {i+1}&quot;,
+                    purpose=&quot;Ensures minimum chart count guarantee is enforced.&quot;,
+                    insight=&quot;Generated as fallback to satisfy minimum chart coverage.&quot;,
+                    fallback_payload={&quot;rows&quot;: [{&quot;label&quot;: &quot;generated&quot;, &quot;value&quot;: True}]},
+                )
+            )
+        return pads
+
+
+def build_predictions_from_model_bundle(
+    df: pd.DataFrame,
+    *,
+    target_column: str,
+    model_bundle: Dict[str, Any],
+) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;Build y_true/y_pred payload for evaluation from a saved model bundle.&quot;&quot;&quot;
+    pipeline = model_bundle.get(&quot;pipeline&quot;)
+    if pipeline is None:
+        raise ValueError(&quot;Model bundle missing pipeline&quot;)
+
+    feature_names: Sequence[str] = model_bundle.get(&quot;feature_names&quot;) or []
+    if not feature_names:
+        feature_names = [c for c in df.columns if c != target_column]
+
+    if target_column not in df.columns:
+        raise ValueError(&quot;Target column missing from dataset&quot;)
+
+    frame = df.copy()
+    for col in feature_names:
+        if col not in frame.columns:
+            frame[col] = np.nan
+
+    X = frame[list(feature_names)]
+    y_true = frame[target_column]
+
+    valid = y_true.notna()
+    X = X.loc[valid]
+    y_true = y_true.loc[valid]
+
+    y_pred = pipeline.predict(X)
+
+    return {
+        &quot;y_true&quot;: y_true.to_numpy().tolist(),
+        &quot;y_pred&quot;: np.asarray(y_pred).tolist(),
+    }
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>Actual</strong>: No official citation linked here.</li><li><strong>Analytics</strong>: No official citation linked here.</li><li><strong>AnalyticsReportService</strong>: No official citation linked here.</li><li><strong>Any</strong>: No official citation linked here.</li><li><strong>Artifact</strong>: No official citation linked here.</li><li><strong>At</strong>: No official citation linked here.</li><li><strong>BASE_STORAGE_PATH</strong>: No official citation linked here.</li><li><strong>Balanced</strong>: No official citation linked here.</li><li><strong>Bias</strong>: No official citation linked here.</li><li><strong>Binned</strong>: No official citation linked here.</li><li><strong>Box</strong>: No official citation linked here.</li><li><strong>Build</strong>: No official citation linked here.</li><li><strong>Categorical</strong>: No official citation linked here.</li><li><strong>ChartContext</strong>: No official citation linked here.</li><li><strong>Checks</strong>: No official citation linked here.</li><li><strong>Classes</strong>: No official citation linked here.</li><li><strong>Classification</strong>: No official citation linked here.</li><li><strong>Columns</strong>: No official citation linked here.</li><li><strong>Compares</strong>: No official citation linked here.</li><li><strong>Confusion</strong>: No official citation linked here.</li><li><strong>Correlation</strong>: No official citation linked here.</li><li><strong>Count</strong>: No official citation linked here.</li><li><strong>Cox</strong>: No official citation linked here.</li><li><strong>DataFrame</strong>: No official citation linked here.</li><li><strong>Detects</strong>: No official citation linked here.</li><li><strong>Dict</strong>: No official citation linked here.</li><li><strong>Distinct</strong>: No official citation linked here.</li><li><strong>Distribution</strong>: No official citation linked here.</li><li><strong>EDA</strong>: No official citation linked here.</li><li><strong>Ensures</strong>: No official citation linked here.</li><li><strong>Exception</strong>: No official citation linked here.</li><li><strong>Exploratory</strong>: No official citation linked here.</li><li><strong>Fallback</strong>: No official citation linked here.</li><li><strong>False</strong>: No official citation linked here.</li><li><strong>Feature</strong>: No official citation linked here.</li><li><strong>Features</strong>: No official citation linked here.</li><li><strong>Flags</strong>: No official citation linked here.</li><li><strong>Generated</strong>: No official citation linked here.</li><li><strong>Generates</strong>: No official citation linked here.</li><li><strong>Heavy</strong>: No official citation linked here.</li><li><strong>High</strong>: No official citation linked here.</li><li><strong>Higher</strong>: No official citation linked here.</li><li><strong>Highlights</strong>: No official citation linked here.</li><li><strong>Highly</strong>: No official citation linked here.</li><li><strong>IQR</strong>: No official citation linked here.</li><li><strong>Identifies</strong>: No official citation linked here.</li><li><strong>Keep</strong>: No official citation linked here.</li><li><strong>Large</strong>: No official citation linked here.</li><li><strong>List</strong>: No official citation linked here.</li><li><strong>MAE</strong>: No official citation linked here.</li><li><strong>MI</strong>: No official citation linked here.</li><li><strong>MIN_CHARTS</strong>: No official citation linked here.</li><li><strong>MSE</strong>: No official citation linked here.</li><li><strong>Mean</strong>: No official citation linked here.</li><li><strong>Measures</strong>: No official citation linked here.</li><li><strong>Median</strong>: No official citation linked here.</li><li><strong>Missing</strong>: No official citation linked here.</li><li><strong>Model</strong>: No official citation linked here.</li><li><strong>Near</strong>: No official citation linked here.</li><li><strong>No</strong>: No official citation linked here.</li><li><strong>None</strong>: No official citation linked here.</li><li><strong>Numeric</strong>: No official citation linked here.</li><li><strong>Optional</strong>: No official citation linked here.</li><li><strong>Outlier</strong>: No official citation linked here.</li><li><strong>Outliers</strong>: No official citation linked here.</li><li><strong>Pairplot</strong>: No official citation linked here.</li><li><strong>Patterns</strong>: No official citation linked here.</li><li><strong>Per</strong>: No official citation linked here.</li><li><strong>Points</strong>: No official citation linked here.</li><li><strong>Precision</strong>: No official citation linked here.</li><li><strong>Predictions</strong>: No official citation linked here.</li><li><strong>Q1</strong>: No official citation linked here.</li><li><strong>Q3</strong>: No official citation linked here.</li><li><strong>RMSE</strong>: No official citation linked here.</li><li><strong>Ranks</strong>: No official citation linked here.</li><li><strong>Recall</strong>: No official citation linked here.</li><li><strong>Regression</strong>: No official citation linked here.</li><li><strong>Rendered</strong>: No official citation linked here.</li><li><strong>Residual</strong>: No official citation linked here.</li><li><strong>Residuals</strong>: No official citation linked here.</li><li><strong>Reveals</strong>: No official citation linked here.</li><li><strong>Rule</strong>: No official citation linked here.</li><li><strong>Rules</strong>: No official citation linked here.</li><li><strong>Scatter</strong>: No official citation linked here.</li><li><strong>Score</strong>: No official citation linked here.</li><li><strong>Sequence</strong>: No official citation linked here.</li><li><strong>Series</strong>: No official citation linked here.</li><li><strong>Shared</strong>: No official citation linked here.</li><li><strong>Shows</strong>: No official citation linked here.</li><li><strong>Skewness</strong>: No official citation linked here.</li><li><strong>Strong</strong>: No official citation linked here.</li><li><strong>Summarizes</strong>: No official citation linked here.</li><li><strong>Target</strong>: No official citation linked here.</li><li><strong>Task</strong>: No official citation linked here.</li><li><strong>Top</strong>: No official citation linked here.</li><li><strong>Trim</strong>: No official citation linked here.</li><li><strong>True</strong>: No official citation linked here.</li><li><strong>Tuple</strong>: No official citation linked here.</li><li><strong>Unique</strong>: No official citation linked here.</li><li><strong>Use</strong>: No official citation linked here.</li><li><strong>Using</strong>: No official citation linked here.</li><li><strong>Validates</strong>: No official citation linked here.</li><li><strong>ValueError</strong>: No official citation linked here.</li><li><strong>Variance</strong>: No official citation linked here.</li><li><strong>Very</strong>: No official citation linked here.</li><li><strong>Visualizes</strong>: No official citation linked here.</li><li><strong>X_arr</strong>: No official citation linked here.</li><li><strong>X_enc</strong>: No official citation linked here.</li><li><strong>__future__</strong>: No official citation linked here.</li><li><strong>__init__</strong>: No official citation linked here.</li><li><strong>_build_classification_eda</strong>: No official citation linked here.</li><li><strong>_build_classification_eval</strong>: No official citation linked here.</li><li><strong>_build_regression_eda</strong>: No official citation linked here.</li><li><strong>_build_regression_eval</strong>: No official citation linked here.</li><li><strong>_chart_actual_vs_predicted</strong>: No official citation linked here.</li><li><strong>_chart_binned_target_by_category</strong>: No official citation linked here.</li><li><strong>_chart_boxplot_by_class</strong>: No official citation linked here.</li><li><strong>_chart_categorical_concentration</strong>: No official citation linked here.</li><li><strong>_chart_categorical_vs_class_rate</strong>: No official citation linked here.</li><li><strong>_chart_correlation_heatmap</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

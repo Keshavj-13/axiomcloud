@@ -1,0 +1,906 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>pipeline.py</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>backend/app/ml/pipeline.py</span></div>
+        <h1 style="margin:10px 0 6px">pipeline.py</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="metrics_payload.py.html">Previous</a><a href="../models/__init__.py.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: backend/app/ml/pipeline.py</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>backend/app/ml/pipeline.py</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-python">&quot;&quot;&quot;
+Axiom Cloud AI - AutoML Pipeline
+Automatically detects task type, preprocesses data, trains multiple models,
+evaluates performance, and saves results.
+&quot;&quot;&quot;
+import os
+import time
+import logging
+import numpy as np
+import pandas as pd
+import joblib
+from typing import Dict, List, Optional, Tuple, Any
+from datetime import datetime
+from sklearn.base import clone
+from sklearn.base import BaseEstimator
+
+# Explainability
+import shap
+try:
+    from lime.lime_tabular import LimeTabularExplainer
+except Exception:  # pragma: no cover
+    LimeTabularExplainer = None
+
+from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, KFold
+from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+
+# Classification models
+from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge
+from sklearn.ensemble import (
+    RandomForestClassifier,
+    RandomForestRegressor,
+    GradientBoostingClassifier,
+    GradientBoostingRegressor,
+    ExtraTreesClassifier,
+    ExtraTreesRegressor,
+    AdaBoostClassifier,
+    AdaBoostRegressor,
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-python">&quot;&quot;&quot;
+Axiom Cloud AI - AutoML Pipeline
+Automatically detects task type, preprocesses data, trains multiple models,
+evaluates performance, and saves results.
+&quot;&quot;&quot;
+import os
+import time
+import logging
+import numpy as np
+import pandas as pd
+import joblib
+from typing import Dict, List, Optional, Tuple, Any
+from datetime import datetime
+from sklearn.base import clone
+from sklearn.base import BaseEstimator
+
+# Explainability
+import shap
+try:
+    from lime.lime_tabular import LimeTabularExplainer
+except Exception:  # pragma: no cover
+    LimeTabularExplainer = None
+
+from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, KFold
+from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+
+# Classification models
+from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge
+from sklearn.ensemble import (
+    RandomForestClassifier,
+    RandomForestRegressor,
+    GradientBoostingClassifier,
+    GradientBoostingRegressor,
+    ExtraTreesClassifier,
+    ExtraTreesRegressor,
+    AdaBoostClassifier,
+    AdaBoostRegressor,
+)
+from sklearn.svm import SVC, SVR
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
+from sklearn.neural_network import MLPClassifier, MLPRegressor
+from xgboost import XGBClassifier, XGBRegressor
+from lightgbm import LGBMClassifier, LGBMRegressor
+
+# Metrics
+from sklearn.metrics import (
+    accuracy_score, f1_score, roc_auc_score,
+    mean_squared_error, mean_absolute_error, r2_score,
+    confusion_matrix, roc_curve, classification_report,
+    precision_score, recall_score, balanced_accuracy_score,
+    explained_variance_score, median_absolute_error
+)
+
+from app.core.config import settings
+
+try:
+    import optuna
+except Exception:  # pragma: no cover
+    optuna = None
+
+logger = logging.getLogger(__name__)
+
+
+class UnsupportedGraphNN(BaseEstimator):
+    &quot;&quot;&quot;Placeholder estimator to keep GNN visible in catalog for future support.&quot;&quot;&quot;
+
+    def __init__(self, task_type: str = &quot;classification&quot;):
+        self.task_type = task_type
+
+    def fit(self, X, y):
+        raise ValueError(
+            &quot;Graph Neural Network requires graph-structured data and is not supported &quot;
+            &quot;in this tabular pipeline yet.&quot;
+        )
+
+    def predict(self, X):  # pragma: no cover
+        return np.zeros(len(X))
+
+
+class AutoMLPipeline:
+    &quot;&quot;&quot;Production-grade AutoML pipeline that automatically:
+    1. Detects problem type (classification/regression)
+    2. Preprocesses data (imputation, encoding, scaling)
+    3. Trains multiple models
+    4. Evaluates with cross-validation
+    5. Returns comprehensive metrics
+    &quot;&quot;&quot;
+
+    CLASSIFICATION_MODELS = {
+        &quot;Logistic Regression&quot;: LogisticRegression(max_iter=1000, random_state=settings.RANDOM_STATE),
+        &quot;Linear SVM&quot;: SVC(kernel=&quot;linear&quot;, probability=True, random_state=settings.RANDOM_STATE),
+        &quot;RBF SVM&quot;: SVC(kernel=&quot;rbf&quot;, probability=True, random_state=settings.RANDOM_STATE),
+        &quot;KNN&quot;: KNeighborsClassifier(n_neighbors=7),
+        &quot;Decision Tree&quot;: DecisionTreeClassifier(random_state=settings.RANDOM_STATE),
+        &quot;Random Forest&quot;: RandomForestClassifier(n_estimators=100, random_state=settings.RANDOM_STATE),
+        &quot;Extra Trees&quot;: ExtraTreesClassifier(n_estimators=160, random_state=settings.RANDOM_STATE),
+        &quot;AdaBoost&quot;: AdaBoostClassifier(n_estimators=160, random_state=settings.RANDOM_STATE),
+        &quot;XGBoost&quot;: XGBClassifier(n_estimators=100, random_state=settings.RANDOM_STATE, eval_metric=&quot;logloss&quot;, verbosity=0),
+        &quot;LightGBM&quot;: LGBMClassifier(n_estimators=100, random_state=settings.RANDOM_STATE, verbose=-1),
+        &quot;Gradient Boosting&quot;: GradientBoostingClassifier(n_estimators=100, random_state=settings.RANDOM_STATE),
+        &quot;MLP Neural Net&quot;: MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=320, random_state=settings.RANDOM_STATE),
+        &quot;Deep MLP Neural Net&quot;: MLPClassifier(hidden_layer_sizes=(256, 128, 64), max_iter=420, random_state=settings.RANDOM_STATE),
+        &quot;Graph Neural Network (experimental)&quot;: UnsupportedGraphNN(task_type=&quot;classification&quot;),
+    }
+
+    REGRESSION_MODELS = {
+        &quot;Linear Regression&quot;: Ridge(alpha=1.0),
+        &quot;Linear SVR&quot;: SVR(kernel=&quot;linear&quot;, C=1.0),
+        &quot;RBF SVR&quot;: SVR(kernel=&quot;rbf&quot;, C=1.0),
+        &quot;KNN&quot;: KNeighborsRegressor(n_neighbors=7),
+        &quot;Decision Tree&quot;: DecisionTreeRegressor(random_state=settings.RANDOM_STATE),
+        &quot;Random Forest&quot;: RandomForestRegressor(n_estimators=100, random_state=settings.RANDOM_STATE),
+        &quot;Extra Trees&quot;: ExtraTreesRegressor(n_estimators=160, random_state=settings.RANDOM_STATE),
+        &quot;AdaBoost&quot;: AdaBoostRegressor(n_estimators=160, random_state=settings.RANDOM_STATE),
+        &quot;XGBoost&quot;: XGBRegressor(n_estimators=100, random_state=settings.RANDOM_STATE, verbosity=0),
+        &quot;LightGBM&quot;: LGBMRegressor(n_estimators=100, random_state=settings.RANDOM_STATE, verbose=-1),
+        &quot;Gradient Boosting&quot;: GradientBoostingRegressor(n_estimators=100, random_state=settings.RANDOM_STATE),
+        &quot;MLP Neural Net&quot;: MLPRegressor(hidden_layer_sizes=(64, 32), max_iter=320, random_state=settings.RANDOM_STATE),
+        &quot;Deep MLP Neural Net&quot;: MLPRegressor(hidden_layer_sizes=(256, 128, 64), max_iter=420, random_state=settings.RANDOM_STATE),
+        &quot;Graph Neural Network (experimental)&quot;: UnsupportedGraphNN(task_type=&quot;regression&quot;),
+    }
+
+    def __init__(self, job_id: str, progress_callback=None):
+        self.job_id = job_id
+        self.progress_callback = progress_callback
+        self.label_encoder = None
+        self.feature_names = None
+        self.tuning_meta: Dict[str, Any] = {}
+
+    def _score_metric(self, task_type: str) -&gt; str:
+        return &quot;accuracy&quot; if task_type == &quot;classification&quot; else &quot;r2&quot;
+
+    def _auto_starting_params(
+        self,
+        model_name: str,
+        task_type: str,
+        n_rows: int,
+        n_features: int,
+    ) -&gt; Dict[str, Any]:
+        rows = max(int(n_rows), 1)
+        feats = max(int(n_features), 1)
+
+        if model_name == &quot;Random Forest&quot;:
+            return {
+                &quot;n_estimators&quot;: int(min(320, max(120, rows // 120 + feats * 4))),
+                &quot;max_depth&quot;: int(min(22, max(6, int(np.log2(rows)) + 3))),
+                &quot;min_samples_split&quot;: 2 if rows &gt; 1500 else 4,
+                &quot;min_samples_leaf&quot;: 1 if rows &gt; 3000 else 2,
+            }
+        if model_name == &quot;Extra Trees&quot;:
+            return {
+                &quot;n_estimators&quot;: int(min(360, max(140, rows // 110 + feats * 5))),
+                &quot;max_depth&quot;: int(min(24, max(7, int(np.log2(rows)) + 4))),
+            }
+        if model_name == &quot;Gradient Boosting&quot;:
+            return {
+                &quot;n_estimators&quot;: int(min(260, max(120, rows // 200 + feats * 2))),
+                &quot;learning_rate&quot;: 0.05 if rows &gt; 3000 else 0.08,
+                &quot;max_depth&quot;: int(min(6, max(2, int(np.log2(feats + 1))))),
+                &quot;subsample&quot;: 0.9,
+            }
+        if model_name == &quot;XGBoost&quot;:
+            return {
+                &quot;n_estimators&quot;: int(min(320, max(140, rows // 140 + feats * 3))),
+                &quot;max_depth&quot;: int(min(12, max(4, int(np.log2(feats + 2)) + 2))),
+                &quot;learning_rate&quot;: 0.05 if rows &gt; 4000 else 0.08,
+                &quot;subsample&quot;: 0.85,
+                &quot;colsample_bytree&quot;: 0.85,
+            }
+        if model_name == &quot;LightGBM&quot;:
+            return {
+                &quot;n_estimators&quot;: int(min(320, max(140, rows // 140 + feats * 3))),
+                &quot;num_leaves&quot;: int(min(96, max(31, 16 + int(np.sqrt(feats)) * 6))),
+                &quot;learning_rate&quot;: 0.05 if rows &gt; 4000 else 0.08,
+                &quot;subsample&quot;: 0.9,
+                &quot;colsample_bytree&quot;: 0.9,
+            }
+        if model_name in {&quot;Logistic Regression&quot;, &quot;Linear Regression&quot;}:
+            return {&quot;C&quot;: 1.0} if model_name == &quot;Logistic Regression&quot; else {&quot;alpha&quot;: 1.0}
+        if model_name == &quot;KNN&quot;:
+            return {&quot;n_neighbors&quot;: int(min(31, max(5, int(np.sqrt(rows) // 2 * 2 + 1))))}
+        if model_name in {&quot;Linear SVM&quot;, &quot;Linear SVR&quot;}:
+            return {&quot;C&quot;: 1.0}
+        if model_name in {&quot;RBF SVM&quot;, &quot;RBF SVR&quot;}:
+            gamma = max(0.001, min(1.0, 1.0 / max(feats, 1)))
+            return {&quot;C&quot;: 1.0, &quot;gamma&quot;: float(gamma)}
+        if model_name == &quot;MLP Neural Net&quot;:
+            return {&quot;alpha&quot;: 0.0005 if rows &gt; 5000 else 0.0001, &quot;max_iter&quot;: 320}
+        if model_name == &quot;Deep MLP Neural Net&quot;:
+            return {&quot;alpha&quot;: 0.001 if rows &gt; 5000 else 0.0003, &quot;max_iter&quot;: 420}
+        return {}
+
+    def _sanitize_model_overrides(self, estimator, overrides: Optional[Dict[str, Any]]) -&gt; Dict[str, Any]:
+        if not overrides:
+            return {}
+        allowed = set(estimator.get_params().keys())
+        cleaned: Dict[str, Any] = {}
+        for k, v in overrides.items():
+            if k in allowed:
+                cleaned[k] = v
+        return cleaned
+
+    def tune_estimator(
+        self,
+        model_name: str,
+        estimator,
+        preprocessor: ColumnTransformer,
+        X_train,
+        y_train,
+        task_type: str,
+        cv_folds: int,
+        tuning_trials: int,
+        tuning_time_budget_sec: int,
+    ):
+        &quot;&quot;&quot;Tune estimator hyperparameters with Optuna (if available).&quot;&quot;&quot;
+        if optuna is None:
+            return estimator, {&quot;enabled&quot;: False, &quot;reason&quot;: &quot;optuna_not_installed&quot;}
+
+        score_metric = self._score_metric(task_type)
+
+        def suggest(trial):
+            if model_name == &quot;Random Forest&quot;:
+                return {
+                    &quot;n_estimators&quot;: trial.suggest_int(&quot;n_estimators&quot;, 80, 300),
+                    &quot;max_depth&quot;: trial.suggest_int(&quot;max_depth&quot;, 3, 18),
+                    &quot;min_samples_split&quot;: trial.suggest_int(&quot;min_samples_split&quot;, 2, 12),
+                    &quot;min_samples_leaf&quot;: trial.suggest_int(&quot;min_samples_leaf&quot;, 1, 8),
+                }
+            if model_name == &quot;XGBoost&quot;:
+                return {
+                    &quot;n_estimators&quot;: trial.suggest_int(&quot;n_estimators&quot;, 80, 260),
+                    &quot;max_depth&quot;: trial.suggest_int(&quot;max_depth&quot;, 3, 12),
+                    &quot;learning_rate&quot;: trial.suggest_float(&quot;learning_rate&quot;, 0.01, 0.3, log=True),
+                    &quot;subsample&quot;: trial.suggest_float(&quot;subsample&quot;, 0.6, 1.0),
+                    &quot;colsample_bytree&quot;: trial.suggest_float(&quot;colsample_bytree&quot;, 0.6, 1.0),
+                }
+            if model_name == &quot;LightGBM&quot;:
+                return {
+                    &quot;n_estimators&quot;: trial.suggest_int(&quot;n_estimators&quot;, 80, 260),
+                    &quot;learning_rate&quot;: trial.suggest_float(&quot;learning_rate&quot;, 0.01, 0.3, log=True),
+                    &quot;num_leaves&quot;: trial.suggest_int(&quot;num_leaves&quot;, 16, 96),
+                    &quot;subsample&quot;: trial.suggest_float(&quot;subsample&quot;, 0.6, 1.0),
+                    &quot;colsample_bytree&quot;: trial.suggest_float(&quot;colsample_bytree&quot;, 0.6, 1.0),
+                }
+            if model_name == &quot;Gradient Boosting&quot;:
+                return {
+                    &quot;n_estimators&quot;: trial.suggest_int(&quot;n_estimators&quot;, 60, 240),
+                    &quot;learning_rate&quot;: trial.suggest_float(&quot;learning_rate&quot;, 0.01, 0.3, log=True),
+                    &quot;max_depth&quot;: trial.suggest_int(&quot;max_depth&quot;, 2, 8),
+                    &quot;subsample&quot;: trial.suggest_float(&quot;subsample&quot;, 0.6, 1.0),
+                }
+            if model_name == &quot;Logistic Regression&quot;:
+                return {
+                    &quot;C&quot;: trial.suggest_float(&quot;C&quot;, 1e-3, 20.0, log=True),
+                }
+            if model_name == &quot;Linear Regression&quot;:
+                return {
+                    &quot;alpha&quot;: trial.suggest_float(&quot;alpha&quot;, 1e-3, 20.0, log=True),
+                }
+            return {}
+
+        def objective(trial):
+            params = suggest(trial)
+            est = clone(estimator)
+            if params:
+                est.set_params(**params)
+
+            step_name = &quot;classifier&quot; if task_type == &quot;classification&quot; else &quot;regressor&quot;
+            candidate = Pipeline([
+                (&quot;preprocessor&quot;, preprocessor),
+                (step_name, est),
+            ])
+
+            if task_type == &quot;classification&quot;:
+                cv = StratifiedKFold(n_splits=max(2, min(5, cv_folds)), shuffle=True, random_state=settings.RANDOM_STATE)
+            else:
+                cv = KFold(n_splits=max(2, min(5, cv_folds)), shuffle=True, random_state=settings.RANDOM_STATE)
+
+            scores = cross_val_score(candidate, X_train, y_train, cv=cv, scoring=score_metric)
+            return float(np.mean(scores))
+
+        try:
+            study = optuna.create_study(direction=&quot;maximize&quot;)
+            study.optimize(objective, n_trials=tuning_trials, timeout=tuning_time_budget_sec)
+
+            best_params = study.best_params or {}
+            tuned = clone(estimator)
+            if best_params:
+                tuned.set_params(**best_params)
+
+            return tuned, {
+                &quot;enabled&quot;: True,
+                &quot;score_metric&quot;: score_metric,
+                &quot;n_trials&quot;: len(study.trials),
+                &quot;best_value&quot;: float(study.best_value) if study.best_value is not None else None,
+                &quot;best_params&quot;: best_params,
+            }
+        except Exception as e:
+            logger.warning(&quot;Tuning failed for %s: %s&quot;, model_name, e)
+            return estimator, {&quot;enabled&quot;: True, &quot;failed&quot;: True, &quot;reason&quot;: str(e)}
+
+    def _update_progress(self, progress: int, message: str = &quot;&quot;):
+        &quot;&quot;&quot;Update training progress.&quot;&quot;&quot;
+        if self.progress_callback:
+            self.progress_callback(progress, message)
+        logger.info(f&quot;[{self.job_id}] Progress {progress}%: {message}&quot;)
+
+    def detect_task_type(self, y: pd.Series) -&gt; str:
+        &quot;&quot;&quot;
+        Automatically detect if task is classification or regression.
+        Heuristic: ≤ 20 unique values OR dtype is object/bool → classification
+        &quot;&quot;&quot;
+        n_unique = y.nunique()
+        dtype = y.dtype
+
+        if dtype == &quot;object&quot; or dtype == &quot;bool&quot;:
+            return &quot;classification&quot;
+        if n_unique &lt;= 20 and n_unique / len(y) &lt; 0.05:
+            return &quot;classification&quot;
+        return &quot;regression&quot;
+
+    def preprocess(
+        self,
+        df: pd.DataFrame,
+        target_column: str,
+        test_size: float = 0.2
+    ) -&gt; Tuple[Any, Any, Any, Any, ColumnTransformer, List[str]]:
+        &quot;&quot;&quot;
+        Full preprocessing pipeline:
+        - Drop rows with missing targets
+        - Handle numerical &amp; categorical features
+        - Apply imputation, encoding, and scaling
+        - Split into train/test
+        &quot;&quot;&quot;
+        # Drop target NaNs
+        df = df.dropna(subset=[target_column])
+        X = df.drop(columns=[target_column])
+        y = df[target_column].copy()
+
+        # Identify column types
+        num_cols = X.select_dtypes(include=[&quot;int64&quot;, &quot;float64&quot;]).columns.tolist()
+        cat_cols = X.select_dtypes(include=[&quot;object&quot;, &quot;category&quot;, &quot;bool&quot;]).columns.tolist()
+
+        # Drop high-cardinality categoricals (&gt; 50 unique values)
+        cat_cols = [c for c in cat_cols if X[c].nunique() &lt;= 50]
+
+        self.feature_names = num_cols + cat_cols
+        X = X[self.feature_names]
+
+        # Build preprocessor
+        num_transformer = Pipeline([
+            (&quot;imputer&quot;, SimpleImputer(strategy=&quot;median&quot;)),
+            (&quot;scaler&quot;, StandardScaler()),
+        ])
+        cat_transformer = Pipeline([
+            (&quot;imputer&quot;, SimpleImputer(strategy=&quot;most_frequent&quot;)),
+            (&quot;encoder&quot;, OneHotEncoder(handle_unknown=&quot;ignore&quot;, sparse_output=False)),
+        ])
+
+        preprocessor = ColumnTransformer(transformers=[
+            (&quot;num&quot;, num_transformer, num_cols),
+            (&quot;cat&quot;, cat_transformer, cat_cols),
+        ], remainder=&quot;drop&quot;)
+
+        # Encode target for classification
+        if y.dtype == &quot;object&quot; or y.dtype == &quot;bool&quot;:
+            self.label_encoder = LabelEncoder()
+            y = pd.Series(self.label_encoder.fit_transform(y.astype(str)), name=target_column)
+
+        # Train-test split
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y,
+            test_size=test_size,
+            random_state=settings.RANDOM_STATE,
+            stratify=y if len(y.unique()) &lt; 20 else None
+        )
+
+        return X_train, X_test, y_train, y_test, preprocessor, self.feature_names
+
+    def get_feature_importances(self, model, preprocessor: ColumnTransformer, feature_names: List[str]) -&gt; Dict[str, float]:
+        &quot;&quot;&quot;Extract feature importances from a fitted pipeline.&quot;&quot;&quot;
+        try:
+            estimator = model.named_steps.get(&quot;classifier&quot;) or model.named_steps.get(&quot;regressor&quot;)
+            if estimator is None:
+                return {}
+
+            fitted_preprocessor = model.named_steps.get(&quot;preprocessor&quot;)
+            if fitted_preprocessor is None:
+                return {}
+
+            # Get feature names after one-hot encoding
+            ohe_features = []
+            for name, transformer, cols in fitted_preprocessor.transformers_:
+                if name == &quot;num&quot;:
+                    ohe_features.extend(cols)
+                elif name == &quot;cat&quot;:
+                    enc = transformer.named_steps.get(&quot;encoder&quot;)
+                    if enc and hasattr(enc, &quot;get_feature_names_out&quot;):
+                        ohe_features.extend(enc.get_feature_names_out(cols).tolist())
+
+            if hasattr(estimator, &quot;feature_importances_&quot;):
+                importances = estimator.feature_importances_
+            elif hasattr(estimator, &quot;coef_&quot;):
+                importances = np.abs(estimator.coef_).flatten()
+            else:
+                return {}
+
+            # Aggregate OHE features back to original
+            importance_dict = {}
+            ohe_idx = 0
+            for fname in feature_names:
+                # Count OHE columns for this feature
+                matching = [f for f in ohe_features if f == fname or f.startswith(f&quot;{fname}_&quot;)]
+                n = len(matching) if matching else 1
+                if ohe_idx &lt; len(importances):
+                    importance_dict[fname] = float(np.sum(importances[ohe_idx:ohe_idx + n]))
+                    ohe_idx += n
+
+            # Normalize
+            total = sum(importance_dict.values())
+            if total &gt; 0:
+                importance_dict = {k: v / total for k, v in importance_dict.items()}
+
+            return dict(sorted(importance_dict.items(), key=lambda x: x[1], reverse=True)[:20])
+        except Exception as e:
+            logger.warning(f&quot;Could not extract feature importances: {e}&quot;)
+            return {}
+
+    def get_shap_explanation(self, pipeline, X_sample, task_type: str = &quot;classification&quot;, nsamples: int = 100):
+        &quot;&quot;&quot;Return SHAP values for a sample of the data.&quot;&quot;&quot;
+        try:
+            estimator = pipeline.named_steps.get(&quot;classifier&quot;) or pipeline.named_steps.get(&quot;regressor&quot;)
+            if estimator is None:
+                return {&quot;error&quot;: &quot;No estimator found in pipeline&quot;}
+
+            preprocessor = pipeline.named_steps[&quot;preprocessor&quot;]
+            X_proc = preprocessor.transform(X_sample)
+            if hasattr(X_proc, &quot;toarray&quot;):
+                X_proc = X_proc.toarray()
+
+            feature_names = list(getattr(X_sample, &quot;columns&quot;, []))
+            if not feature_names:
+                feature_names = [str(i) for i in range(X_proc.shape[1])]
+
+            explainer = shap.Explainer(estimator, X_proc)
+            shap_values = explainer(X_proc[:nsamples])
+
+            values = np.array(shap_values.values)
+            if values.ndim == 2:
+                mean_abs = np.abs(values).mean(axis=0)
+            elif values.ndim == 3:
+                mean_abs = np.abs(values).mean(axis=(0, 2))
+            else:
+                mean_abs = np.array([])
+
+            global_importance = []
+            if mean_abs.size:
+                for idx, val in enumerate(mean_abs.tolist()):
+                    fname = feature_names[idx] if idx &lt; len(feature_names) else str(idx)
+                    global_importance.append({&quot;feature&quot;: fname, &quot;importance&quot;: float(val)})
+                global_importance = sorted(global_importance, key=lambda x: x[&quot;importance&quot;], reverse=True)[:20]
+
+            base_values = getattr(shap_values, &quot;base_values&quot;, None)
+            if isinstance(base_values, np.ndarray):
+                expected_value = base_values.tolist()
+            else:
+                expected_value = base_values
+
+            return {
+                &quot;shap_values&quot;: values.tolist(),
+                &quot;expected_value&quot;: expected_value,
+                &quot;data&quot;: X_proc[:nsamples].tolist(),
+                &quot;feature_names&quot;: feature_names,
+                &quot;global_importance&quot;: global_importance,
+            }
+        except Exception as e:
+            logger.warning(f&quot;SHAP explanation failed: {e}&quot;)
+            return {&quot;error&quot;: str(e)}
+
+    def get_lime_explanation(self, pipeline, X_sample, y_sample, task_type: str = &quot;classification&quot;, nsamples: int = 5):
+        &quot;&quot;&quot;Return LIME explanations for a few samples.&quot;&quot;&quot;
+        if LimeTabularExplainer is None:
+            return {&quot;error&quot;: &quot;LIME dependency is not installed. Install &#x27;lime&#x27; package.&quot;}
+        try:
+            estimator = pipeline.named_steps.get(&quot;classifier&quot;) or pipeline.named_steps.get(&quot;regressor&quot;)
+            if estimator is None:
+                return {&quot;error&quot;: &quot;No estimator found in pipeline&quot;}
+
+            preprocessor = pipeline.named_steps[&quot;preprocessor&quot;]
+            X_proc = preprocessor.transform(X_sample)
+            if hasattr(X_proc, &quot;toarray&quot;):
+                X_proc = X_proc.toarray()
+
+            feature_names = list(getattr(X_sample, &quot;columns&quot;, []))
+            if not feature_names:
+                feature_names = [str(i) for i in range(X_proc.shape[1])]
+
+            class_names = None
+            if task_type == &quot;classification&quot;:
+                class_names = [str(v) for v in sorted(pd.Series(y_sample).dropna().unique().tolist())]
+
+            explainer = LimeTabularExplainer(
+                X_proc,
+                feature_names=feature_names,
+                class_names=class_names,
+                mode=task_type,
+            )
+
+            explanations = []
+            for i in range(min(nsamples, X_proc.shape[0])):
+                exp = explainer.explain_instance(
+                    X_proc[i],
+                    estimator.predict_proba if task_type == &quot;classification&quot; else estimator.predict,
+                    num_features=min(10, X_proc.shape[1]),
+                )
+                explanations.append({
+                    &quot;instance&quot;: i,
+                    &quot;explanation&quot;: exp.as_list(),
+                })
+
+            return {&quot;lime_explanations&quot;: explanations}
+        except Exception as e:
+            logger.warning(f&quot;LIME explanation failed: {e}&quot;)
+            return {&quot;error&quot;: str(e)}
+
+    def evaluate_classification(
+        self, pipeline, X_test, y_test, X_train, y_train, cv_folds: int
+    ) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;Compute classification metrics.&quot;&quot;&quot;
+        y_pred = pipeline.predict(X_test)
+        metrics = {
+            &quot;accuracy&quot;: float(accuracy_score(y_test, y_pred)),
+            &quot;f1_score&quot;: float(f1_score(y_test, y_pred, average=&quot;weighted&quot;, zero_division=0)),
+            &quot;precision&quot;: float(precision_score(y_test, y_pred, average=&quot;weighted&quot;, zero_division=0)),
+            &quot;recall&quot;: float(recall_score(y_test, y_pred, average=&quot;weighted&quot;, zero_division=0)),
+            &quot;balanced_accuracy&quot;: float(balanced_accuracy_score(y_test, y_pred)),
+        }
+
+        # ROC-AUC (binary and multiclass)
+        try:
+            n_classes = len(np.unique(y_test))
+            if n_classes == 2:
+                y_prob = pipeline.predict_proba(X_test)[:, 1]
+                metrics[&quot;roc_auc&quot;] = float(roc_auc_score(y_test, y_prob))
+                fpr, tpr, thresholds = roc_curve(y_test, y_prob)
+                metrics[&quot;roc_curve&quot;] = {
+                    &quot;fpr&quot;: fpr.tolist(),
+                    &quot;tpr&quot;: tpr.tolist(),
+                    &quot;thresholds&quot;: thresholds.tolist(),
+                }
+            else:
+                y_prob = pipeline.predict_proba(X_test)
+                metrics[&quot;roc_auc&quot;] = float(roc_auc_score(y_test, y_prob, multi_class=&quot;ovr&quot;, average=&quot;weighted&quot;))
+        except Exception:
+            metrics[&quot;roc_auc&quot;] = None
+
+        # Confusion matrix
+        cm = confusion_matrix(y_test, y_pred)
+        metrics[&quot;confusion_matrix&quot;] = cm.tolist()
+
+        # Classification report (macro/weighted diagnostics)
+        try:
+            report = classification_report(y_test, y_pred, output_dict=True, zero_division=0)
+            metrics[&quot;classification_report&quot;] = report
+        except Exception:
+            metrics[&quot;classification_report&quot;] = None
+
+        # Cross-validation
+        cv = StratifiedKFold(n_splits=cv_folds, shuffle=True, random_state=settings.RANDOM_STATE)
+        cv_scores = cross_val_score(pipeline, pd.concat([X_train, X_test]), pd.concat([y_train, y_test]), cv=cv, scoring=&quot;accuracy&quot;)
+        metrics[&quot;cv_scores&quot;] = cv_scores.tolist()
+        metrics[&quot;cv_mean&quot;] = float(cv_scores.mean())
+        metrics[&quot;cv_std&quot;] = float(cv_scores.std())
+        metrics[&quot;per_fold&quot;] = [
+            {&quot;fold&quot;: int(i + 1), &quot;score&quot;: float(v)} for i, v in enumerate(cv_scores.tolist())
+        ]
+
+        return metrics
+
+    def evaluate_regression(
+        self, pipeline, X_test, y_test, X_train, y_train, cv_folds: int
+    ) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;Compute regression metrics.&quot;&quot;&quot;
+        y_pred = pipeline.predict(X_test)
+
+        metrics = {
+            &quot;rmse&quot;: float(np.sqrt(mean_squared_error(y_test, y_pred))),
+            &quot;mae&quot;: float(mean_absolute_error(y_test, y_pred)),
+            &quot;r2_score&quot;: float(r2_score(y_test, y_pred)),
+            &quot;explained_variance&quot;: float(explained_variance_score(y_test, y_pred)),
+            &quot;median_ae&quot;: float(median_absolute_error(y_test, y_pred)),
+            &quot;residuals&quot;: {
+                &quot;predicted&quot;: y_pred.tolist()[:200],
+                &quot;actual&quot;: y_test.tolist()[:200],
+            }
+        }
+
+        # Robust MAPE (avoid divide-by-zero explosions)
+        try:
+            epsilon = 1e-8
+            denom = np.where(np.abs(np.array(y_test)) &lt; epsilon, epsilon, np.abs(np.array(y_test)))
+            mape = float(np.mean(np.abs((np.array(y_test) - np.array(y_pred)) / denom)))
+            metrics[&quot;mape&quot;] = mape
+        except Exception:
+            metrics[&quot;mape&quot;] = None
+
+        # Cross-validation
+        cv = KFold(n_splits=cv_folds, shuffle=True, random_state=settings.RANDOM_STATE)
+        cv_scores = cross_val_score(pipeline, pd.concat([X_train, X_test]), pd.concat([y_train, y_test]), cv=cv, scoring=&quot;r2&quot;)
+        metrics[&quot;cv_scores&quot;] = cv_scores.tolist()
+        metrics[&quot;cv_mean&quot;] = float(cv_scores.mean())
+        metrics[&quot;cv_std&quot;] = float(cv_scores.std())
+        metrics[&quot;per_fold&quot;] = [
+            {&quot;fold&quot;: int(i + 1), &quot;score&quot;: float(v)} for i, v in enumerate(cv_scores.tolist())
+        ]
+
+        return metrics
+
+    def train_all_models(
+        self,
+        df: pd.DataFrame,
+        target_column: str,
+        task_type: Optional[str] = None,
+        test_size: float = 0.2,
+        cv_folds: int = 5,
+        models_to_train: Optional[List[str]] = None,
+        model_hyperparams: Optional[Dict[str, Dict[str, Any]]] = None,
+        enable_tuning: bool = False,
+        tuning_trials: int = 12,
+        tuning_time_budget_sec: int = 180,
+    ) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;
+        Main training entrypoint.
+        Returns a dict with task_type and list of model results.
+        &quot;&quot;&quot;
+        self._update_progress(5, &quot;Preprocessing data...&quot;)
+
+        X_train, X_test, y_train, y_test, preprocessor, feature_names = self.preprocess(
+            df, target_column, test_size
+        )
+
+        # Auto-detect task type
+        if task_type is None or task_type == &quot;auto&quot;:
+            task_type = self.detect_task_type(pd.concat([y_train, y_test]))
+        logger.info(f&quot;Task type detected: {task_type}&quot;)
+
+        model_catalog = (
+            self.CLASSIFICATION_MODELS if task_type == &quot;classification&quot;
+            else self.REGRESSION_MODELS
+        )
+
+        if models_to_train:
+            model_catalog = {k: v for k, v in model_catalog.items() if k in models_to_train}
+
+        if not model_catalog:
+            raise ValueError(
+                &quot;No compatible models selected for this task type. &quot;
+                &quot;Pick at least one valid model for the detected task.&quot;
+            )
+
+        results = []
+        n_models = len(model_catalog)
+        n_rows = len(df)
+        n_features = len(feature_names)
+        model_hyperparams = model_hyperparams or {}
+
+        for i, (model_name, estimator) in enumerate(model_catalog.items()):
+            progress = 10 + int((i / n_models) * 80)
+            self._update_progress(progress, f&quot;Training {model_name}...&quot;)
+
+            try:
+                start = time.time()
+
+                auto_starting = self._auto_starting_params(model_name, task_type, n_rows, n_features)
+                user_override_raw = model_hyperparams.get(model_name) if isinstance(model_hyperparams, dict) else None
+                user_overrides = self._sanitize_model_overrides(estimator, user_override_raw)
+
+                if auto_starting:
+                    estimator.set_params(**auto_starting)
+                if user_overrides:
+                    estimator.set_params(**user_overrides)
+
+                # Build full pipeline
+                tuning_info = {&quot;enabled&quot;: False}
+                if enable_tuning:
+                    tuned_estimator, tuning_info = self.tune_estimator(
+                        model_name=model_name,
+                        estimator=estimator,
+                        preprocessor=preprocessor,
+                        X_train=X_train,
+                        y_train=y_train,
+                        task_type=task_type,
+                        cv_folds=cv_folds,
+                        tuning_trials=tuning_trials,
+                        tuning_time_budget_sec=tuning_time_budget_sec,
+                    )
+                    estimator = tuned_estimator
+
+                step_name = &quot;classifier&quot; if task_type == &quot;classification&quot; else &quot;regressor&quot;
+                pipeline = Pipeline([
+                    (&quot;preprocessor&quot;, preprocessor),
+                    (step_name, estimator),
+                ])
+
+                pipeline.fit(X_train, y_train)
+                training_time = time.time() - start
+
+                # Evaluate
+                if task_type == &quot;classification&quot;:
+                    metrics = self.evaluate_classification(pipeline, X_test, y_test, X_train, y_train, cv_folds)
+                else:
+                    metrics = self.evaluate_regression(pipeline, X_test, y_test, X_train, y_train, cv_folds)
+
+                # Feature importances
+                feature_importance = self.get_feature_importances(pipeline, preprocessor, feature_names)
+
+                # Save model
+                model_filename = f&quot;{self.job_id}_{model_name.replace(&#x27; &#x27;, &#x27;_&#x27;)}.joblib&quot;
+                model_path = os.path.join(settings.MODEL_STORAGE_PATH, model_filename)
+                joblib.dump({
+                    &quot;pipeline&quot;: pipeline,
+                    &quot;feature_names&quot;: feature_names,
+                    &quot;label_encoder&quot;: self.label_encoder,
+                    &quot;task_type&quot;: task_type,
+                    &quot;model_name&quot;: model_name,
+                }, model_path)
+
+                results.append({
+                    &quot;model_name&quot;: model_name,
+                    &quot;model_type&quot;: type(estimator).__name__,
+                    &quot;task_type&quot;: task_type,
+                    &quot;file_path&quot;: model_path,
+                    &quot;metrics&quot;: metrics,
+                    &quot;tuning&quot;: {
+                        **tuning_info,
+                        &quot;starting_params&quot;: auto_starting,
+                        &quot;manual_overrides&quot;: user_overrides,
+                    },
+                    &quot;feature_importance&quot;: feature_importance,
+                    &quot;training_time&quot;: training_time,
+                    # Flatten key metrics
+                    &quot;accuracy&quot;: metrics.get(&quot;accuracy&quot;),
+                    &quot;f1_score&quot;: metrics.get(&quot;f1_score&quot;),
+                    &quot;roc_auc&quot;: metrics.get(&quot;roc_auc&quot;),
+                    &quot;rmse&quot;: metrics.get(&quot;rmse&quot;),
+                    &quot;mae&quot;: metrics.get(&quot;mae&quot;),
+                    &quot;r2_score&quot;: metrics.get(&quot;r2_score&quot;),
+                    &quot;confusion_matrix&quot;: metrics.get(&quot;confusion_matrix&quot;),
+                    &quot;roc_curve_data&quot;: metrics.get(&quot;roc_curve&quot;),
+                    &quot;cv_scores&quot;: metrics.get(&quot;cv_scores&quot;),
+                })
+
+                logger.info(f&quot;{model_name} trained in {training_time:.2f}s&quot;)
+
+            except Exception as e:
+                logger.exception(f&quot;Failed to train {model_name}: {e}&quot;)
+                results.append({
+                    &quot;model_name&quot;: model_name,
+                    &quot;model_type&quot;: type(estimator).__name__,
+                    &quot;task_type&quot;: task_type,
+                    &quot;error&quot;: str(e),
+                    &quot;training_time&quot;: 0,
+                })
+
+        self._update_progress(100, &quot;Training complete!&quot;)
+
+        return {
+            &quot;task_type&quot;: task_type,
+            &quot;models&quot;: results,
+            &quot;feature_names&quot;: feature_names,
+        }
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>AI</strong>: No official citation linked here.</li><li><strong>AUC</strong>: No official citation linked here.</li><li><strong>AdaBoost</strong>: No official citation linked here.</li><li><strong>AdaBoostClassifier</strong>: No official citation linked here.</li><li><strong>AdaBoostRegressor</strong>: No official citation linked here.</li><li><strong>Aggregate</strong>: No official citation linked here.</li><li><strong>Any</strong>: No official citation linked here.</li><li><strong>Apply</strong>: No official citation linked here.</li><li><strong>Auto</strong>: No official citation linked here.</li><li><strong>AutoML</strong>: No official citation linked here.</li><li><strong>AutoMLPipeline</strong>: No official citation linked here.</li><li><strong>Automatically</strong>: No official citation linked here.</li><li><strong>Axiom</strong>: No official citation linked here.</li><li><strong>BaseEstimator</strong>: No official citation linked here.</li><li><strong>Boosting</strong>: No official citation linked here.</li><li><strong>Build</strong>: No official citation linked here.</li><li><strong>CLASSIFICATION_MODELS</strong>: No official citation linked here.</li><li><strong>Classification</strong>: No official citation linked here.</li><li><strong>Cloud</strong>: No official citation linked here.</li><li><strong>ColumnTransformer</strong>: No official citation linked here.</li><li><strong>Compute</strong>: No official citation linked here.</li><li><strong>Confusion</strong>: No official citation linked here.</li><li><strong>Could</strong>: No official citation linked here.</li><li><strong>Count</strong>: No official citation linked here.</li><li><strong>Cross</strong>: No official citation linked here.</li><li><strong>DataFrame</strong>: No official citation linked here.</li><li><strong>Decision</strong>: No official citation linked here.</li><li><strong>DecisionTreeClassifier</strong>: No official citation linked here.</li><li><strong>DecisionTreeRegressor</strong>: No official citation linked here.</li><li><strong>Deep</strong>: No official citation linked here.</li><li><strong>Detects</strong>: No official citation linked here.</li><li><strong>Dict</strong>: No official citation linked here.</li><li><strong>Drop</strong>: No official citation linked here.</li><li><strong>Encode</strong>: No official citation linked here.</li><li><strong>Evaluate</strong>: No official citation linked here.</li><li><strong>Evaluates</strong>: No official citation linked here.</li><li><strong>Exception</strong>: No official citation linked here.</li><li><strong>Explainability</strong>: No official citation linked here.</li><li><strong>Explainer</strong>: No official citation linked here.</li><li><strong>Extra</strong>: No official citation linked here.</li><li><strong>ExtraTreesClassifier</strong>: No official citation linked here.</li><li><strong>ExtraTreesRegressor</strong>: No official citation linked here.</li><li><strong>Extract</strong>: No official citation linked here.</li><li><strong>Failed</strong>: No official citation linked here.</li><li><strong>False</strong>: No official citation linked here.</li><li><strong>Feature</strong>: No official citation linked here.</li><li><strong>Flatten</strong>: No official citation linked here.</li><li><strong>Forest</strong>: No official citation linked here.</li><li><strong>Full</strong>: No official citation linked here.</li><li><strong>GNN</strong>: No official citation linked here.</li><li><strong>Get</strong>: No official citation linked here.</li><li><strong>Gradient</strong>: No official citation linked here.</li><li><strong>GradientBoostingClassifier</strong>: No official citation linked here.</li><li><strong>GradientBoostingRegressor</strong>: No official citation linked here.</li><li><strong>Graph</strong>: No official citation linked here.</li><li><strong>Handle</strong>: No official citation linked here.</li><li><strong>Heuristic</strong>: No official citation linked here.</li><li><strong>Identify</strong>: No official citation linked here.</li><li><strong>Install</strong>: No official citation linked here.</li><li><strong>KFold</strong>: No official citation linked here.</li><li><strong>KNN</strong>: No official citation linked here.</li><li><strong>KNeighborsClassifier</strong>: No official citation linked here.</li><li><strong>KNeighborsRegressor</strong>: No official citation linked here.</li><li><strong>LGBMClassifier</strong>: No official citation linked here.</li><li><strong>LGBMRegressor</strong>: No official citation linked here.</li><li><strong>LIME</strong>: No official citation linked here.</li><li><strong>LabelEncoder</strong>: No official citation linked here.</li><li><strong>LightGBM</strong>: No official citation linked here.</li><li><strong>LimeTabularExplainer</strong>: No official citation linked here.</li><li><strong>Linear</strong>: No official citation linked here.</li><li><strong>LinearRegression</strong>: No official citation linked here.</li><li><strong>List</strong>: No official citation linked here.</li><li><strong>Logistic</strong>: No official citation linked here.</li><li><strong>LogisticRegression</strong>: No official citation linked here.</li><li><strong>MAPE</strong>: No official citation linked here.</li><li><strong>MLP</strong>: No official citation linked here.</li><li><strong>MLPClassifier</strong>: No official citation linked here.</li><li><strong>MLPRegressor</strong>: No official citation linked here.</li><li><strong>MODEL_STORAGE_PATH</strong>: No official citation linked here.</li><li><strong>Main</strong>: No official citation linked here.</li><li><strong>Metrics</strong>: No official citation linked here.</li><li><strong>NaNs</strong>: No official citation linked here.</li><li><strong>Net</strong>: No official citation linked here.</li><li><strong>Network</strong>: No official citation linked here.</li><li><strong>Neural</strong>: No official citation linked here.</li><li><strong>No</strong>: No official citation linked here.</li><li><strong>None</strong>: No official citation linked here.</li><li><strong>Normalize</strong>: No official citation linked here.</li><li><strong>OHE</strong>: No official citation linked here.</li><li><strong>OR</strong>: No official citation linked here.</li><li><strong>OneHotEncoder</strong>: No official citation linked here.</li><li><strong>Optional</strong>: No official citation linked here.</li><li><strong>Optuna</strong>: No official citation linked here.</li><li><strong>Pick</strong>: No official citation linked here.</li><li><strong>Pipeline</strong>: No official citation linked here.</li><li><strong>Placeholder</strong>: No official citation linked here.</li><li><strong>Preprocesses</strong>: No official citation linked here.</li><li><strong>Preprocessing</strong>: No official citation linked here.</li><li><strong>Production</strong>: No official citation linked here.</li><li><strong>Progress</strong>: No official citation linked here.</li><li><strong>RANDOM_STATE</strong>: No official citation linked here.</li><li><strong>RBF</strong>: No official citation linked here.</li><li><strong>REGRESSION_MODELS</strong>: No official citation linked here.</li><li><strong>ROC</strong>: No official citation linked here.</li><li><strong>Random</strong>: No official citation linked here.</li><li><strong>RandomForestClassifier</strong>: No official citation linked here.</li><li><strong>RandomForestRegressor</strong>: No official citation linked here.</li><li><strong>Regression</strong>: No official citation linked here.</li><li><strong>Return</strong>: No official citation linked here.</li><li><strong>Returns</strong>: No official citation linked here.</li><li><strong>Ridge</strong>: No official citation linked here.</li><li><strong>Robust</strong>: No official citation linked here.</li><li><strong>SHAP</strong>: No official citation linked here.</li><li><strong>SVC</strong>: No official citation linked here.</li><li><strong>SVM</strong>: No official citation linked here.</li><li><strong>SVR</strong>: No official citation linked here.</li><li><strong>Save</strong>: No official citation linked here.</li><li><strong>Series</strong>: No official citation linked here.</li><li><strong>SimpleImputer</strong>: No official citation linked here.</li><li><strong>Split</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

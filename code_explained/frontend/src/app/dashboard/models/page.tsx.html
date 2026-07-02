@@ -1,0 +1,1144 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>page.tsx</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>frontend/src/app/dashboard/models/page.tsx</span></div>
+        <h1 style="margin:10px 0 6px">page.tsx</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="../deploy/page.tsx.html">Previous</a><a href="../predict/page.tsx.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: frontend/src/app/dashboard/models/page.tsx</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>frontend/src/app/dashboard/models/page.tsx</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-tsx">&quot;use client&quot;;
+import { useState, useEffect } from &quot;react&quot;;
+import { useSearchParams } from &quot;next/navigation&quot;;
+import { metricsAPI, trainingAPI, modelsAPI, datasetsAPI } from &quot;@/lib/api&quot;;
+import {
+  MetricsData,
+  TrainedModel,
+  ShapResult,
+  LimeResult,
+  ModelMonitoring,
+  Dataset,
+  DatasetQualityReport,
+  CleanPreview,
+  LeakageReport,
+  EDAReport,
+  TrainingJob,
+  AnalyticsReport,
+  AnalyticsChart,
+} from &quot;@/types&quot;;
+import toast from &quot;react-hot-toast&quot;;
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, ScatterChart, Scatter
+} from &quot;recharts&quot;;
+import { Trophy, Download, Rocket, BarChart3, Loader2, Brain, Activity } from &quot;lucide-react&quot;;
+import PanelHeader from &quot;@/components/ui/PanelHeader&quot;;
+import StatusBadge from &quot;@/components/ui/StatusBadge&quot;;
+
+export const dynamic = &quot;force-dynamic&quot;;
+
+const COLORS = [&quot;#3b6ef6&quot;, &quot;#00f5ff&quot;, &quot;#00ff94&quot;, &quot;#ffb700&quot;, &quot;#7b2fff&quot;];
+
+function HeatCell({ value }: { value: number }) {
+  const clamped = Math.max(-1, Math.min(1, Number.isFinite(value) ? value : 0));
+  const alpha = Math.abs(clamped);
+  const bg = clamped &gt;= 0
+    ? `rgba(110, 59, 215, ${0.2 + alpha * 0.5})`
+    : `rgba(239, 68, 68, ${0.2 + alpha * 0.5})`;
+  return &lt;div className=&quot;h-6 w-6 rounded&quot; style={{ background: bg }} title={clamped.toFixed(3)} /&gt;;
+}
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-tsx">&quot;use client&quot;;
+import { useState, useEffect } from &quot;react&quot;;
+import { useSearchParams } from &quot;next/navigation&quot;;
+import { metricsAPI, trainingAPI, modelsAPI, datasetsAPI } from &quot;@/lib/api&quot;;
+import {
+  MetricsData,
+  TrainedModel,
+  ShapResult,
+  LimeResult,
+  ModelMonitoring,
+  Dataset,
+  DatasetQualityReport,
+  CleanPreview,
+  LeakageReport,
+  EDAReport,
+  TrainingJob,
+  AnalyticsReport,
+  AnalyticsChart,
+} from &quot;@/types&quot;;
+import toast from &quot;react-hot-toast&quot;;
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, ScatterChart, Scatter
+} from &quot;recharts&quot;;
+import { Trophy, Download, Rocket, BarChart3, Loader2, Brain, Activity } from &quot;lucide-react&quot;;
+import PanelHeader from &quot;@/components/ui/PanelHeader&quot;;
+import StatusBadge from &quot;@/components/ui/StatusBadge&quot;;
+
+export const dynamic = &quot;force-dynamic&quot;;
+
+const COLORS = [&quot;#3b6ef6&quot;, &quot;#00f5ff&quot;, &quot;#00ff94&quot;, &quot;#ffb700&quot;, &quot;#7b2fff&quot;];
+
+function HeatCell({ value }: { value: number }) {
+  const clamped = Math.max(-1, Math.min(1, Number.isFinite(value) ? value : 0));
+  const alpha = Math.abs(clamped);
+  const bg = clamped &gt;= 0
+    ? `rgba(110, 59, 215, ${0.2 + alpha * 0.5})`
+    : `rgba(239, 68, 68, ${0.2 + alpha * 0.5})`;
+  return &lt;div className=&quot;h-6 w-6 rounded&quot; style={{ background: bg }} title={clamped.toFixed(3)} /&gt;;
+}
+
+function EmptyPlotState({ message }: { message: string }) {
+  return (
+    &lt;div className=&quot;flex h-[150px] items-center justify-center rounded border border-outline/20 bg-surface/40 p-3 text-center text-[11px] text-text-muted&quot;&gt;
+      {message}
+    &lt;/div&gt;
+  );
+}
+
+function AnalyticsChartCard({ chart }: { chart: AnalyticsChart }) {
+  const spec = (chart.spec || {}) as Record&lt;string, unknown&gt;;
+  const rows = (spec.rows as Record&lt;string, unknown&gt;[] | undefined) || [];
+  const xKey = (spec.xKey as string | undefined) || &quot;label&quot;;
+  const yKey = (spec.yKey as string | undefined) || &quot;value&quot;;
+  const series = (spec.series as Array&lt;{ key: string; name: string; color?: string }&gt; | undefined) || [];
+
+  return (
+    &lt;div className=&quot;rounded-lg border border-outline/20 bg-surface-variant/30 p-3&quot;&gt;
+      &lt;div className=&quot;mb-2 flex items-start justify-between gap-2&quot;&gt;
+        &lt;div&gt;
+          &lt;div className=&quot;text-xs font-semibold text-text-primary&quot;&gt;{chart.title}&lt;/div&gt;
+          &lt;div className=&quot;text-[11px] text-text-muted&quot;&gt;{chart.purpose}&lt;/div&gt;
+        &lt;/div&gt;
+        {chart.fallback_used ? &lt;StatusBadge label=&quot;fallback&quot; tone=&quot;idle&quot; /&gt; : null}
+      &lt;/div&gt;
+
+      {chart.chart_type === &quot;bar&quot; &amp;&amp; rows.length &gt; 0 ? (
+        &lt;ResponsiveContainer width=&quot;100%&quot; height={190}&gt;
+          &lt;BarChart data={rows}&gt;
+            &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(117,117,123,0.2)&quot; /&gt;
+            &lt;XAxis dataKey={xKey} tick={{ fontSize: 10, fill: &quot;#acaab1&quot; }} interval=&quot;preserveStartEnd&quot; angle={-20} textAnchor=&quot;end&quot; height={44} minTickGap={24} /&gt;
+            &lt;YAxis tick={{ fontSize: 10, fill: &quot;#acaab1&quot; }} /&gt;
+            &lt;Tooltip contentStyle={{ background: &quot;#19191d&quot;, border: &quot;1px solid rgba(117,117,123,0.35)&quot;, borderRadius: &quot;8px&quot; }} /&gt;
+            {(series.length ? series : [{ key: &quot;value&quot;, name: &quot;Value&quot;, color: &quot;#d0bcff&quot; }]).map((s) =&gt; (
+              &lt;Bar key={s.key} dataKey={s.key} name={s.name} fill={s.color || &quot;#d0bcff&quot;} radius={[3, 3, 0, 0]} /&gt;
+            ))}
+          &lt;/BarChart&gt;
+        &lt;/ResponsiveContainer&gt;
+      ) : chart.chart_type === &quot;line&quot; &amp;&amp; rows.length &gt; 0 ? (
+        &lt;ResponsiveContainer width=&quot;100%&quot; height={190}&gt;
+          &lt;LineChart data={rows}&gt;
+            &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(117,117,123,0.2)&quot; /&gt;
+            &lt;XAxis dataKey={xKey} tick={{ fontSize: 10, fill: &quot;#acaab1&quot; }} /&gt;
+            &lt;YAxis tick={{ fontSize: 10, fill: &quot;#acaab1&quot; }} /&gt;
+            &lt;Tooltip contentStyle={{ background: &quot;#19191d&quot;, border: &quot;1px solid rgba(117,117,123,0.35)&quot;, borderRadius: &quot;8px&quot; }} /&gt;
+            {(series.length ? series : [{ key: &quot;value&quot;, name: &quot;Value&quot;, color: &quot;#d0bcff&quot; }]).map((s) =&gt; (
+              &lt;Line key={s.key} dataKey={s.key} name={s.name} stroke={s.color || &quot;#d0bcff&quot;} dot={false} /&gt;
+            ))}
+          &lt;/LineChart&gt;
+        &lt;/ResponsiveContainer&gt;
+      ) : chart.chart_type === &quot;scatter&quot; &amp;&amp; rows.length &gt; 0 ? (
+        &lt;ResponsiveContainer width=&quot;100%&quot; height={190}&gt;
+          &lt;ScatterChart&gt;
+            &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(117,117,123,0.2)&quot; /&gt;
+            &lt;XAxis dataKey={xKey} name={xKey} tick={{ fontSize: 10, fill: &quot;#acaab1&quot; }} /&gt;
+            &lt;YAxis dataKey={yKey} name={yKey} tick={{ fontSize: 10, fill: &quot;#acaab1&quot; }} /&gt;
+            &lt;Tooltip cursor={{ strokeDasharray: &quot;3 3&quot; }} contentStyle={{ background: &quot;#19191d&quot;, border: &quot;1px solid rgba(117,117,123,0.35)&quot;, borderRadius: &quot;8px&quot; }} /&gt;
+            &lt;Scatter data={rows} fill=&quot;#d0bcff&quot; shape={&lt;circle r={1.8} /&gt;} /&gt;
+          &lt;/ScatterChart&gt;
+        &lt;/ResponsiveContainer&gt;
+      ) : chart.chart_type === &quot;heatmap&quot; ? (
+        &lt;div className=&quot;overflow-auto&quot;&gt;
+          &lt;div className=&quot;inline-flex flex-col gap-1&quot;&gt;
+            {(((spec.matrix as number[][] | undefined) || [])).slice(0, 10).map((row, r) =&gt; (
+              &lt;div key={r} className=&quot;flex gap-1&quot;&gt;
+                {row.slice(0, 10).map((v, c) =&gt; &lt;HeatCell key={`${r}-${c}`} value={v} /&gt;)}
+              &lt;/div&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/div&gt;
+      ) : (
+        &lt;div className=&quot;max-h-40 overflow-auto rounded border border-outline/20 bg-surface/40 p-2 text-[11px] text-text-muted&quot;&gt;
+          {rows.length &gt; 0 ? rows.slice(0, 10).map((r, idx) =&gt; &lt;div key={idx}&gt;{JSON.stringify(r)}&lt;/div&gt;) : (chart.insight || &quot;No chart rows available.&quot;)}
+        &lt;/div&gt;
+      )}
+
+      &lt;div className=&quot;mt-2 text-[11px] text-text-muted&quot;&gt;Insight: {chart.insight}&lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default function ModelsPage() {
+  const searchParams = useSearchParams();
+  const [jobId, setJobId] = useState(searchParams.get(&quot;job&quot;) || &quot;&quot;);
+  const [jobs, setJobs] = useState&lt;TrainingJob[]&gt;([]);
+  const [metrics, setMetrics] = useState&lt;MetricsData | null&gt;(null);
+  const [selectedModel, setSelectedModel] = useState&lt;TrainedModel | null&gt;(null);
+  const [loading, setLoading] = useState(false);
+  const [datasets, setDatasets] = useState&lt;Dataset[]&gt;([]);
+  const [compareDatasetId, setCompareDatasetId] = useState&lt;number | &quot;&quot;&gt;(&quot;&quot;);
+  const [shapData, setShapData] = useState&lt;ShapResult | null&gt;(null);
+  const [limeData, setLimeData] = useState&lt;LimeResult | null&gt;(null);
+  const [monitoring, setMonitoring] = useState&lt;ModelMonitoring | null&gt;(null);
+  const [explainLoading, setExplainLoading] = useState(false);
+  const [monitorLoading, setMonitorLoading] = useState(false);
+  const [explainTab, setExplainTab] = useState&lt;&quot;summary&quot; | &quot;shap&quot; | &quot;lime&quot;&gt;(&quot;summary&quot;);
+  const [sampleIndex, setSampleIndex] = useState(0);
+  const [customInput, setCustomInput] = useState(&quot;{}&quot;);
+  const [explainError, setExplainError] = useState&lt;string | null&gt;(null);
+  const [qualityReport, setQualityReport] = useState&lt;DatasetQualityReport | null&gt;(null);
+  const [cleanPreview, setCleanPreview] = useState&lt;CleanPreview | null&gt;(null);
+  const [leakageReport, setLeakageReport] = useState&lt;LeakageReport | null&gt;(null);
+  const [edaReport, setEdaReport] = useState&lt;EDAReport | null&gt;(null);
+  const [qualityLoading, setQualityLoading] = useState(false);
+  const [analyticsReport, setAnalyticsReport] = useState&lt;AnalyticsReport | null&gt;(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+
+  useEffect(() =&gt; {
+    trainingAPI.listJobs().then(r =&gt; {
+      const completed = (r.data as TrainingJob[]).filter((j) =&gt; j.status === &quot;completed&quot;);
+      setJobs(completed);
+      if (!jobId &amp;&amp; completed.length &gt; 0) setJobId(completed[0].job_id);
+    }).catch(() =&gt; {});
+    datasetsAPI.list().then(r =&gt; setDatasets(r.data)).catch(() =&gt; {});
+  }, []);
+
+  useEffect(() =&gt; {
+    if (!jobId) return;
+    setLoading(true);
+    metricsAPI.getJobMetrics(jobId).then(r =&gt; {
+      const payload = r.data;
+      setMetrics(payload);
+      const fallbackBest = payload?.models?.find((m: TrainedModel) =&gt; m.id === payload?.best_model_id)
+        || payload?.best_model
+        || payload?.models?.[0]
+        || null;
+      setSelectedModel(fallbackBest);
+    }).catch(() =&gt; toast.error(&quot;Could not load metrics&quot;))
+    .finally(() =&gt; setLoading(false));
+  }, [jobId]);
+
+  useEffect(() =&gt; {
+    if (!jobId || jobs.length === 0) return;
+    const selectedJob = jobs.find((j) =&gt; j.job_id === jobId);
+    if (!selectedJob?.dataset_id) return;
+
+    setQualityLoading(true);
+    Promise.all([
+      datasetsAPI.qualityReport(selectedJob.dataset_id),
+      datasetsAPI.cleanPreview(selectedJob.dataset_id, 200),
+      datasetsAPI.leakageReport(selectedJob.dataset_id),
+      datasetsAPI.edaReport(selectedJob.dataset_id),
+    ]).then(([qualityRes, cleanRes, leakageRes, edaRes]) =&gt; {
+      setQualityReport(qualityRes.data);
+      setCleanPreview(cleanRes.data);
+      setLeakageReport(leakageRes.data);
+      setEdaReport(edaRes.data);
+    }).catch(() =&gt; {
+      setQualityReport(null);
+      setCleanPreview(null);
+      setLeakageReport(null);
+      setEdaReport(null);
+    }).finally(() =&gt; setQualityLoading(false));
+  }, [jobId, jobs]);
+
+  useEffect(() =&gt; {
+    const activeJob = jobs.find((j) =&gt; j.job_id === jobId);
+    if (!activeJob?.dataset_id || !selectedModel?.id) {
+      setAnalyticsReport(null);
+      return;
+    }
+
+    setAnalyticsLoading(true);
+    datasetsAPI.analyticsReport(activeJob.dataset_id, {
+      target_column: activeJob.target_column,
+      model_type: activeJob.task_type,
+      model_id: selectedModel.id,
+    }).then((res) =&gt; {
+      setAnalyticsReport(res.data);
+    }).catch(() =&gt; {
+      setAnalyticsReport(null);
+    }).finally(() =&gt; {
+      setAnalyticsLoading(false);
+    });
+  }, [jobId, jobs, selectedModel?.id]);
+
+  const selectedJob = jobs.find((j) =&gt; j.job_id === jobId) || null;
+  const droppedRows = cleanPreview &amp;&amp; qualityReport ? Math.max(0, qualityReport.rows - cleanPreview.rows_after_cleaning) : 0;
+  const leakageMax = leakageReport?.leakage_risks?.length
+    ? Math.max(...leakageReport.leakage_risks.map(r =&gt; r.risk_score))
+    : 0;
+
+  const bestModel = metrics?.models?.find((m) =&gt; m.id === metrics?.best_model_id)
+    || metrics?.best_model
+    || metrics?.models?.[0]
+    || null;
+
+  const deployModel = async (id: number) =&gt; {
+    try {
+      await modelsAPI.deploy(id);
+      toast.success(&quot;Model deployed!&quot;);
+      if (jobId) {
+        metricsAPI.getJobMetrics(jobId).then(r =&gt; {
+          const payload = r.data;
+          setMetrics(payload);
+          const fallbackBest = payload?.models?.find((m: TrainedModel) =&gt; m.id === payload?.best_model_id)
+            || payload?.best_model
+            || payload?.models?.[0]
+            || null;
+          if (fallbackBest) setSelectedModel(fallbackBest);
+        });
+      }
+    } catch { toast.error(&quot;Deploy failed&quot;); }
+  };
+
+  const loadExplainability = async () =&gt; {
+    if (!selectedModel) return;
+    setExplainLoading(true);
+    setExplainError(null);
+    try {
+      const parsedCustom = customInput.trim() ? JSON.parse(customInput) : undefined;
+      const [shapRes, limeRes] = await Promise.all([
+        modelsAPI.shap(selectedModel.id, { nsamples: 220, sample_index: sampleIndex }),
+        modelsAPI.lime(selectedModel.id, { sample_index: sampleIndex, num_features: 12, custom_input: parsedCustom }),
+      ]);
+      setShapData(shapRes.data);
+      setLimeData(limeRes.data);
+    } catch (e: any) {
+      const message = e?.response?.data?.detail?.error?.message || &quot;Failed to load SHAP/LIME explanations&quot;;
+      setExplainError(message);
+      toast.error(message);
+    } finally {
+      setExplainLoading(false);
+    }
+  };
+
+  const loadMonitoring = async () =&gt; {
+    if (!selectedModel) return;
+    setMonitorLoading(true);
+    try {
+      const res = await modelsAPI.monitoring(
+        selectedModel.id,
+        compareDatasetId === &quot;&quot; ? undefined : Number(compareDatasetId)
+      );
+      setMonitoring(res.data);
+    } catch {
+      toast.error(&quot;Failed to load monitoring/drift report&quot;);
+    } finally {
+      setMonitorLoading(false);
+    }
+  };
+
+  const leaderboardData = metrics?.models.map(m =&gt; ({
+    name: m.model_name,
+    Accuracy: m.accuracy !== undefined &amp;&amp; m.accuracy !== null ? +(m.accuracy * 100).toFixed(1) : undefined,
+    &quot;R²&quot;: m.r2_score !== undefined &amp;&amp; m.r2_score !== null ? +(m.r2_score * 100).toFixed(1) : undefined,
+    F1: m.f1_score !== undefined &amp;&amp; m.f1_score !== null ? +(m.f1_score * 100).toFixed(1) : undefined,
+    &quot;ROC-AUC&quot;: m.roc_auc !== undefined &amp;&amp; m.roc_auc !== null ? +(m.roc_auc * 100).toFixed(1) : undefined,
+    &quot;Training Time (s)&quot;: m.training_time !== undefined &amp;&amp; m.training_time !== null ? +m.training_time.toFixed(2) : undefined,
+  })) || [];
+
+  const featureImportanceData = selectedModel?.feature_importance
+    ? Object.entries(selectedModel.feature_importance)
+        .sort((a, b) =&gt; b[1] - a[1])
+        .slice(0, 12)
+        .map(([name, value]) =&gt; ({ name, value: +(value * 100).toFixed(1) }))
+    : [];
+
+  const cvData = selectedModel?.cv_scores?.map((s, i) =&gt; ({
+    fold: `Fold ${i + 1}`, score: +(s * 100).toFixed(2)
+  })) || [];
+
+  const isClassification = metrics?.task_type === &quot;classification&quot;;
+  const missingByColumnData = qualityReport
+    ? Object.entries(qualityReport.missing_by_column || {})
+        .map(([column, missing]) =&gt; ({ column, missing }))
+        .filter((r) =&gt; Number(r.missing) &gt; 0)
+        .sort((a, b) =&gt; Number(b.missing) - Number(a.missing))
+        .slice(0, 6)
+    : [];
+  const outlierByColumnData = qualityReport
+    ? Object.entries(qualityReport.outliers_by_column || {})
+        .map(([column, outliers]) =&gt; ({ column, outliers }))
+        .filter((r) =&gt; Number(r.outliers) &gt; 0)
+        .sort((a, b) =&gt; Number(b.outliers) - Number(a.outliers))
+        .slice(0, 6)
+    : [];
+  const leakageRiskData = (leakageReport?.leakage_risks || [])
+    .map((r) =&gt; ({
+      feature: r.feature.length &gt; 18 ? `${r.feature.slice(0, 18)}…` : r.feature,
+      risk_pct: +(r.risk_score * 100).toFixed(2),
+    }))
+    .filter((r) =&gt; r.risk_pct &gt; 0)
+    .sort((a, b) =&gt; b.risk_pct - a.risk_pct)
+    .slice(0, 6);
+  const metricEntries = selectedModel?.metrics
+    ? Object.entries(selectedModel.metrics)
+        .filter(([, value]) =&gt; [&quot;number&quot;, &quot;string&quot;, &quot;boolean&quot;].includes(typeof value) || value === null)
+        .map(([key, value]) =&gt; ({ key, value: value === null ? &quot;null&quot; : String(value) }))
+    : [];
+
+  const modelOriginLabel = (model?: TrainedModel | null): &quot;local&quot; | &quot;server&quot; =&gt; {
+    const origin = String((model?.metrics as Record&lt;string, unknown&gt; | undefined)?.storage_origin || &quot;&quot;).toLowerCase();
+    if (origin === &quot;local&quot;) return &quot;local&quot;;
+    if ((model?.model_type || &quot;&quot;).toLowerCase().includes(&quot;local&quot;)) return &quot;local&quot;;
+    return &quot;server&quot;;
+  };
+
+  return (
+    &lt;div className=&quot;mx-auto max-w-7xl&quot;&gt;
+      &lt;div className=&quot;mb-8&quot;&gt;
+        &lt;div className=&quot;section-kicker mb-2&quot;&gt;Leaderboard&lt;/div&gt;
+        &lt;h1 className=&quot;font-display mb-1 text-4xl font-semibold text-text-primary&quot;&gt;Model Quality Console&lt;/h1&gt;
+        &lt;p className=&quot;text-text-muted&quot;&gt;Compare rank, quality, and diagnostics across completed training jobs.&lt;/p&gt;
+      &lt;/div&gt;
+
+      {/* Job selector */}
+      &lt;div className=&quot;panel mb-6 rounded-xl p-6&quot;&gt;
+        &lt;div className=&quot;flex items-center gap-4&quot;&gt;
+          &lt;label className=&quot;whitespace-nowrap text-sm text-text-muted&quot;&gt;Training Job:&lt;/label&gt;
+          &lt;select
+            value={jobId}
+            onChange={e =&gt; setJobId(e.target.value)}
+            className=&quot;flex-1 rounded-lg border border-outline/25 bg-surface px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary/50&quot;
+          &gt;
+            &lt;option value=&quot;&quot;&gt;Select a completed job...&lt;/option&gt;
+            {jobs.map(j =&gt; (
+              &lt;option key={j.job_id} value={j.job_id}&gt;
+                {j.job_id.slice(0, 8)}… — Target: {j.target_column} ({j.task_type})
+              &lt;/option&gt;
+            ))}
+          &lt;/select&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div className=&quot;panel mb-6 rounded-xl p-6&quot;&gt;
+        &lt;PanelHeader title=&quot;Dataset Validity &amp; Preparation&quot; subtitle=&quot;Multi-level quality gates before trusting model performance.&quot; className=&quot;mb-4&quot; /&gt;
+        {qualityLoading ? (
+          &lt;div className=&quot;flex items-center gap-2 text-xs text-text-muted&quot;&gt;
+            &lt;Loader2 className=&quot;h-4 w-4 animate-spin&quot; /&gt; Loading dataset diagnostics...
+          &lt;/div&gt;
+        ) : qualityReport ? (
+          &lt;div className=&quot;space-y-4&quot;&gt;
+            &lt;div className=&quot;grid lg:grid-cols-3 gap-4&quot;&gt;
+              &lt;div className=&quot;rounded-lg border border-outline/20 bg-surface-variant/30 p-3&quot;&gt;
+                &lt;div className=&quot;mb-2 text-xs font-semibold text-text-primary&quot;&gt;Missingness by column&lt;/div&gt;
+                {missingByColumnData.length &gt; 0 ? (
+                  &lt;ResponsiveContainer width=&quot;100%&quot; height={150}&gt;
+                    &lt;BarChart data={missingByColumnData} margin={{ top: 6, right: 8, left: 0, bottom: 8 }}&gt;
+                      &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(117,117,123,0.15)&quot; /&gt;
+                      &lt;XAxis dataKey=&quot;column&quot; tick={{ fill: &quot;#acaab1&quot;, fontSize: 10 }} interval=&quot;preserveStartEnd&quot; angle={-20} textAnchor=&quot;end&quot; height={42} minTickGap={24} /&gt;
+                      &lt;YAxis tick={{ fill: &quot;#acaab1&quot;, fontSize: 10 }} /&gt;
+                      &lt;Tooltip contentStyle={{ background: &quot;#19191d&quot;, border: &quot;1px solid rgba(117,117,123,0.35)&quot;, borderRadius: &quot;8px&quot; }} /&gt;
+                      &lt;Bar dataKey=&quot;missing&quot; fill=&quot;#d0bcff&quot; radius={[3, 3, 0, 0]} /&gt;
+                    &lt;/BarChart&gt;
+                  &lt;/ResponsiveContainer&gt;
+                ) : (
+                  &lt;EmptyPlotState message=&quot;No missing-value signal found. All columns currently have zero missing entries.&quot; /&gt;
+                )}
+              &lt;/div&gt;
+
+              &lt;div className=&quot;rounded-lg border border-outline/20 bg-surface-variant/30 p-3&quot;&gt;
+                &lt;div className=&quot;mb-2 text-xs font-semibold text-text-primary&quot;&gt;Outliers by column&lt;/div&gt;
+                {outlierByColumnData.length &gt; 0 ? (
+                  &lt;ResponsiveContainer width=&quot;100%&quot; height={150}&gt;
+                    &lt;BarChart data={outlierByColumnData} margin={{ top: 6, right: 8, left: 0, bottom: 8 }}&gt;
+                      &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(117,117,123,0.15)&quot; /&gt;
+                      &lt;XAxis dataKey=&quot;column&quot; tick={{ fill: &quot;#acaab1&quot;, fontSize: 10 }} interval=&quot;preserveStartEnd&quot; angle={-20} textAnchor=&quot;end&quot; height={42} minTickGap={24} /&gt;
+                      &lt;YAxis tick={{ fill: &quot;#acaab1&quot;, fontSize: 10 }} /&gt;
+                      &lt;Tooltip contentStyle={{ background: &quot;#19191d&quot;, border: &quot;1px solid rgba(117,117,123,0.35)&quot;, borderRadius: &quot;8px&quot; }} /&gt;
+                      &lt;Bar dataKey=&quot;outliers&quot; fill=&quot;#6e3bd7&quot; radius={[3, 3, 0, 0]} /&gt;
+                    &lt;/BarChart&gt;
+                  &lt;/ResponsiveContainer&gt;
+                ) : (
+                  &lt;EmptyPlotState message=&quot;No outlier counts were detected for the profiled columns.&quot; /&gt;
+                )}
+              &lt;/div&gt;
+
+              &lt;div className=&quot;rounded-lg border border-outline/20 bg-surface-variant/30 p-3&quot;&gt;
+                &lt;div className=&quot;mb-2 text-xs font-semibold text-text-primary&quot;&gt;Leakage risk by feature&lt;/div&gt;
+                {leakageRiskData.length &gt; 0 ? (
+                  &lt;ResponsiveContainer width=&quot;100%&quot; height={150}&gt;
+                    &lt;BarChart data={leakageRiskData} margin={{ top: 6, right: 8, left: 0, bottom: 8 }}&gt;
+                      &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(117,117,123,0.15)&quot; /&gt;
+                      &lt;XAxis dataKey=&quot;feature&quot; tick={{ fill: &quot;#acaab1&quot;, fontSize: 10 }} interval=&quot;preserveStartEnd&quot; angle={-20} textAnchor=&quot;end&quot; height={42} minTickGap={24} /&gt;
+                      &lt;YAxis tick={{ fill: &quot;#acaab1&quot;, fontSize: 10 }} unit=&quot;%&quot; /&gt;
+                      &lt;Tooltip contentStyle={{ background: &quot;#19191d&quot;, border: &quot;1px solid rgba(117,117,123,0.35)&quot;, borderRadius: &quot;8px&quot; }} /&gt;
+                      &lt;Bar dataKey=&quot;risk_pct&quot; fill=&quot;#ef4444&quot; radius={[3, 3, 0, 0]} /&gt;
+                    &lt;/BarChart&gt;
+                  &lt;/ResponsiveContainer&gt;
+                ) : (
+                  &lt;EmptyPlotState message=&quot;No leakage-risk values were produced. This typically means no feature crossed the leakage heuristics threshold for the selected dataset and target.&quot; /&gt;
+                )}
+              &lt;/div&gt;
+            &lt;/div&gt;
+
+            &lt;div className=&quot;grid lg:grid-cols-3 gap-4 text-xs&quot;&gt;
+            &lt;div className=&quot;rounded-lg border border-outline/20 bg-surface-variant/30 p-4 space-y-2&quot;&gt;
+              &lt;div className=&quot;text-sm font-semibold text-text-primary&quot;&gt;Level 1 • Raw Quality&lt;/div&gt;
+              &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-text-muted&quot;&gt;Dataset&lt;/span&gt;&lt;span className=&quot;font-mono text-text-primary&quot;&gt;{qualityReport.dataset_name}&lt;/span&gt;&lt;/div&gt;
+              &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-text-muted&quot;&gt;Quality score&lt;/span&gt;&lt;span className=&quot;font-mono text-text-primary&quot;&gt;{qualityReport.quality_score.toFixed(1)}&lt;/span&gt;&lt;/div&gt;
+              &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-text-muted&quot;&gt;Rows × cols&lt;/span&gt;&lt;span className=&quot;font-mono text-text-primary&quot;&gt;{qualityReport.rows} × {qualityReport.columns}&lt;/span&gt;&lt;/div&gt;
+              &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-text-muted&quot;&gt;Missing cells&lt;/span&gt;&lt;span className=&quot;font-mono text-text-primary&quot;&gt;{qualityReport.missing_cells}&lt;/span&gt;&lt;/div&gt;
+              &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-text-muted&quot;&gt;Duplicate rows&lt;/span&gt;&lt;span className=&quot;font-mono text-text-primary&quot;&gt;{qualityReport.duplicate_rows}&lt;/span&gt;&lt;/div&gt;
+            &lt;/div&gt;
+
+            &lt;div className=&quot;rounded-lg border border-outline/20 bg-surface-variant/30 p-4 space-y-2&quot;&gt;
+              &lt;div className=&quot;text-sm font-semibold text-text-primary&quot;&gt;Level 2 • Cleaning Impact&lt;/div&gt;
+              &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-text-muted&quot;&gt;Rows after cleaning&lt;/span&gt;&lt;span className=&quot;font-mono text-text-primary&quot;&gt;{cleanPreview?.rows_after_cleaning ?? &quot;—&quot;}&lt;/span&gt;&lt;/div&gt;
+              &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-text-muted&quot;&gt;Rows dropped&lt;/span&gt;&lt;span className=&quot;font-mono text-text-primary&quot;&gt;{cleanPreview ? droppedRows : &quot;—&quot;}&lt;/span&gt;&lt;/div&gt;
+              &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-text-muted&quot;&gt;Fixes applied&lt;/span&gt;&lt;span className=&quot;font-mono text-text-primary&quot;&gt;{cleanPreview?.applied_fixes?.length ?? 0}&lt;/span&gt;&lt;/div&gt;
+              &lt;div className=&quot;mt-2&quot;&gt;
+                &lt;div className=&quot;mb-1 text-text-muted&quot;&gt;Top fixes&lt;/div&gt;
+                &lt;ul className=&quot;space-y-1&quot;&gt;
+                  {(cleanPreview?.applied_fixes || []).slice(0, 4).map((fix, idx) =&gt; (
+                    &lt;li key={`${fix}-${idx}`} className=&quot;truncate text-text-primary&quot;&gt;• {fix}&lt;/li&gt;
+                  ))}
+                  {(cleanPreview?.applied_fixes || []).length === 0 &amp;&amp; &lt;li className=&quot;text-text-muted&quot;&gt;No automatic fixes detected.&lt;/li&gt;}
+                &lt;/ul&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+
+            &lt;div className=&quot;rounded-lg border border-outline/20 bg-surface-variant/30 p-4 space-y-2&quot;&gt;
+              &lt;div className=&quot;text-sm font-semibold text-text-primary&quot;&gt;Level 3 • Leakage &amp; Validity&lt;/div&gt;
+              &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-text-muted&quot;&gt;Target&lt;/span&gt;&lt;span className=&quot;font-mono text-text-primary&quot;&gt;{selectedJob?.target_column || leakageReport?.target_column || &quot;—&quot;}&lt;/span&gt;&lt;/div&gt;
+              &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-text-muted&quot;&gt;Leakage candidates&lt;/span&gt;&lt;span className=&quot;font-mono text-text-primary&quot;&gt;{leakageReport?.leakage_risks?.length ?? 0}&lt;/span&gt;&lt;/div&gt;
+              &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-text-muted&quot;&gt;Max leakage risk&lt;/span&gt;&lt;span className=&quot;font-mono text-text-primary&quot;&gt;{(leakageMax * 100).toFixed(1)}%&lt;/span&gt;&lt;/div&gt;
+              &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-text-muted&quot;&gt;High correlations&lt;/span&gt;&lt;span className=&quot;font-mono text-text-primary&quot;&gt;{edaReport?.high_correlations?.length ?? 0}&lt;/span&gt;&lt;/div&gt;
+              &lt;div className=&quot;mt-2&quot;&gt;
+                &lt;div className=&quot;mb-1 text-text-muted&quot;&gt;Top risky features&lt;/div&gt;
+                &lt;ul className=&quot;space-y-1&quot;&gt;
+                  {(leakageReport?.leakage_risks || []).slice(0, 4).map((risk) =&gt; (
+                    &lt;li key={risk.feature} className=&quot;truncate text-text-primary&quot;&gt;
+                      • {risk.feature} ({(risk.risk_score * 100).toFixed(1)}%)
+                    &lt;/li&gt;
+                  ))}
+                  {(leakageReport?.leakage_risks || []).length === 0 &amp;&amp; &lt;li className=&quot;text-text-muted&quot;&gt;No strong leakage indicators found.&lt;/li&gt;}
+                &lt;/ul&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        ) : (
+          &lt;p className=&quot;text-xs text-text-muted&quot;&gt;Select a completed job to load quality, cleaning impact, and validity diagnostics.&lt;/p&gt;
+        )}
+      &lt;/div&gt;
+
+      {loading &amp;&amp; (
+        &lt;div className=&quot;flex justify-center py-20&quot;&gt;
+          &lt;Loader2 className=&quot;w-8 h-8 text-sigma-400 animate-spin&quot; /&gt;
+        &lt;/div&gt;
+      )}
+
+      {metrics &amp;&amp; !loading &amp;&amp; (
+        &lt;&gt;
+          {/* Best model banner */}
+          {bestModel &amp;&amp; (
+            &lt;div className=&quot;panel-glass glow-blue mb-6 p-6&quot;&gt;
+              &lt;div className=&quot;flex items-center gap-4&quot;&gt;
+                  &lt;div className=&quot;flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15&quot;&gt;
+                    &lt;Trophy className=&quot;h-6 w-6 text-primary&quot; /&gt;
+                &lt;/div&gt;
+                &lt;div className=&quot;flex-1&quot;&gt;
+                    &lt;div className=&quot;mb-0.5 text-xs text-text-muted&quot;&gt;Best Model&lt;/div&gt;
+                    &lt;div className=&quot;font-display text-xl font-semibold text-text-primary&quot;&gt;{bestModel.model_name}&lt;/div&gt;
+                  &lt;div className=&quot;flex flex-wrap gap-3 mt-1&quot;&gt;
+                    &lt;span className={`metric-badge ${modelOriginLabel(bestModel) === &quot;local&quot; ? &quot;bg-emerald-900/40 text-emerald-300&quot; : &quot;bg-slate-800/60 text-slate-200&quot;}`}&gt;
+                      Origin: {modelOriginLabel(bestModel)}
+                    &lt;/span&gt;
+                    {bestModel.accuracy !== undefined &amp;&amp; bestModel.accuracy !== null &amp;&amp; (
+                      &lt;span className=&quot;metric-badge bg-blue-900/40 text-blue-300&quot;&gt;Accuracy: {(bestModel.accuracy * 100).toFixed(1)}%&lt;/span&gt;
+                    )}
+                    {bestModel.precision !== undefined &amp;&amp; bestModel.precision !== null &amp;&amp; (
+                      &lt;span className=&quot;metric-badge bg-fuchsia-900/40 text-fuchsia-300&quot;&gt;Precision: {(bestModel.precision * 100).toFixed(1)}%&lt;/span&gt;
+                    )}
+                    {bestModel.recall !== undefined &amp;&amp; bestModel.recall !== null &amp;&amp; (
+                      &lt;span className=&quot;metric-badge bg-indigo-900/40 text-indigo-300&quot;&gt;Recall: {(bestModel.recall * 100).toFixed(1)}%&lt;/span&gt;
+                    )}
+                    {bestModel.f1_score !== undefined &amp;&amp; bestModel.f1_score !== null &amp;&amp; (
+                      &lt;span className=&quot;metric-badge bg-cyan-900/40 text-cyan-300&quot;&gt;F1: {(bestModel.f1_score * 100).toFixed(1)}%&lt;/span&gt;
+                    )}
+                    {bestModel.roc_auc !== undefined &amp;&amp; bestModel.roc_auc !== null &amp;&amp; (
+                      &lt;span className=&quot;metric-badge bg-purple-900/40 text-purple-300&quot;&gt;AUC: {(bestModel.roc_auc * 100).toFixed(1)}%&lt;/span&gt;
+                    )}
+                    {bestModel.r2_score !== undefined &amp;&amp; bestModel.r2_score !== null &amp;&amp; (
+                      &lt;span className=&quot;metric-badge bg-green-900/40 text-green-300&quot;&gt;R²: {bestModel.r2_score.toFixed(3)}&lt;/span&gt;
+                    )}
+                    {bestModel.rmse !== undefined &amp;&amp; bestModel.rmse !== null &amp;&amp; (
+                      &lt;span className=&quot;metric-badge bg-red-900/40 text-red-300&quot;&gt;RMSE: {bestModel.rmse.toFixed(3)}&lt;/span&gt;
+                    )}
+                    {bestModel.mape !== undefined &amp;&amp; bestModel.mape !== null &amp;&amp; (
+                      &lt;span className=&quot;metric-badge bg-orange-900/40 text-orange-300&quot;&gt;MAPE: {(bestModel.mape * 100).toFixed(2)}%&lt;/span&gt;
+                    )}
+                  &lt;/div&gt;
+                &lt;/div&gt;
+                &lt;button onClick={() =&gt; deployModel(bestModel.id)} className=&quot;btn-primary&quot;&gt;
+                  &lt;Rocket className=&quot;w-4 h-4&quot; /&gt; Deploy
+                &lt;/button&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          )}
+
+          {/* Model cards */}
+          &lt;div className=&quot;grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6&quot;&gt;
+            {metrics.models.map((model, i) =&gt; (
+              &lt;div
+                key={model.id}
+                onClick={() =&gt; setSelectedModel(model)}
+                className={`panel cursor-pointer rounded-xl p-6 transition-all ${selectedModel?.id === model.id ? &quot;border-primary/60 glow-blue&quot; : &quot;&quot;}`}
+              &gt;
+                &lt;div className=&quot;flex items-center justify-between mb-3&quot;&gt;
+                  &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+                    &lt;div className=&quot;w-2 h-2 rounded-full&quot; style={{ background: COLORS[i % COLORS.length] }} /&gt;
+                    &lt;span className=&quot;text-sm font-semibold text-text-primary&quot;&gt;{model.model_name}&lt;/span&gt;
+                  &lt;/div&gt;
+                  &lt;StatusBadge label={modelOriginLabel(model)} tone={modelOriginLabel(model) === &quot;local&quot; ? &quot;healthy&quot; : &quot;idle&quot;} /&gt;
+                  {model.is_deployed &amp;&amp; (
+                    &lt;StatusBadge label=&quot;deployed&quot; tone=&quot;healthy&quot; /&gt;
+                  )}
+                  {(bestModel?.id === model.id) &amp;&amp; (
+                    &lt;Trophy className=&quot;w-4 h-4 text-neon-amber&quot; /&gt;
+                  )}
+                &lt;/div&gt;
+
+                &lt;div className=&quot;space-y-1.5&quot;&gt;
+                  {model.accuracy !== undefined &amp;&amp; model.accuracy !== null &amp;&amp; (
+                    &lt;div className=&quot;flex justify-between text-xs&quot;&gt;
+                      &lt;span className=&quot;text-text-muted&quot;&gt;Accuracy&lt;/span&gt;
+                      &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{(model.accuracy * 100).toFixed(1)}%&lt;/span&gt;
+                    &lt;/div&gt;
+                  )}
+                  {model.f1_score !== undefined &amp;&amp; model.f1_score !== null &amp;&amp; (
+                    &lt;div className=&quot;flex justify-between text-xs&quot;&gt;
+                      &lt;span className=&quot;text-text-muted&quot;&gt;F1 Score&lt;/span&gt;
+                      &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{(model.f1_score * 100).toFixed(1)}%&lt;/span&gt;
+                    &lt;/div&gt;
+                  )}
+                  {model.roc_auc !== undefined &amp;&amp; model.roc_auc !== null &amp;&amp; (
+                    &lt;div className=&quot;flex justify-between text-xs&quot;&gt;
+                      &lt;span className=&quot;text-text-muted&quot;&gt;ROC-AUC&lt;/span&gt;
+                      &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{(model.roc_auc * 100).toFixed(1)}%&lt;/span&gt;
+                    &lt;/div&gt;
+                  )}
+                  {model.precision !== undefined &amp;&amp; model.precision !== null &amp;&amp; (
+                    &lt;div className=&quot;flex justify-between text-xs&quot;&gt;
+                      &lt;span className=&quot;text-text-muted&quot;&gt;Precision&lt;/span&gt;
+                      &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{(model.precision * 100).toFixed(1)}%&lt;/span&gt;
+                    &lt;/div&gt;
+                  )}
+                  {model.recall !== undefined &amp;&amp; model.recall !== null &amp;&amp; (
+                    &lt;div className=&quot;flex justify-between text-xs&quot;&gt;
+                      &lt;span className=&quot;text-text-muted&quot;&gt;Recall&lt;/span&gt;
+                      &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{(model.recall * 100).toFixed(1)}%&lt;/span&gt;
+                    &lt;/div&gt;
+                  )}
+                  {model.r2_score !== undefined &amp;&amp; model.r2_score !== null &amp;&amp; (
+                    &lt;div className=&quot;flex justify-between text-xs&quot;&gt;
+                      &lt;span className=&quot;text-text-muted&quot;&gt;R² Score&lt;/span&gt;
+                      &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{model.r2_score.toFixed(3)}&lt;/span&gt;
+                    &lt;/div&gt;
+                  )}
+                  {model.rmse !== undefined &amp;&amp; model.rmse !== null &amp;&amp; (
+                    &lt;div className=&quot;flex justify-between text-xs&quot;&gt;
+                      &lt;span className=&quot;text-text-muted&quot;&gt;RMSE&lt;/span&gt;
+                      &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{model.rmse.toFixed(3)}&lt;/span&gt;
+                    &lt;/div&gt;
+                  )}
+                  {model.mape !== undefined &amp;&amp; model.mape !== null &amp;&amp; (
+                    &lt;div className=&quot;flex justify-between text-xs&quot;&gt;
+                      &lt;span className=&quot;text-text-muted&quot;&gt;MAPE&lt;/span&gt;
+                      &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{(model.mape * 100).toFixed(2)}%&lt;/span&gt;
+                    &lt;/div&gt;
+                  )}
+                  {model.explained_variance !== undefined &amp;&amp; model.explained_variance !== null &amp;&amp; (
+                    &lt;div className=&quot;flex justify-between text-xs&quot;&gt;
+                      &lt;span className=&quot;text-text-muted&quot;&gt;Explained Variance&lt;/span&gt;
+                      &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{model.explained_variance.toFixed(3)}&lt;/span&gt;
+                    &lt;/div&gt;
+                  )}
+                  &lt;div className=&quot;flex justify-between text-xs&quot;&gt;
+                    &lt;span className=&quot;text-text-muted&quot;&gt;Train time&lt;/span&gt;
+                    &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{model.training_time?.toFixed(2)}s&lt;/span&gt;
+                  &lt;/div&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;flex gap-2 mt-4&quot;&gt;
+                  &lt;button onClick={e =&gt; { e.stopPropagation(); deployModel(model.id); }}
+                    className=&quot;flex-1 btn-outline text-xs py-1.5 justify-center&quot;&gt;
+                    &lt;Rocket className=&quot;w-3 h-3&quot; /&gt; Deploy
+                  &lt;/button&gt;
+                  &lt;a href={modelsAPI.download(model.id)} download
+                    className=&quot;btn-outline text-xs py-1.5 px-2.5&quot; onClick={e =&gt; e.stopPropagation()}&gt;
+                    &lt;Download className=&quot;w-3 h-3&quot; /&gt;
+                  &lt;/a&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            ))}
+          &lt;/div&gt;
+
+          {/* Charts section */}
+          &lt;div className=&quot;grid lg:grid-cols-2 gap-6 mb-6&quot;&gt;
+            {/* Comparison bar chart */}
+            &lt;div className=&quot;panel rounded-xl p-6&quot;&gt;
+              &lt;PanelHeader title=&quot;Model Comparison&quot; icon={BarChart3} className=&quot;mb-4&quot; /&gt;
+              &lt;ResponsiveContainer width=&quot;100%&quot; height={240}&gt;
+                &lt;BarChart data={leaderboardData}&gt;
+                  &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(59,110,246,0.1)&quot; /&gt;
+                  &lt;XAxis dataKey=&quot;name&quot; tick={{ fill: &quot;#6b7a9e&quot;, fontSize: 10 }} /&gt;
+                  &lt;YAxis tick={{ fill: &quot;#6b7a9e&quot;, fontSize: 10 }} /&gt;
+                  &lt;Tooltip contentStyle={{ background: &quot;#0d1526&quot;, border: &quot;1px solid rgba(59,110,246,0.3)&quot;, borderRadius: &quot;8px&quot;, color: &quot;#e8edf8&quot; }} /&gt;
+                  {isClassification ? (
+                    &lt;&gt;
+                      &lt;Bar dataKey=&quot;Accuracy&quot; fill=&quot;#3b6ef6&quot; radius={[3,3,0,0]} /&gt;
+                      &lt;Bar dataKey=&quot;F1&quot; fill=&quot;#00f5ff&quot; radius={[3,3,0,0]} /&gt;
+                    &lt;/&gt;
+                  ) : (
+                    &lt;Bar dataKey=&quot;R²&quot; fill=&quot;#00ff94&quot; radius={[3,3,0,0]} /&gt;
+                  )}
+                &lt;/BarChart&gt;
+              &lt;/ResponsiveContainer&gt;
+            &lt;/div&gt;
+
+            {/* CV Scores */}
+            {cvData.length &gt; 0 &amp;&amp; (
+              &lt;div className=&quot;sigma-card&quot;&gt;
+                &lt;h3 className=&quot;font-display font-semibold text-white mb-4&quot;&gt;
+                  Cross-Validation Scores — {selectedModel?.model_name}
+                &lt;/h3&gt;
+                &lt;ResponsiveContainer width=&quot;100%&quot; height={240}&gt;
+                  &lt;LineChart data={cvData}&gt;
+                    &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(59,110,246,0.1)&quot; /&gt;
+                    &lt;XAxis dataKey=&quot;fold&quot; tick={{ fill: &quot;#6b7a9e&quot;, fontSize: 11 }} /&gt;
+                    &lt;YAxis domain={[&#x27;auto&#x27;, &#x27;auto&#x27;]} tick={{ fill: &quot;#6b7a9e&quot;, fontSize: 11 }} /&gt;
+                    &lt;Tooltip contentStyle={{ background: &quot;#0d1526&quot;, border: &quot;1px solid rgba(59,110,246,0.3)&quot;, borderRadius: &quot;8px&quot;, color: &quot;#e8edf8&quot; }} /&gt;
+                    &lt;Line type=&quot;monotone&quot; dataKey=&quot;score&quot; stroke=&quot;#3b6ef6&quot; strokeWidth={2} dot={{ fill: &quot;#00f5ff&quot; }} /&gt;
+                  &lt;/LineChart&gt;
+                &lt;/ResponsiveContainer&gt;
+              &lt;/div&gt;
+            )}
+          &lt;/div&gt;
+
+          &lt;div className=&quot;panel mb-6 rounded-xl p-6&quot;&gt;
+            &lt;PanelHeader
+              title=&quot;AutoML Analytics &amp; Diagnostics&quot;
+              subtitle=&quot;Rendered directly after cross-validation scores with full-data evaluation plots and task-specific equivalents.&quot;
+              className=&quot;mb-4&quot;
+            /&gt;
+            {analyticsLoading ? (
+              &lt;div className=&quot;flex items-center gap-2 text-xs text-text-muted&quot;&gt;
+                &lt;Loader2 className=&quot;h-4 w-4 animate-spin&quot; /&gt; Loading analytics charts...
+              &lt;/div&gt;
+            ) : analyticsReport ? (
+              &lt;div className=&quot;space-y-4&quot;&gt;
+                &lt;div className=&quot;flex flex-wrap items-center gap-2 text-xs text-text-muted&quot;&gt;
+                  &lt;span&gt;Task: {analyticsReport.task_type}&lt;/span&gt;
+                  &lt;span&gt;•&lt;/span&gt;
+                  &lt;span&gt;Charts: {analyticsReport.chart_count}&lt;/span&gt;
+                  &lt;span&gt;•&lt;/span&gt;
+                  &lt;StatusBadge label={`evaluation: ${analyticsReport.evaluation_status}`} tone={analyticsReport.evaluation_status === &quot;ready&quot; ? &quot;healthy&quot; : &quot;idle&quot;} /&gt;
+                &lt;/div&gt;
+
+                &lt;div&gt;
+                  &lt;div className=&quot;mb-2 text-xs uppercase tracking-[0.12em] text-text-muted&quot;&gt;1) Exploratory data analysis&lt;/div&gt;
+                  &lt;div className=&quot;grid gap-3 md:grid-cols-1 xl:grid-cols-2&quot;&gt;
+                    {analyticsReport.exploratory_charts.map((chart) =&gt; (
+                      &lt;AnalyticsChartCard key={chart.id} chart={chart} /&gt;
+                    ))}
+                  &lt;/div&gt;
+                &lt;/div&gt;
+
+                &lt;div&gt;
+                  &lt;div className=&quot;mb-2 text-xs uppercase tracking-[0.12em] text-text-muted&quot;&gt;2) Model evaluation&lt;/div&gt;
+                  &lt;div className=&quot;grid gap-3 md:grid-cols-1 xl:grid-cols-2&quot;&gt;
+                    {analyticsReport.evaluation_charts.map((chart) =&gt; (
+                      &lt;AnalyticsChartCard key={chart.id} chart={chart} /&gt;
+                    ))}
+                  &lt;/div&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            ) : (
+              &lt;p className=&quot;text-xs text-text-muted&quot;&gt;Analytics report is not available for the selected job/model pair.&lt;/p&gt;
+            )}
+          &lt;/div&gt;
+
+          {selectedModel &amp;&amp; (
+            &lt;div className=&quot;panel mb-6 rounded-xl p-6&quot;&gt;
+              &lt;PanelHeader title=&quot;Full Metric Surface&quot; subtitle=&quot;Complete scalar metric payload for model audit and validity checks.&quot; className=&quot;mb-4&quot; /&gt;
+              &lt;div className=&quot;grid md:grid-cols-2 lg:grid-cols-3 gap-2 text-xs&quot;&gt;
+                {metricEntries.map((entry) =&gt; (
+                  &lt;div key={entry.key} className=&quot;rounded border border-outline/20 bg-surface-variant/30 px-3 py-2&quot;&gt;
+                    &lt;div className=&quot;text-text-muted truncate&quot;&gt;{entry.key}&lt;/div&gt;
+                    &lt;div className=&quot;font-mono text-text-primary truncate&quot;&gt;{entry.value}&lt;/div&gt;
+                  &lt;/div&gt;
+                ))}
+                {metricEntries.length === 0 &amp;&amp; (
+                  &lt;div className=&quot;text-text-muted&quot;&gt;No scalar metrics found in payload.&lt;/div&gt;
+                )}
+              &lt;/div&gt;
+              &lt;div className=&quot;mt-4&quot;&gt;
+                &lt;div className=&quot;mb-1 text-xs text-text-muted&quot;&gt;Raw metric payload (full)&lt;/div&gt;
+                &lt;pre className=&quot;max-h-64 overflow-auto rounded border border-outline/20 bg-surface-variant/30 p-3 text-[11px] text-text-primary&quot;&gt;
+                  {JSON.stringify(selectedModel.metrics || {}, null, 2)}
+                &lt;/pre&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          )}
+
+          {/* Feature Importance */}
+          {featureImportanceData.length &gt; 0 &amp;&amp; (
+            &lt;div className=&quot;sigma-card mb-6&quot;&gt;
+              &lt;h3 className=&quot;font-display font-semibold text-white mb-4&quot;&gt;
+                Feature Importance — {selectedModel?.model_name}
+              &lt;/h3&gt;
+              &lt;ResponsiveContainer width=&quot;100%&quot; height={300}&gt;
+                &lt;BarChart data={featureImportanceData} layout=&quot;vertical&quot;&gt;
+                  &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(59,110,246,0.1)&quot; /&gt;
+                  &lt;XAxis type=&quot;number&quot; tick={{ fill: &quot;#6b7a9e&quot;, fontSize: 11 }} unit=&quot;%&quot; /&gt;
+                  &lt;YAxis type=&quot;category&quot; dataKey=&quot;name&quot; width={140} tick={{ fill: &quot;#8b97b8&quot;, fontSize: 11 }} /&gt;
+                  &lt;Tooltip contentStyle={{ background: &quot;#0d1526&quot;, border: &quot;1px solid rgba(59,110,246,0.3)&quot;, borderRadius: &quot;8px&quot;, color: &quot;#e8edf8&quot; }} /&gt;
+                  &lt;Bar dataKey=&quot;value&quot; fill=&quot;#3b6ef6&quot; radius={[0,3,3,0]}&gt;
+                    {featureImportanceData.map((_, i) =&gt; (
+                      &lt;rect key={i} fill={`hsl(${220 + i * 10}, 80%, 60%)`} /&gt;
+                    ))}
+                  &lt;/Bar&gt;
+                &lt;/BarChart&gt;
+              &lt;/ResponsiveContainer&gt;
+            &lt;/div&gt;
+          )}
+
+          {/* Confusion Matrix */}
+          {selectedModel?.confusion_matrix &amp;&amp; (
+            &lt;div className=&quot;sigma-card mb-6&quot;&gt;
+              &lt;h3 className=&quot;font-display font-semibold text-white mb-4&quot;&gt;
+                Confusion Matrix — {selectedModel.model_name}
+              &lt;/h3&gt;
+              &lt;div className=&quot;overflow-x-auto&quot;&gt;
+                &lt;table className=&quot;mx-auto text-center text-sm font-mono&quot;&gt;
+                  &lt;thead&gt;
+                    &lt;tr&gt;
+                      &lt;th className=&quot;p-2 text-sigma-500 text-xs&quot;&gt;Actual\Predicted&lt;/th&gt;
+                      {selectedModel.confusion_matrix[0].map((_, i) =&gt; (
+                        &lt;th key={i} className=&quot;p-2 text-sigma-400&quot;&gt;Class {i}&lt;/th&gt;
+                      ))}
+                    &lt;/tr&gt;
+                  &lt;/thead&gt;
+                  &lt;tbody&gt;
+                    {selectedModel.confusion_matrix.map((row, i) =&gt; (
+                      &lt;tr key={i}&gt;
+                        &lt;td className=&quot;p-2 text-sigma-400 text-xs&quot;&gt;Class {i}&lt;/td&gt;
+                        {row.map((val, j) =&gt; {
+                          const max = Math.max(...selectedModel.confusion_matrix!.flat());
+                          const intensity = max &gt; 0 ? val / max : 0;
+                          return (
+                            &lt;td key={j} className=&quot;p-3 rounded text-white font-bold&quot;
+                              style={{ background: i === j
+                                ? `rgba(0, 255, 148, ${0.15 + intensity * 0.4})`
+                                : `rgba(239, 68, 68, ${0.05 + intensity * 0.3})` }}&gt;
+                              {val}
+                            &lt;/td&gt;
+                          );
+                        })}
+                      &lt;/tr&gt;
+                    ))}
+                  &lt;/tbody&gt;
+                &lt;/table&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          )}
+
+          {/* ROC Curve */}
+          {selectedModel?.roc_curve_data &amp;&amp; (
+            &lt;div className=&quot;sigma-card&quot;&gt;
+              &lt;h3 className=&quot;font-display font-semibold text-white mb-4&quot;&gt;
+                ROC Curve — {selectedModel.model_name}
+              &lt;/h3&gt;
+              &lt;ResponsiveContainer width=&quot;100%&quot; height={280}&gt;
+                &lt;LineChart data={selectedModel.roc_curve_data.fpr.map((fpr, i) =&gt; ({
+                  fpr: +fpr.toFixed(3),
+                  tpr: +selectedModel.roc_curve_data!.tpr[i].toFixed(3),
+                }))}&gt;
+                  &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(59,110,246,0.1)&quot; /&gt;
+                  &lt;XAxis dataKey=&quot;fpr&quot; type=&quot;number&quot; domain={[0,1]} label={{ value: &quot;False Positive Rate&quot;, position: &quot;insideBottom&quot;, fill: &quot;#6b7a9e&quot;, dy: 10 }} tick={{ fill: &quot;#6b7a9e&quot;, fontSize: 11 }} /&gt;
+                  &lt;YAxis domain={[0,1]} label={{ value: &quot;True Positive Rate&quot;, angle: -90, position: &quot;insideLeft&quot;, fill: &quot;#6b7a9e&quot; }} tick={{ fill: &quot;#6b7a9e&quot;, fontSize: 11 }} /&gt;
+                  &lt;Tooltip contentStyle={{ background: &quot;#0d1526&quot;, border: &quot;1px solid rgba(59,110,246,0.3)&quot;, borderRadius: &quot;8px&quot;, color: &quot;#e8edf8&quot; }} /&gt;
+                  &lt;Line type=&quot;monotone&quot; dataKey=&quot;tpr&quot; stroke=&quot;#00f5ff&quot; strokeWidth={2} dot={false} /&gt;
+                &lt;/LineChart&gt;
+              &lt;/ResponsiveContainer&gt;
+            &lt;/div&gt;
+          )}
+
+          {/* Explainability */}
+          &lt;div className=&quot;sigma-card mt-6&quot;&gt;
+            &lt;div className=&quot;flex items-center justify-between mb-4&quot;&gt;
+              &lt;h3 className=&quot;font-display font-semibold text-white flex items-center gap-2&quot;&gt;
+                &lt;Brain className=&quot;w-4 h-4 text-sigma-400&quot; /&gt; Explainable AI (SHAP / LIME)
+              &lt;/h3&gt;
+              &lt;button onClick={loadExplainability} disabled={explainLoading || !selectedModel} className=&quot;btn-outline text-xs py-1.5 px-3&quot;&gt;
+                {explainLoading ? &lt;Loader2 className=&quot;w-3 h-3 animate-spin&quot; /&gt; : &quot;Load Explanations&quot;}
+              &lt;/button&gt;
+            &lt;/div&gt;
+
+            &lt;div className=&quot;grid md:grid-cols-4 gap-3 mb-4&quot;&gt;
+              &lt;div&gt;
+                &lt;label className=&quot;text-xs text-sigma-500 mb-1 block&quot;&gt;Sample Index&lt;/label&gt;
+                &lt;input
+                  type=&quot;number&quot;
+                  min={0}
+                  value={sampleIndex}
+                  onChange={(e) =&gt; setSampleIndex(Math.max(0, Number(e.target.value || 0)))}
+                  className=&quot;w-full bg-sigma-900/50 border border-sigma-700/50 rounded-lg px-2.5 py-1.5 text-xs text-white&quot;
+                /&gt;
+              &lt;/div&gt;
+              &lt;div className=&quot;md:col-span-2&quot;&gt;
+                &lt;label className=&quot;text-xs text-sigma-500 mb-1 block&quot;&gt;Custom Input JSON (optional)&lt;/label&gt;
+                &lt;input
+                  value={customInput}
+                  onChange={(e) =&gt; setCustomInput(e.target.value)}
+                  className=&quot;w-full bg-sigma-900/50 border border-sigma-700/50 rounded-lg px-2.5 py-1.5 text-xs text-white&quot;
+                /&gt;
+              &lt;/div&gt;
+              &lt;div&gt;
+                &lt;label className=&quot;text-xs text-sigma-500 mb-1 block&quot;&gt;View&lt;/label&gt;
+                &lt;select
+                  value={explainTab}
+                  onChange={(e) =&gt; setExplainTab(e.target.value as &quot;summary&quot; | &quot;shap&quot; | &quot;lime&quot;)}
+                  className=&quot;w-full bg-sigma-900/50 border border-sigma-700/50 rounded-lg px-2.5 py-1.5 text-xs text-white&quot;
+                &gt;
+                  &lt;option value=&quot;summary&quot;&gt;Summary&lt;/option&gt;
+                  &lt;option value=&quot;shap&quot;&gt;SHAP&lt;/option&gt;
+                  &lt;option value=&quot;lime&quot;&gt;LIME&lt;/option&gt;
+                &lt;/select&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+
+            {explainError &amp;&amp; (
+              &lt;div className=&quot;mb-4 rounded-lg border border-red-700/50 bg-red-900/20 p-3 text-xs text-red-300&quot;&gt;
+                {explainError}
+              &lt;/div&gt;
+            )}
+
+            &lt;div className=&quot;grid lg:grid-cols-2 gap-4&quot;&gt;
+              {explainTab === &quot;summary&quot; &amp;&amp; (
+                &lt;&gt;
+                  &lt;div className=&quot;rounded-lg border border-sigma-800/50 bg-sigma-900/20 p-4 text-xs space-y-1.5&quot;&gt;
+                    &lt;div className=&quot;text-sm font-semibold text-white mb-2&quot;&gt;SHAP Summary&lt;/div&gt;
+                    &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-sigma-500&quot;&gt;Expected Value&lt;/span&gt;&lt;span className=&quot;font-mono text-sigma-200&quot;&gt;{String(shapData?.expected_value ?? &quot;—&quot;)}&lt;/span&gt;&lt;/div&gt;
+                    &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-sigma-500&quot;&gt;Prediction&lt;/span&gt;&lt;span className=&quot;font-mono text-sigma-200&quot;&gt;{String(shapData?.sample_prediction?.prediction ?? &quot;—&quot;)}&lt;/span&gt;&lt;/div&gt;
+                    &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-sigma-500&quot;&gt;Confidence&lt;/span&gt;&lt;span className=&quot;font-mono text-sigma-200&quot;&gt;{shapData?.sample_prediction?.confidence !== undefined ? `${(shapData.sample_prediction.confidence * 100).toFixed(2)}%` : &quot;—&quot;}&lt;/span&gt;&lt;/div&gt;
+                    &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-sigma-500&quot;&gt;Explainer&lt;/span&gt;&lt;span className=&quot;font-mono text-sigma-200&quot;&gt;{shapData?.metadata?.explainer ?? &quot;—&quot;}&lt;/span&gt;&lt;/div&gt;
+                  &lt;/div&gt;
+                  &lt;div className=&quot;rounded-lg border border-sigma-800/50 bg-sigma-900/20 p-4 text-xs space-y-1.5&quot;&gt;
+                    &lt;div className=&quot;text-sm font-semibold text-white mb-2&quot;&gt;LIME Summary&lt;/div&gt;
+                    &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-sigma-500&quot;&gt;Prediction&lt;/span&gt;&lt;span className=&quot;font-mono text-sigma-200&quot;&gt;{String(limeData?.sample_prediction?.prediction ?? &quot;—&quot;)}&lt;/span&gt;&lt;/div&gt;
+                    &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-sigma-500&quot;&gt;Top Positive&lt;/span&gt;&lt;span className=&quot;font-mono text-sigma-200&quot;&gt;{limeData?.top_positive?.[0]?.feature ?? &quot;—&quot;}&lt;/span&gt;&lt;/div&gt;
+                    &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-sigma-500&quot;&gt;Top Negative&lt;/span&gt;&lt;span className=&quot;font-mono text-sigma-200&quot;&gt;{limeData?.top_negative?.[0]?.feature ?? &quot;—&quot;}&lt;/span&gt;&lt;/div&gt;
+                    &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-sigma-500&quot;&gt;Explainer&lt;/span&gt;&lt;span className=&quot;font-mono text-sigma-200&quot;&gt;{limeData?.metadata?.explainer ?? &quot;—&quot;}&lt;/span&gt;&lt;/div&gt;
+                  &lt;/div&gt;
+                &lt;/&gt;
+              )}
+
+              {explainTab === &quot;shap&quot; &amp;&amp; (
+                &lt;div className=&quot;rounded-lg border border-sigma-800/50 bg-sigma-900/20 p-4 lg:col-span-2&quot;&gt;
+                  &lt;div className=&quot;text-sm font-semibold text-white mb-2&quot;&gt;Global SHAP Impact&lt;/div&gt;
+                  {shapData?.global_importance?.length ? (
+                    &lt;div className=&quot;grid lg:grid-cols-2 gap-4&quot;&gt;
+                      &lt;div className=&quot;space-y-1.5 text-xs max-h-60 overflow-auto&quot;&gt;
+                        {shapData.global_importance.slice(0, 16).map((item) =&gt; (
+                          &lt;div key={item.feature} className=&quot;flex justify-between&quot;&gt;
+                            &lt;span className=&quot;text-sigma-400 truncate pr-3&quot;&gt;{item.feature}&lt;/span&gt;
+                            &lt;span className=&quot;text-sigma-200 font-mono&quot;&gt;{item.mean_abs_contribution.toFixed(4)}&lt;/span&gt;
+                          &lt;/div&gt;
+                        ))}
+                      &lt;/div&gt;
+                      &lt;div className=&quot;space-y-1.5 text-xs max-h-60 overflow-auto&quot;&gt;
+                        &lt;div className=&quot;text-sm font-semibold text-white mb-1&quot;&gt;Local SHAP Contributions&lt;/div&gt;
+                        {shapData.local_contributions?.slice(0, 16).map((item) =&gt; (
+                          &lt;div key={item.feature} className=&quot;flex justify-between&quot;&gt;
+                            &lt;span className=&quot;text-sigma-400 truncate pr-3&quot;&gt;{item.feature}&lt;/span&gt;
+                            &lt;span className=&quot;text-sigma-200 font-mono&quot;&gt;{item.value.toFixed(4)}&lt;/span&gt;
+                          &lt;/div&gt;
+                        ))}
+                      &lt;/div&gt;
+                    &lt;/div&gt;
+                  ) : &lt;p className=&quot;text-xs text-sigma-500&quot;&gt;Load explanations to view SHAP summary.&lt;/p&gt;}
+                &lt;/div&gt;
+              )}
+
+              {explainTab === &quot;lime&quot; &amp;&amp; (
+                &lt;div className=&quot;rounded-lg border border-sigma-800/50 bg-sigma-900/20 p-4 lg:col-span-2&quot;&gt;
+                  &lt;div className=&quot;text-sm font-semibold text-white mb-2&quot;&gt;LIME Feature Weights&lt;/div&gt;
+                  {limeData?.weights?.length ? (
+                    &lt;div className=&quot;space-y-1.5 text-xs max-h-60 overflow-auto&quot;&gt;
+                      {limeData.weights.slice(0, 18).map((item) =&gt; (
+                        &lt;div key={`${item.feature}-${item.rank}`} className=&quot;flex justify-between&quot;&gt;
+                          &lt;span className=&quot;text-sigma-400 truncate pr-3&quot;&gt;{item.feature}&lt;/span&gt;
+                          &lt;span className={`font-mono ${item.weight &gt;= 0 ? &quot;text-emerald-300&quot; : &quot;text-red-300&quot;}`}&gt;{item.weight.toFixed(4)}&lt;/span&gt;
+                        &lt;/div&gt;
+                      ))}
+                    &lt;/div&gt;
+                  ) : &lt;p className=&quot;text-xs text-sigma-500&quot;&gt;Load explanations to view LIME details.&lt;/p&gt;}
+                &lt;/div&gt;
+              )}
+            &lt;/div&gt;
+          &lt;/div&gt;
+
+          {/* Monitoring + Drift */}
+          &lt;div className=&quot;sigma-card mt-6&quot;&gt;
+            &lt;div className=&quot;flex flex-wrap items-center justify-between gap-3 mb-4&quot;&gt;
+              &lt;h3 className=&quot;font-display font-semibold text-white flex items-center gap-2&quot;&gt;
+                &lt;Activity className=&quot;w-4 h-4 text-sigma-400&quot; /&gt; Model Monitoring &amp; Drift
+              &lt;/h3&gt;
+              &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+                &lt;select
+                  value={compareDatasetId}
+                  onChange={(e) =&gt; setCompareDatasetId(e.target.value ? Number(e.target.value) : &quot;&quot;)}
+                  className=&quot;bg-sigma-900/50 border border-sigma-700/50 rounded-lg px-3 py-1.5 text-xs text-white&quot;
+                &gt;
+                  &lt;option value=&quot;&quot;&gt;No drift comparison&lt;/option&gt;
+                  {datasets.map((d) =&gt; (
+                    &lt;option key={d.id} value={d.id}&gt;{d.name}&lt;/option&gt;
+                  ))}
+                &lt;/select&gt;
+                &lt;button onClick={loadMonitoring} disabled={monitorLoading || !selectedModel} className=&quot;btn-outline text-xs py-1.5 px-3&quot;&gt;
+                  {monitorLoading ? &lt;Loader2 className=&quot;w-3 h-3 animate-spin&quot; /&gt; : &quot;Load Monitoring&quot;}
+                &lt;/button&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+
+            {monitoring ? (
+              &lt;div className=&quot;grid lg:grid-cols-2 gap-4 text-xs&quot;&gt;
+                &lt;div className=&quot;rounded-lg border border-sigma-800/50 bg-sigma-900/20 p-4 space-y-2&quot;&gt;
+                  &lt;div className=&quot;text-sm font-semibold text-white&quot;&gt;Health Snapshot&lt;/div&gt;
+                  &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-sigma-500&quot;&gt;Stability&lt;/span&gt;&lt;span className=&quot;text-sigma-300 uppercase&quot;&gt;{monitoring.monitoring.stability}&lt;/span&gt;&lt;/div&gt;
+                  &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-sigma-500&quot;&gt;CV mean&lt;/span&gt;&lt;span className=&quot;text-sigma-300 font-mono&quot;&gt;{monitoring.monitoring.cv_mean?.toFixed(4) ?? &quot;—&quot;}&lt;/span&gt;&lt;/div&gt;
+                  &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-sigma-500&quot;&gt;CV std&lt;/span&gt;&lt;span className=&quot;text-sigma-300 font-mono&quot;&gt;{monitoring.monitoring.cv_std?.toFixed(4) ?? &quot;—&quot;}&lt;/span&gt;&lt;/div&gt;
+                  &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-sigma-500&quot;&gt;Primary metric&lt;/span&gt;&lt;span className=&quot;text-sigma-300 font-mono&quot;&gt;{monitoring.monitoring.primary_metric?.toFixed(4) ?? &quot;—&quot;}&lt;/span&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div className=&quot;rounded-lg border border-sigma-800/50 bg-sigma-900/20 p-4 space-y-2&quot;&gt;
+                  &lt;div className=&quot;text-sm font-semibold text-white&quot;&gt;Drift Report&lt;/div&gt;
+                  {monitoring.drift ? (
+                    &lt;&gt;
+                      &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-sigma-500&quot;&gt;Drift level&lt;/span&gt;&lt;span className=&quot;text-sigma-300 uppercase&quot;&gt;{monitoring.drift.drift_level}&lt;/span&gt;&lt;/div&gt;
+                      &lt;div className=&quot;flex justify-between&quot;&gt;&lt;span className=&quot;text-sigma-500&quot;&gt;Avg z-drift&lt;/span&gt;&lt;span className=&quot;text-sigma-300 font-mono&quot;&gt;{monitoring.drift.avg_z_drift.toFixed(4)}&lt;/span&gt;&lt;/div&gt;
+                      &lt;div className=&quot;text-sigma-500 mt-2&quot;&gt;Top drift features&lt;/div&gt;
+                      &lt;div className=&quot;h-36&quot;&gt;
+                        &lt;ResponsiveContainer width=&quot;100%&quot; height=&quot;100%&quot;&gt;
+                          &lt;BarChart
+                            data={monitoring.drift.top_drift_features.slice(0, 6).map((f) =&gt; ({
+                              feature: f.feature.length &gt; 16 ? `${f.feature.slice(0, 16)}…` : f.feature,
+                              z: f.z_drift,
+                            }))}
+                            margin={{ top: 6, right: 8, left: 0, bottom: 8 }}
+                          &gt;
+                            &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(117,117,123,0.15)&quot; /&gt;
+                            &lt;XAxis dataKey=&quot;feature&quot; tick={{ fill: &quot;#acaab1&quot;, fontSize: 10 }} interval={0} angle={-20} textAnchor=&quot;end&quot; height={42} /&gt;
+                            &lt;YAxis tick={{ fill: &quot;#acaab1&quot;, fontSize: 10 }} /&gt;
+                            &lt;Tooltip contentStyle={{ background: &quot;#19191d&quot;, border: &quot;1px solid rgba(117,117,123,0.35)&quot;, borderRadius: &quot;8px&quot;, color: &quot;#e7e4ec&quot; }} /&gt;
+                            &lt;Bar dataKey=&quot;z&quot; fill=&quot;#6e3bd7&quot; radius={[3, 3, 0, 0]} /&gt;
+                          &lt;/BarChart&gt;
+                        &lt;/ResponsiveContainer&gt;
+                      &lt;/div&gt;
+                    &lt;/&gt;
+                  ) : (
+                    &lt;p className=&quot;text-sigma-500&quot;&gt;Select a comparison dataset to compute drift.&lt;/p&gt;
+                  )}
+                &lt;/div&gt;
+              &lt;/div&gt;
+            ) : (
+              &lt;p className=&quot;text-xs text-sigma-500&quot;&gt;Load monitoring to view model health and optional drift analysis.&lt;/p&gt;
+            )}
+          &lt;/div&gt;
+        &lt;/&gt;
+      )}
+
+      {!metrics &amp;&amp; !loading &amp;&amp; (
+        &lt;div className=&quot;text-center py-20 text-sigma-600&quot;&gt;
+          &lt;BarChart3 className=&quot;w-12 h-12 mx-auto mb-3 opacity-30&quot; /&gt;
+          &lt;p&gt;Select a completed training job to view model metrics.&lt;/p&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>AI</strong>: No official citation linked here.</li><li><strong>AUC</strong>: No official citation linked here.</li><li><strong>Accuracy</strong>: No official citation linked here.</li><li><strong>Activity</strong>: No official citation linked here.</li><li><strong>Actual</strong>: No official citation linked here.</li><li><strong>All</strong>: No official citation linked here.</li><li><strong>Analytics</strong>: No official citation linked here.</li><li><strong>AnalyticsChart</strong>: No official citation linked here.</li><li><strong>AnalyticsChartCard</strong>: No official citation linked here.</li><li><strong>AnalyticsReport</strong>: No official citation linked here.</li><li><strong>Array</strong>: No official citation linked here.</li><li><strong>AutoML</strong>: No official citation linked here.</li><li><strong>Avg</strong>: No official citation linked here.</li><li><strong>Bar</strong>: No official citation linked here.</li><li><strong>BarChart</strong>: No official citation linked here.</li><li><strong>BarChart3</strong>: No official citation linked here.</li><li><strong>Best</strong>: No official citation linked here.</li><li><strong>Brain</strong>: No official citation linked here.</li><li><strong>COLORS</strong>: No official citation linked here.</li><li><strong>CV</strong>: No official citation linked here.</li><li><strong>CartesianGrid</strong>: No official citation linked here.</li><li><strong>Charts</strong>: No official citation linked here.</li><li><strong>Class</strong>: No official citation linked here.</li><li><strong>CleanPreview</strong>: No official citation linked here.</li><li><strong>Cleaning</strong>: No official citation linked here.</li><li><strong>Compare</strong>: No official citation linked here.</li><li><strong>Comparison</strong>: No official citation linked here.</li><li><strong>Complete</strong>: No official citation linked here.</li><li><strong>Confidence</strong>: No official citation linked here.</li><li><strong>Confusion</strong>: No official citation linked here.</li><li><strong>Console</strong>: No official citation linked here.</li><li><strong>Contributions</strong>: No official citation linked here.</li><li><strong>Could</strong>: No official citation linked here.</li><li><strong>Cross</strong>: No official citation linked here.</li><li><strong>Curve</strong>: No official citation linked here.</li><li><strong>Custom</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>DatasetQualityReport</strong>: No official citation linked here.</li><li><strong>Deploy</strong>: No official citation linked here.</li><li><strong>Diagnostics</strong>: No official citation linked here.</li><li><strong>Download</strong>: No official citation linked here.</li><li><strong>Drift</strong>: No official citation linked here.</li><li><strong>Duplicate</strong>: No official citation linked here.</li><li><strong>EDAReport</strong>: No official citation linked here.</li><li><strong>EmptyPlotState</strong>: No official citation linked here.</li><li><strong>Expected</strong>: No official citation linked here.</li><li><strong>Explainability</strong>: No official citation linked here.</li><li><strong>Explainable</strong>: No official citation linked here.</li><li><strong>Explained</strong>: No official citation linked here.</li><li><strong>Explainer</strong>: No official citation linked here.</li><li><strong>Explanations</strong>: No official citation linked here.</li><li><strong>Exploratory</strong>: No official citation linked here.</li><li><strong>F1</strong>: No official citation linked here.</li><li><strong>Failed</strong>: No official citation linked here.</li><li><strong>False</strong>: No official citation linked here.</li><li><strong>Feature</strong>: No official citation linked here.</li><li><strong>Fixes</strong>: No official citation linked here.</li><li><strong>Fold</strong>: No official citation linked here.</li><li><strong>Full</strong>: No official citation linked here.</li><li><strong>Global</strong>: No official citation linked here.</li><li><strong>Health</strong>: No official citation linked here.</li><li><strong>HeatCell</strong>: No official citation linked here.</li><li><strong>High</strong>: No official citation linked here.</li><li><strong>Impact</strong>: No official citation linked here.</li><li><strong>Importance</strong>: No official citation linked here.</li><li><strong>Index</strong>: No official citation linked here.</li><li><strong>Input</strong>: No official citation linked here.</li><li><strong>Insight</strong>: No official citation linked here.</li><li><strong>JSON</strong>: No official citation linked here.</li><li><strong>Job</strong>: No official citation linked here.</li><li><strong>LIME</strong>: No official citation linked here.</li><li><strong>Leaderboard</strong>: No official citation linked here.</li><li><strong>Leakage</strong>: No official citation linked here.</li><li><strong>LeakageReport</strong>: No official citation linked here.</li><li><strong>Level</strong>: No official citation linked here.</li><li><strong>LimeResult</strong>: No official citation linked here.</li><li><strong>Line</strong>: No official citation linked here.</li><li><strong>LineChart</strong>: No official citation linked here.</li><li><strong>Load</strong>: No official citation linked here.</li><li><strong>Loader2</strong>: No official citation linked here.</li><li><strong>Loading</strong>: No official citation linked here.</li><li><strong>Local</strong>: No official citation linked here.</li><li><strong>MAPE</strong>: No official citation linked here.</li><li><strong>Math</strong>: No official citation linked here.</li><li><strong>Matrix</strong>: No official citation linked here.</li><li><strong>Max</strong>: No official citation linked here.</li><li><strong>Metric</strong>: No official citation linked here.</li><li><strong>MetricsData</strong>: No official citation linked here.</li><li><strong>Missing</strong>: No official citation linked here.</li><li><strong>Missingness</strong>: No official citation linked here.</li><li><strong>Model</strong>: No official citation linked here.</li><li><strong>ModelMonitoring</strong>: No official citation linked here.</li><li><strong>ModelsPage</strong>: No official citation linked here.</li><li><strong>Monitoring</strong>: No official citation linked here.</li><li><strong>Multi</strong>: No official citation linked here.</li><li><strong>Negative</strong>: No official citation linked here.</li><li><strong>No</strong>: No official citation linked here.</li><li><strong>Number</strong>: No official citation linked here.</li><li><strong>Object</strong>: No official citation linked here.</li><li><strong>Origin</strong>: No official citation linked here.</li><li><strong>Outliers</strong>: No official citation linked here.</li><li><strong>PanelHeader</strong>: No official citation linked here.</li><li><strong>Positive</strong>: No official citation linked here.</li><li><strong>Precision</strong>: No official citation linked here.</li><li><strong>Predicted</strong>: No official citation linked here.</li><li><strong>Prediction</strong>: No official citation linked here.</li><li><strong>Preparation</strong>: No official citation linked here.</li><li><strong>Primary</strong>: No official citation linked here.</li><li><strong>Promise</strong>: No official citation linked here.</li><li><strong>Quality</strong>: No official citation linked here.</li><li><strong>RMSE</strong>: No official citation linked here.</li><li><strong>ROC</strong>: No official citation linked here.</li><li><strong>Rate</strong>: No official citation linked here.</li><li><strong>Raw</strong>: No official citation linked here.</li><li><strong>Recall</strong>: No official citation linked here.</li><li><strong>Record</strong>: No official citation linked here.</li><li><strong>Rendered</strong>: No official citation linked here.</li><li><strong>Report</strong>: No official citation linked here.</li><li><strong>ResponsiveContainer</strong>: No official citation linked here.</li><li><strong>Rocket</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

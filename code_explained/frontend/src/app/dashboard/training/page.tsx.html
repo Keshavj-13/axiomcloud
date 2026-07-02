@@ -1,0 +1,981 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>page.tsx</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>frontend/src/app/dashboard/training/page.tsx</span></div>
+        <h1 style="margin:10px 0 6px">page.tsx</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="../search/page.tsx.html">Previous</a><span class="muted">Next</span></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: frontend/src/app/dashboard/training/page.tsx</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>frontend/src/app/dashboard/training/page.tsx</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-tsx">&quot;use client&quot;;
+import { useState, useEffect, useRef } from &quot;react&quot;;
+import { datasetsAPI, trainingAPI, experimentsAPI } from &quot;@/lib/api&quot;;
+import {
+  Dataset,
+  TrainingJob,
+  TrainingLaunchResponse,
+  LocalTrainingJobSpec,
+  ExperimentRun,
+  TrainingModelCatalog,
+  DatasetQualityReport,
+  CleanPreview,
+  LeakageReport,
+  EDAReport,
+} from &quot;@/types&quot;;
+import toast from &quot;react-hot-toast&quot;;
+import { BrainCircuit, Play, Loader2, CheckCircle, AlertTriangle, ChevronRight, Layers } from &quot;lucide-react&quot;;
+import Link from &quot;next/link&quot;;
+import PanelHeader from &quot;@/components/ui/PanelHeader&quot;;
+import StatusBadge from &quot;@/components/ui/StatusBadge&quot;;
+
+export default function TrainingPage() {
+  const MAX_MODELS_PER_RUN = 5;
+  const MAX_CV_FOLDS = 5;
+
+  const [datasets, setDatasets] = useState&lt;Dataset[]&gt;([]);
+  const [selectedDataset, setSelectedDataset] = useState&lt;Dataset | null&gt;(null);
+  const [targetColumn, setTargetColumn] = useState(&quot;&quot;);
+  const [taskType, setTaskType] = useState(&quot;auto&quot;);
+  const [testSize, setTestSize] = useState(0.2);
+  const [cvFolds, setCvFolds] = useState(5);
+  const [enableTuning, setEnableTuning] = useState(true);
+  const [tuningTrials, setTuningTrials] = useState(16);
+  const [tuningBudgetSec, setTuningBudgetSec] = useState(180);
+  const [trainingDepth, setTrainingDepth] = useState&lt;&quot;quick&quot; | &quot;balanced&quot; | &quot;deep&quot;&gt;(&quot;balanced&quot;);
+  const [modelCatalog, setModelCatalog] = useState&lt;TrainingModelCatalog&gt;({ classification: [], regression: [], all: [] });
+  const [selectedModels, setSelectedModels] = useState&lt;string[]&gt;([]);
+  const [expertMode, setExpertMode] = useState(false);
+  const [modelHyperparams, setModelHyperparams] = useState&lt;Record&lt;string, Record&lt;string, string | number | boolean&gt;&gt;&gt;({});
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-tsx">&quot;use client&quot;;
+import { useState, useEffect, useRef } from &quot;react&quot;;
+import { datasetsAPI, trainingAPI, experimentsAPI } from &quot;@/lib/api&quot;;
+import {
+  Dataset,
+  TrainingJob,
+  TrainingLaunchResponse,
+  LocalTrainingJobSpec,
+  ExperimentRun,
+  TrainingModelCatalog,
+  DatasetQualityReport,
+  CleanPreview,
+  LeakageReport,
+  EDAReport,
+} from &quot;@/types&quot;;
+import toast from &quot;react-hot-toast&quot;;
+import { BrainCircuit, Play, Loader2, CheckCircle, AlertTriangle, ChevronRight, Layers } from &quot;lucide-react&quot;;
+import Link from &quot;next/link&quot;;
+import PanelHeader from &quot;@/components/ui/PanelHeader&quot;;
+import StatusBadge from &quot;@/components/ui/StatusBadge&quot;;
+
+export default function TrainingPage() {
+  const MAX_MODELS_PER_RUN = 5;
+  const MAX_CV_FOLDS = 5;
+
+  const [datasets, setDatasets] = useState&lt;Dataset[]&gt;([]);
+  const [selectedDataset, setSelectedDataset] = useState&lt;Dataset | null&gt;(null);
+  const [targetColumn, setTargetColumn] = useState(&quot;&quot;);
+  const [taskType, setTaskType] = useState(&quot;auto&quot;);
+  const [testSize, setTestSize] = useState(0.2);
+  const [cvFolds, setCvFolds] = useState(5);
+  const [enableTuning, setEnableTuning] = useState(true);
+  const [tuningTrials, setTuningTrials] = useState(16);
+  const [tuningBudgetSec, setTuningBudgetSec] = useState(180);
+  const [trainingDepth, setTrainingDepth] = useState&lt;&quot;quick&quot; | &quot;balanced&quot; | &quot;deep&quot;&gt;(&quot;balanced&quot;);
+  const [modelCatalog, setModelCatalog] = useState&lt;TrainingModelCatalog&gt;({ classification: [], regression: [], all: [] });
+  const [selectedModels, setSelectedModels] = useState&lt;string[]&gt;([]);
+  const [expertMode, setExpertMode] = useState(false);
+  const [modelHyperparams, setModelHyperparams] = useState&lt;Record&lt;string, Record&lt;string, string | number | boolean&gt;&gt;&gt;({});
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [analysisReasons, setAnalysisReasons] = useState&lt;string[]&gt;([]);
+  const [analysisWarning, setAnalysisWarning] = useState&lt;string | null&gt;(null);
+  const [currentJob, setCurrentJob] = useState&lt;TrainingJob | null&gt;(null);
+  const [executionMode, setExecutionMode] = useState&lt;&quot;remote&quot; | &quot;local&quot;&gt;(&quot;remote&quot;);
+  const [localApiPort, setLocalApiPort] = useState(&quot;8000&quot;);
+  const [localJobSpec, setLocalJobSpec] = useState&lt;LocalTrainingJobSpec | null&gt;(null);
+  const [localAgentLogs, setLocalAgentLogs] = useState&lt;string[]&gt;([]);
+  const [experiments, setExperiments] = useState&lt;ExperimentRun[]&gt;([]);
+  const [training, setTraining] = useState(false);
+  const pollRef = useRef&lt;ReturnType&lt;typeof setInterval&gt; | null&gt;(null);
+  useEffect(() =&gt; {
+    datasetsAPI.list().then(r =&gt; setDatasets(r.data)).catch(() =&gt; {});
+    experimentsAPI.list().then(r =&gt; setExperiments(r.data)).catch(() =&gt; {});
+    trainingAPI.modelCatalog().then(r =&gt; {
+      setModelCatalog(r.data);
+    }).catch(() =&gt; {});
+    return () =&gt; { if (pollRef.current) clearInterval(pollRef.current); };
+  }, []);
+
+  useEffect(() =&gt; {
+    if (trainingDepth === &quot;quick&quot;) {
+      setCvFolds(3);
+      setEnableTuning(false);
+      setTuningTrials(6);
+      setTuningBudgetSec(60);
+      return;
+    }
+    if (trainingDepth === &quot;deep&quot;) {
+      setCvFolds(5);
+      setEnableTuning(true);
+      setTuningTrials(40);
+      setTuningBudgetSec(480);
+      return;
+    }
+    setCvFolds(5);
+    setEnableTuning(true);
+    setTuningTrials(16);
+    setTuningBudgetSec(180);
+  }, [trainingDepth]);
+
+  const visibleModelOptions = taskType === &quot;classification&quot;
+    ? modelCatalog.classification
+    : taskType === &quot;regression&quot;
+      ? modelCatalog.regression
+      : modelCatalog.all;
+
+  useEffect(() =&gt; {
+    if (!visibleModelOptions.length) return;
+    setSelectedModels(prev =&gt; {
+      const filtered = prev.filter(m =&gt; visibleModelOptions.includes(m));
+      return filtered.slice(0, MAX_MODELS_PER_RUN);
+    });
+  }, [taskType, modelCatalog.classification, modelCatalog.regression, modelCatalog.all]);
+
+  const toggleModelSelection = (name: string, checked: boolean) =&gt; {
+    setSelectedModels(prev =&gt; {
+      if (checked) {
+        return prev.filter(m =&gt; m !== name);
+      }
+      if (prev.length &gt;= MAX_MODELS_PER_RUN) {
+        toast.error(`Select at most ${MAX_MODELS_PER_RUN} models per run`);
+        return prev;
+      }
+      return [...prev, name];
+    });
+  };
+
+  const updateModelHyperparam = (modelName: string, paramName: string, value: string | number | boolean) =&gt; {
+    setModelHyperparams(prev =&gt; ({
+      ...prev,
+      [modelName]: {
+        ...(prev[modelName] || {}),
+        [paramName]: value,
+      },
+    }));
+  };
+
+  const recommendModelsFromAnalysis = (
+    options: string[],
+    task: string,
+    quality?: DatasetQualityReport,
+    clean?: CleanPreview,
+    leakage?: LeakageReport,
+    eda?: EDAReport,
+  ) =&gt; {
+    const picked = new Set&lt;string&gt;();
+    const reasons: string[] = [];
+
+    const add = (name: string) =&gt; {
+      if (options.includes(name)) picked.add(name);
+    };
+
+    if (task === &quot;classification&quot;) {
+      add(&quot;Logistic Regression&quot;);
+      add(&quot;Random Forest&quot;);
+      add(&quot;XGBoost&quot;);
+      reasons.push(&quot;Classification detected: baseline linear + robust tree ensembles selected.&quot;);
+    } else {
+      add(&quot;Linear Regression&quot;);
+      add(&quot;Random Forest&quot;);
+      add(&quot;XGBoost&quot;);
+      reasons.push(&quot;Regression detected: baseline linear + nonlinear ensembles selected.&quot;);
+    }
+
+    const rows = quality?.rows ?? eda?.overview?.rows ?? 0;
+    const cols = quality?.columns ?? eda?.overview?.columns ?? 0;
+    const droppedRatio = clean &amp;&amp; quality?.rows ? Math.max(0, (quality.rows - clean.rows_after_cleaning) / quality.rows) : 0;
+    const maxLeak = leakage?.leakage_risks?.length ? Math.max(...leakage.leakage_risks.map(r =&gt; r.risk_score)) : 0;
+
+    if (rows &gt; 60000) {
+      add(&quot;LightGBM&quot;);
+      add(&quot;Gradient Boosting&quot;);
+      reasons.push(&quot;Large row count: preferred scalable boosting over instance-based methods.&quot;);
+    } else {
+      add(&quot;KNN&quot;);
+      add(task === &quot;classification&quot; ? &quot;Linear SVM&quot; : &quot;Linear SVR&quot;);
+      reasons.push(&quot;Moderate row count: included local-margin methods (KNN/SVM family).&quot;);
+    }
+
+    if (cols &gt; 80) {
+      add(&quot;LightGBM&quot;);
+      add(&quot;MLP Neural Net&quot;);
+      reasons.push(&quot;High feature count: added neural and gradient methods for nonlinear interactions.&quot;);
+    }
+
+    if ((quality?.missing_cells ?? 0) &gt; 0 || droppedRatio &gt; 0.05) {
+      add(&quot;Random Forest&quot;);
+      add(&quot;Extra Trees&quot;);
+      add(&quot;LightGBM&quot;);
+      reasons.push(&quot;Cleaning/missingness detected: tree ensembles emphasized for robustness.&quot;);
+    }
+
+    if (maxLeak &gt;= 0.8) {
+      reasons.push(&quot;High leakage risk detected: review target-proxy features before trusting metrics.&quot;);
+    }
+
+    // Never auto-select experimental GNN in tabular mode.
+    if (options.includes(&quot;Graph Neural Network (experimental)&quot;)) {
+      reasons.push(&quot;GNN kept optional only (requires graph-structured data and longer runtime). &quot;);
+    }
+
+    if (picked.size &lt; 3) {
+      add(&quot;Gradient Boosting&quot;);
+      add(&quot;LightGBM&quot;);
+    }
+
+    return { recommended: Array.from(picked), reasons, maxLeak };
+  };
+
+  const pollStatus = (jobId: string, mode: &quot;remote&quot; | &quot;local&quot; = &quot;remote&quot;) =&gt; {
+    pollRef.current = setInterval(async () =&gt; {
+      try {
+        const res = await trainingAPI.getStatus(jobId);
+        setCurrentJob(res.data);
+        const logs = (res.data?.config as Record&lt;string, unknown&gt; | undefined)?.local_sync as Record&lt;string, unknown&gt; | undefined;
+        const syncedLogs = logs?.logs as string[] | undefined;
+        if (syncedLogs &amp;&amp; syncedLogs.length &gt; 0) {
+          setLocalAgentLogs(syncedLogs.slice(-200));
+        }
+
+        if (res.data.status === &quot;completed&quot; || res.data.status === &quot;failed&quot;) {
+          clearInterval(pollRef.current!);
+          setTraining(false);
+          experimentsAPI.list().then(r =&gt; setExperiments(r.data)).catch(() =&gt; {});
+          if (res.data.status === &quot;completed&quot;) {
+            toast.success(mode === &quot;local&quot; ? &quot;Local training synced successfully!&quot; : &quot;Training completed!&quot;);
+          } else {
+            toast.error(&quot;Training failed: &quot; + res.data.error_message);
+          }
+        }
+      } catch { clearInterval(pollRef.current!); setTraining(false); }
+    }, mode === &quot;local&quot; ? 4000 : 1500);
+  };
+
+  const downloadLocalAgentFile = async () =&gt; {
+    try {
+      const res = await trainingAPI.downloadLocalAgent();
+      const blob = new Blob([res.data], { type: &quot;text/x-python&quot; });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement(&quot;a&quot;);
+      a.href = url;
+      a.download = &quot;local_agent.py&quot;;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success(&quot;local_agent.py downloaded&quot;);
+    } catch {
+      toast.error(&quot;Could not download local_agent.py from backend&quot;);
+    }
+  };
+
+  const copyLocalRunCommand = async () =&gt; {
+    if (!localJobSpec?.job_id) {
+      toast.error(&quot;Prepare Local Training Job first&quot;);
+      return;
+    }
+    try {
+      const { getAuth } = await import(&quot;firebase/auth&quot;);
+      const auth = getAuth();
+      const token = await auth.currentUser?.getIdToken(true);
+      if (!token) {
+        toast.error(&quot;No Firebase session token found. Please sign in again.&quot;);
+        return;
+      }
+      const cmd = `python local_agent.py --connect ${localJobSpec.job_id} --api-host localhost --api-port ${localApiPort} --token &quot;${token}&quot;`;
+      await navigator.clipboard.writeText(cmd);
+      toast.success(&quot;Copied local run command with your current Firebase token.&quot;);
+    } catch {
+      toast.error(&quot;Could not generate command automatically&quot;);
+    }
+  };
+
+  const startTraining = async () =&gt; {
+    if (!selectedDataset) return toast.error(&quot;Select a dataset&quot;);
+    if (!targetColumn) return toast.error(&quot;Enter target column&quot;);
+    if (selectedModels.length === 0) return toast.error(&quot;Select at least one model&quot;);
+    if (selectedModels.length &gt; MAX_MODELS_PER_RUN) return toast.error(`Select at most ${MAX_MODELS_PER_RUN} models per run`);
+    setTraining(true);
+    setCurrentJob(null);
+    setLocalJobSpec(null);
+    setLocalAgentLogs([]);
+    try {
+      const res = await trainingAPI.train({
+        dataset_id: selectedDataset.id,
+        target_column: targetColumn,
+        execution_mode: executionMode,
+        task_type: taskType === &quot;auto&quot; ? undefined : taskType,
+        test_size: testSize,
+        cv_folds: cvFolds,
+        models_to_train: selectedModels,
+        model_hyperparams: selectedModels.reduce((acc, name) =&gt; {
+          const overrides = modelHyperparams[name];
+          if (overrides &amp;&amp; Object.keys(overrides).length &gt; 0) {
+            const cleaned = Object.fromEntries(
+              Object.entries(overrides).filter(([, value]) =&gt; value !== &quot;&quot; &amp;&amp; value !== null &amp;&amp; value !== undefined)
+            );
+            if (Object.keys(cleaned).length &gt; 0) {
+              acc[name] = cleaned;
+            }
+          }
+          return acc;
+        }, {} as Record&lt;string, Record&lt;string, string | number | boolean&gt;&gt;),
+        enable_tuning: enableTuning,
+        tuning_trials: tuningTrials,
+        tuning_time_budget_sec: tuningBudgetSec,
+      });
+      const payload: TrainingLaunchResponse = res.data;
+      const job: TrainingJob = payload;
+      setCurrentJob(job);
+      if (payload.execution_mode === &quot;local&quot;) {
+        setLocalJobSpec(payload.local_job_spec || null);
+        setTraining(false);
+        toast.success(&quot;Local job spec generated. Run the local agent on your machine.&quot;);
+        pollStatus(job.job_id, &quot;local&quot;);
+      } else {
+        toast.success(&quot;Training started!&quot;);
+        pollStatus(job.job_id, &quot;remote&quot;);
+      }
+    } catch (e: any) {
+      toast.error(e.response?.data?.detail || &quot;Failed to start training&quot;);
+      setTraining(false);
+    }
+  };
+
+  const handleDatasetSelect = async (ds: Dataset) =&gt; {
+    setSelectedDataset(ds);
+    if (ds.target_column) setTargetColumn(ds.target_column);
+    if (ds.task_type) setTaskType(ds.task_type);
+
+    if (!modelCatalog.all.length) return;
+    setAnalysisLoading(true);
+    setAnalysisReasons([]);
+    setAnalysisWarning(null);
+    try {
+      const [cleanRes, qualityRes, leakageRes, edaRes] = await Promise.all([
+        datasetsAPI.cleanPreview(ds.id, 200),
+        datasetsAPI.qualityReport(ds.id),
+        datasetsAPI.leakageReport(ds.id),
+        datasetsAPI.edaReport(ds.id),
+      ]);
+
+      const inferredTask = ds.task_type || taskType;
+      const taskResolved = inferredTask === &quot;classification&quot; || inferredTask === &quot;regression&quot;
+        ? inferredTask
+        : &quot;classification&quot;;
+      if (taskType === &quot;auto&quot; || !taskType) {
+        setTaskType(taskResolved);
+      }
+
+      const options = taskResolved === &quot;classification&quot;
+        ? modelCatalog.classification
+        : modelCatalog.regression;
+
+      const recommendation = recommendModelsFromAnalysis(
+        options,
+        taskResolved,
+        qualityRes.data,
+        cleanRes.data,
+        leakageRes.data,
+        edaRes.data,
+      );
+
+      setSelectedModels(recommendation.recommended.slice(0, MAX_MODELS_PER_RUN));
+      setAnalysisReasons(recommendation.reasons);
+      if (recommendation.maxLeak &gt;= 0.8) {
+        setAnalysisWarning(&quot;High leakage risk detected. Validate feature set before long/deep training.&quot;);
+      }
+      toast.success(&quot;Dataset cleaned + analyzed. Recommended model stack selected.&quot;);
+    } catch {
+      const fallbackTask = ds.task_type === &quot;regression&quot; ? &quot;regression&quot; : &quot;classification&quot;;
+      const options = fallbackTask === &quot;classification&quot; ? modelCatalog.classification : modelCatalog.regression;
+      const fallback = options.filter((m) =&gt; [&quot;Logistic Regression&quot;, &quot;Linear Regression&quot;, &quot;Random Forest&quot;, &quot;XGBoost&quot;].includes(m));
+      setSelectedModels(fallback.slice(0, 3));
+      setAnalysisReasons([&quot;Auto-analysis unavailable; selected a conservative starter stack.&quot;]);
+      toast.error(&quot;Could not run full automatic analysis, using fallback recommendation&quot;);
+    } finally {
+      setAnalysisLoading(false);
+    }
+  };
+
+  useEffect(() =&gt; {
+    if (!selectedDataset) return;
+    if (!modelCatalog.all.length) return;
+    if (selectedModels.length &gt; 0) return;
+    handleDatasetSelect(selectedDataset);
+  }, [modelCatalog.all.length]);
+
+  const progressBar = currentJob ? currentJob.progress : 0;
+  const heavySelected = selectedModels.filter((m) =&gt; modelCatalog.details?.[m]?.cost_tier === &quot;high&quot;);
+
+  return (
+    &lt;div className=&quot;mx-auto max-w-7xl&quot;&gt;
+      &lt;div className=&quot;mb-8&quot;&gt;
+        &lt;div className=&quot;section-kicker mb-2&quot;&gt;Training&lt;/div&gt;
+        &lt;h1 className=&quot;font-display mb-1 text-4xl font-semibold text-text-primary&quot;&gt;Live Training Cockpit&lt;/h1&gt;
+        &lt;p className=&quot;text-text-muted&quot;&gt;Configure safe controls and monitor model training in real-time.&lt;/p&gt;
+      &lt;/div&gt;
+
+      &lt;div className=&quot;grid lg:grid-cols-2 gap-6&quot;&gt;
+        {/* Config */}
+        &lt;div className=&quot;panel p-6&quot;&gt;
+          &lt;PanelHeader title=&quot;Session Controls&quot; subtitle=&quot;Dataset source, target and CV setup.&quot; icon={BrainCircuit} className=&quot;mb-5&quot; /&gt;
+
+          {/* Dataset picker */}
+          &lt;div className=&quot;mb-4&quot;&gt;
+            &lt;label className=&quot;mb-1.5 block text-xs text-text-muted&quot;&gt;Dataset *&lt;/label&gt;
+            {datasets.length === 0 ? (
+              &lt;div className=&quot;rounded-lg bg-surface-variant/35 p-3 text-sm text-text-muted&quot;&gt;
+                No datasets. &lt;Link href=&quot;/dashboard/datasets&quot; className=&quot;text-primary underline&quot;&gt;Upload one →&lt;/Link&gt;
+              &lt;/div&gt;
+            ) : (
+              &lt;select
+                value={selectedDataset?.id ?? &quot;&quot;}
+                onChange={e =&gt; {
+                  const ds = datasets.find(d =&gt; d.id === Number(e.target.value));
+                  if (ds) handleDatasetSelect(ds);
+                }}
+                className=&quot;w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary/50&quot;
+              &gt;
+                &lt;option value=&quot;&quot;&gt;Select dataset...&lt;/option&gt;
+                {datasets.map(ds =&gt; (
+                  &lt;option key={ds.id} value={ds.id}&gt;{ds.name} ({ds.num_rows} rows)&lt;/option&gt;
+                ))}
+              &lt;/select&gt;
+            )}
+          &lt;/div&gt;
+
+          {/* Target column */}
+          &lt;div className=&quot;mb-4&quot;&gt;
+            &lt;label className=&quot;mb-1.5 block text-xs text-text-muted&quot;&gt;Target Column *&lt;/label&gt;
+            {selectedDataset ? (
+              &lt;select
+                value={targetColumn}
+                onChange={e =&gt; setTargetColumn(e.target.value)}
+                className=&quot;w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary/50&quot;
+              &gt;
+                &lt;option value=&quot;&quot;&gt;Select target...&lt;/option&gt;
+                {selectedDataset.columns_info?.map(c =&gt; (
+                  &lt;option key={c.name} value={c.name}&gt;{c.name} ({c.dtype})&lt;/option&gt;
+                ))}
+              &lt;/select&gt;
+            ) : (
+              &lt;input
+                value={targetColumn}
+                onChange={e =&gt; setTargetColumn(e.target.value)}
+                placeholder=&quot;e.g. price, survived&quot;
+                className=&quot;w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary/50&quot;
+              /&gt;
+            )}
+          &lt;/div&gt;
+
+          {/* Task type */}
+          &lt;div className=&quot;mb-4&quot;&gt;
+            &lt;label className=&quot;mb-1.5 block text-xs text-text-muted&quot;&gt;Task Type&lt;/label&gt;
+            &lt;select
+              value={taskType}
+              onChange={e =&gt; setTaskType(e.target.value)}
+              className=&quot;w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary/50&quot;
+            &gt;
+              &lt;option value=&quot;auto&quot;&gt;Auto-detect&lt;/option&gt;
+              &lt;option value=&quot;classification&quot;&gt;Classification&lt;/option&gt;
+              &lt;option value=&quot;regression&quot;&gt;Regression&lt;/option&gt;
+            &lt;/select&gt;
+          &lt;/div&gt;
+
+          {/* Test size &amp; CV */}
+          &lt;div className=&quot;grid grid-cols-2 gap-3 mb-6&quot;&gt;
+            &lt;div&gt;
+              &lt;label className=&quot;mb-1.5 block text-xs text-text-muted&quot;&gt;Test Size: {(testSize * 100).toFixed(0)}%&lt;/label&gt;
+              &lt;input type=&quot;range&quot; min=&quot;0.1&quot; max=&quot;0.4&quot; step=&quot;0.05&quot; value={testSize}
+                onChange={e =&gt; setTestSize(Number(e.target.value))}
+                className=&quot;w-full accent-sigma-500&quot; /&gt;
+            &lt;/div&gt;
+            &lt;div&gt;
+              &lt;label className=&quot;mb-1.5 block text-xs text-text-muted&quot;&gt;CV Folds: {cvFolds}&lt;/label&gt;
+              &lt;input type=&quot;range&quot; min=&quot;2&quot; max={MAX_CV_FOLDS} step=&quot;1&quot; value={cvFolds}
+                onChange={e =&gt; setCvFolds(Number(e.target.value))}
+                className=&quot;w-full accent-sigma-500&quot; /&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+
+          &lt;div className=&quot;mb-6 rounded-lg border border-outline/25 bg-surface-variant/25 p-3&quot;&gt;
+            &lt;div className=&quot;mb-2 text-xs text-text-muted&quot;&gt;Execution Mode&lt;/div&gt;
+            &lt;div className=&quot;grid grid-cols-2 gap-2&quot;&gt;
+              &lt;button
+                type=&quot;button&quot;
+                onClick={() =&gt; setExecutionMode(&quot;remote&quot;)}
+                className={`rounded px-2 py-1.5 text-xs ${executionMode === &quot;remote&quot; ? &quot;bg-primary/20 text-primary border border-primary/30&quot; : &quot;bg-surface text-text-muted border border-outline/20&quot;}`}
+              &gt;
+                Run on server
+              &lt;/button&gt;
+              &lt;button
+                type=&quot;button&quot;
+                onClick={() =&gt; setExecutionMode(&quot;local&quot;)}
+                className={`rounded px-2 py-1.5 text-xs ${executionMode === &quot;local&quot; ? &quot;bg-primary/20 text-primary border border-primary/30&quot; : &quot;bg-surface text-text-muted border border-outline/20&quot;}`}
+              &gt;
+                Run on my machine (use my GPU)
+              &lt;/button&gt;
+            &lt;/div&gt;
+            &lt;p className=&quot;mt-2 text-[11px] text-text-muted&quot;&gt;
+              Local mode does not consume server compute. The backend creates a local job spec and waits for sync.
+            &lt;/p&gt;
+
+            {executionMode === &quot;local&quot; &amp;&amp; (
+              &lt;div className=&quot;mt-3 rounded border border-outline/20 bg-surface/30 p-3 text-xs&quot;&gt;
+                &lt;div className=&quot;mb-2 font-semibold text-text-primary&quot;&gt;Local Agent Setup&lt;/div&gt;
+                &lt;div className=&quot;mb-2 flex flex-wrap gap-2&quot;&gt;
+                  &lt;button
+                    type=&quot;button&quot;
+                    onClick={downloadLocalAgentFile}
+                    className=&quot;btn-outline px-2.5 py-1 text-xs&quot;
+                  &gt;
+                    Download local_agent.py
+                  &lt;/button&gt;
+                  &lt;button
+                    type=&quot;button&quot;
+                    onClick={copyLocalRunCommand}
+                    className=&quot;btn-outline px-2.5 py-1 text-xs&quot;
+                  &gt;
+                    Copy run command (auto token)
+                  &lt;/button&gt;
+                &lt;/div&gt;
+                &lt;div className=&quot;mb-2&quot;&gt;
+                  &lt;label className=&quot;mb-1 block text-[11px] text-text-muted&quot;&gt;Backend Port&lt;/label&gt;
+                  &lt;input
+                    type=&quot;number&quot;
+                    min=&quot;1&quot;
+                    max=&quot;65535&quot;
+                    value={localApiPort}
+                    onChange={(e) =&gt; setLocalApiPort(e.target.value || &quot;8000&quot;)}
+                    className=&quot;w-32 rounded border border-outline/25 bg-surface px-2 py-1 text-xs text-text-primary&quot;
+                  /&gt;
+                &lt;/div&gt;
+                &lt;ol className=&quot;list-decimal space-y-1 pl-4 text-text-muted&quot;&gt;
+                  &lt;li&gt;Install dependencies: &lt;span className=&quot;font-mono text-text-primary&quot;&gt;pip install torch pandas scikit-learn requests joblib&lt;/span&gt;&lt;/li&gt;
+                  &lt;li&gt;Click &lt;span className=&quot;font-mono text-text-primary&quot;&gt;Prepare Local Training Job&lt;/span&gt;.&lt;/li&gt;
+                  &lt;li&gt;Click &lt;span className=&quot;font-mono text-text-primary&quot;&gt;Copy run command (auto token)&lt;/span&gt; to auto-insert your current Firebase token.&lt;/li&gt;
+                  &lt;li&gt;Paste and run in terminal.&lt;/li&gt;
+                &lt;/ol&gt;
+                &lt;div className=&quot;mt-2 text-[11px] text-text-muted&quot;&gt;
+                  GPU is selected automatically if available; CPU fallback is automatic.
+                &lt;/div&gt;
+              &lt;/div&gt;
+            )}
+          &lt;/div&gt;
+
+          &lt;div className=&quot;mb-6 rounded-lg border border-outline/25 bg-surface-variant/25 p-3&quot;&gt;
+            &lt;div className=&quot;mb-3&quot;&gt;
+              &lt;label className=&quot;mb-1 block text-xs text-text-muted&quot;&gt;Training Depth&lt;/label&gt;
+              &lt;div className=&quot;grid grid-cols-3 gap-2&quot;&gt;
+                {[
+                  { key: &quot;quick&quot;, label: &quot;Quick&quot; },
+                  { key: &quot;balanced&quot;, label: &quot;Balanced&quot; },
+                  { key: &quot;deep&quot;, label: &quot;Deep&quot; },
+                ].map(level =&gt; (
+                  &lt;button
+                    key={level.key}
+                    type=&quot;button&quot;
+                    onClick={() =&gt; setTrainingDepth(level.key as &quot;quick&quot; | &quot;balanced&quot; | &quot;deep&quot;)}
+                    className={`rounded px-2 py-1.5 text-xs ${trainingDepth === level.key ? &quot;bg-primary/20 text-primary border border-primary/30&quot; : &quot;bg-surface text-text-muted border border-outline/20&quot;}`}
+                  &gt;
+                    {level.label}
+                  &lt;/button&gt;
+                ))}
+              &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div className=&quot;mb-2 flex items-center justify-between&quot;&gt;
+              &lt;label className=&quot;text-xs text-text-muted&quot;&gt;Adaptive Hyperparameter Tuning&lt;/label&gt;
+              &lt;button
+                type=&quot;button&quot;
+                onClick={() =&gt; setEnableTuning(v =&gt; !v)}
+                className={`rounded px-2 py-1 text-[11px] ${enableTuning ? &quot;bg-primary/20 text-primary&quot; : &quot;bg-surface text-text-muted&quot;}`}
+              &gt;
+                {enableTuning ? &quot;Enabled&quot; : &quot;Disabled&quot;}
+              &lt;/button&gt;
+            &lt;/div&gt;
+            &lt;div className=&quot;grid grid-cols-2 gap-3&quot;&gt;
+              &lt;div&gt;
+                &lt;label className=&quot;mb-1 block text-xs text-text-muted&quot;&gt;Tuning Trials: {tuningTrials}&lt;/label&gt;
+                &lt;input
+                  type=&quot;range&quot;
+                  min=&quot;3&quot;
+                  max=&quot;60&quot;
+                  step=&quot;1&quot;
+                  value={tuningTrials}
+                  disabled={!enableTuning}
+                  onChange={e =&gt; setTuningTrials(Number(e.target.value))}
+                  className=&quot;w-full accent-sigma-500 disabled:opacity-40&quot;
+                /&gt;
+              &lt;/div&gt;
+              &lt;div&gt;
+                &lt;label className=&quot;mb-1 block text-xs text-text-muted&quot;&gt;Time Budget: {tuningBudgetSec}s&lt;/label&gt;
+                &lt;input
+                  type=&quot;range&quot;
+                  min=&quot;30&quot;
+                  max=&quot;900&quot;
+                  step=&quot;30&quot;
+                  value={tuningBudgetSec}
+                  disabled={!enableTuning}
+                  onChange={e =&gt; setTuningBudgetSec(Number(e.target.value))}
+                  className=&quot;w-full accent-sigma-500 disabled:opacity-40&quot;
+                /&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+
+          &lt;button
+            onClick={startTraining}
+            disabled={training}
+            className=&quot;btn-primary w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed&quot;
+          &gt;
+            {training ? &lt;Loader2 className=&quot;w-4 h-4 animate-spin&quot; /&gt; : &lt;Play className=&quot;w-4 h-4&quot; /&gt;}
+            {training ? &quot;Training...&quot; : executionMode === &quot;local&quot; ? &quot;Prepare Local Training Job&quot; : &quot;Start AutoML Training&quot;}
+          &lt;/button&gt;
+          {!selectedDataset || !targetColumn ? (
+            &lt;p className=&quot;mt-2 text-xs text-amber-300&quot;&gt;
+              Select a dataset and target column to start training.
+            &lt;/p&gt;
+          ) : null}
+
+          {executionMode === &quot;local&quot; &amp;&amp; localJobSpec &amp;&amp; (
+            &lt;div className=&quot;mt-4 rounded-lg border border-outline/20 bg-surface-variant/25 p-3 text-xs&quot;&gt;
+              &lt;div className=&quot;mb-1 font-semibold text-text-primary&quot;&gt;Local Job Prepared&lt;/div&gt;
+              &lt;div className=&quot;text-text-muted&quot;&gt;Job ID: &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{localJobSpec.job_id}&lt;/span&gt;&lt;/div&gt;
+              &lt;div className=&quot;text-text-muted&quot;&gt;Dataset: &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{localJobSpec.dataset_name}&lt;/span&gt;&lt;/div&gt;
+            &lt;/div&gt;
+          )}
+
+          {executionMode === &quot;local&quot; &amp;&amp; localAgentLogs.length &gt; 0 &amp;&amp; (
+            &lt;div className=&quot;mt-4 rounded-lg border border-outline/20 bg-surface-variant/25 p-3 text-xs&quot;&gt;
+              &lt;div className=&quot;mb-2 font-semibold text-text-primary&quot;&gt;Local Agent Logs (synced)&lt;/div&gt;
+              &lt;pre className=&quot;max-h-40 overflow-auto whitespace-pre-wrap rounded border border-outline/20 bg-surface/40 p-2 text-[11px] text-text-muted&quot;&gt;
+                {localAgentLogs.join(&quot;\n&quot;)}
+              &lt;/pre&gt;
+            &lt;/div&gt;
+          )}
+        &lt;/div&gt;
+
+        {/* Models to train */}
+        &lt;div className=&quot;panel p-6&quot;&gt;
+          &lt;PanelHeader title=&quot;Model Set&quot; subtitle=&quot;Choose exactly which algorithms to run.&quot; icon={Layers} className=&quot;mb-4&quot; /&gt;
+          &lt;div className=&quot;mb-3 rounded-lg border border-outline/20 bg-surface-variant/25 p-3 text-xs&quot;&gt;
+            &lt;div className=&quot;mb-1 text-text-primary&quot;&gt;Automatic first-pass analysis&lt;/div&gt;
+            &lt;div className=&quot;text-text-muted&quot;&gt;
+              On dataset selection: cleaning preview is computed first, then quality/leakage/EDA analysis recommends the model stack.
+            &lt;/div&gt;
+            {analysisLoading &amp;&amp; (
+              &lt;div className=&quot;mt-2 flex items-center gap-2 text-text-muted&quot;&gt;&lt;Loader2 className=&quot;h-3.5 w-3.5 animate-spin&quot; /&gt; analyzing…&lt;/div&gt;
+            )}
+            {!analysisLoading &amp;&amp; analysisReasons.length &gt; 0 &amp;&amp; (
+              &lt;ul className=&quot;mt-2 space-y-1 text-text-muted&quot;&gt;
+                {analysisReasons.slice(0, 4).map((r, i) =&gt; &lt;li key={`${r}-${i}`}&gt;• {r}&lt;/li&gt;)}
+              &lt;/ul&gt;
+            )}
+            {analysisWarning &amp;&amp; &lt;div className=&quot;mt-2 text-amber-300&quot;&gt;Warning: {analysisWarning}&lt;/div&gt;}
+          &lt;/div&gt;
+          &lt;div className=&quot;mb-3 flex flex-wrap gap-2&quot;&gt;
+            &lt;button
+              type=&quot;button&quot;
+              onClick={() =&gt; setSelectedModels([])}
+              className=&quot;btn-ghost px-2.5 py-1 text-xs&quot;
+            &gt;
+              Clear
+            &lt;/button&gt;
+            &lt;button
+              type=&quot;button&quot;
+              onClick={() =&gt; setExpertMode(v =&gt; !v)}
+              className={`btn-ghost px-2.5 py-1 text-xs ${expertMode ? &quot;border border-primary/40 text-primary&quot; : &quot;&quot;}`}
+            &gt;
+              {expertMode ? &quot;Expert mode: on&quot; : &quot;Expert mode&quot;}
+            &lt;/button&gt;
+            &lt;div className=&quot;rounded border border-outline/20 px-2.5 py-1 text-xs text-text-muted&quot;&gt;
+              {selectedModels.length}/{MAX_MODELS_PER_RUN} selected
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div className=&quot;space-y-2 max-h-[320px] overflow-y-auto pr-1&quot;&gt;
+            {visibleModelOptions.map((name) =&gt; {
+              const checked = selectedModels.includes(name);
+              const detail = modelCatalog.details?.[name];
+              const tag = detail?.family || (/Boost|XGBoost|LightGBM/i.test(name) ? &quot;boosting&quot; : /Forest/i.test(name) ? &quot;ensemble&quot; : &quot;baseline&quot;);
+              return (
+                &lt;label key={name} className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 ${checked ? &quot;border-primary/40 bg-primary/10&quot; : &quot;border-outline/20 bg-surface-variant/30&quot;}`}&gt;
+                  &lt;input
+                    type=&quot;checkbox&quot;
+                    checked={checked}
+                    onChange={() =&gt; toggleModelSelection(name, checked)}
+                    className=&quot;accent-sigma-500&quot;
+                  /&gt;
+                  &lt;span className=&quot;flex-1 text-sm text-text-primary&quot;&gt;
+                    {name}
+                    {detail?.warning ? &lt;span className=&quot;ml-2 text-[11px] text-amber-300&quot;&gt;(longer training)&lt;/span&gt; : null}
+                    {detail?.experimental ? &lt;span className=&quot;ml-2 text-[11px] text-fuchsia-300&quot;&gt;(experimental)&lt;/span&gt; : null}
+                  &lt;/span&gt;
+                  &lt;StatusBadge label={tag} tone=&quot;idle&quot; /&gt;
+                &lt;/label&gt;
+              );
+            })}
+          &lt;/div&gt;
+          {expertMode &amp;&amp; selectedModels.length &gt; 0 &amp;&amp; (
+            &lt;div className=&quot;mt-4 space-y-3 rounded-lg border border-outline/25 bg-surface-variant/25 p-3&quot;&gt;
+              &lt;div className=&quot;text-xs text-text-muted&quot;&gt;Expert Hyperparameters (optional overrides)&lt;/div&gt;
+              {selectedModels.map((name) =&gt; {
+                const spec = modelCatalog.details?.[name]?.hyperparameters;
+                if (!spec || Object.keys(spec).length === 0) {
+                  return (
+                    &lt;div key={name} className=&quot;rounded border border-outline/20 bg-surface/30 p-2 text-xs text-text-muted&quot;&gt;
+                      &lt;span className=&quot;text-text-primary&quot;&gt;{name}&lt;/span&gt;: no exposed expert controls.
+                    &lt;/div&gt;
+                  );
+                }
+                return (
+                  &lt;div key={name} className=&quot;rounded border border-outline/20 bg-surface/30 p-2&quot;&gt;
+                    &lt;div className=&quot;mb-2 text-xs text-text-primary&quot;&gt;{name}&lt;/div&gt;
+                    &lt;div className=&quot;grid gap-2 sm:grid-cols-2&quot;&gt;
+                      {Object.entries(spec).map(([paramName, meta]) =&gt; {
+                        const controlType = meta?.type || &quot;number&quot;;
+                        const current = modelHyperparams[name]?.[paramName] ?? meta?.default ?? &quot;&quot;;
+                        return (
+                          &lt;label key={`${name}-${paramName}`} className=&quot;text-[11px] text-text-muted&quot;&gt;
+                            &lt;div className=&quot;mb-1&quot;&gt;{paramName}&lt;/div&gt;
+                            {controlType === &quot;boolean&quot; ? (
+                              &lt;select
+                                value={String(current)}
+                                onChange={(e) =&gt; updateModelHyperparam(name, paramName, e.target.value === &quot;true&quot;)}
+                                className=&quot;w-full rounded border border-outline/25 bg-surface px-2 py-1 text-xs text-text-primary&quot;
+                              &gt;
+                                &lt;option value=&quot;true&quot;&gt;true&lt;/option&gt;
+                                &lt;option value=&quot;false&quot;&gt;false&lt;/option&gt;
+                              &lt;/select&gt;
+                            ) : controlType === &quot;select&quot; &amp;&amp; Array.isArray(meta?.options) ? (
+                              &lt;select
+                                value={String(current)}
+                                onChange={(e) =&gt; updateModelHyperparam(name, paramName, e.target.value)}
+                                className=&quot;w-full rounded border border-outline/25 bg-surface px-2 py-1 text-xs text-text-primary&quot;
+                              &gt;
+                                {meta.options.map((opt) =&gt; (
+                                  &lt;option key={`${name}-${paramName}-${String(opt)}`} value={String(opt)}&gt;{String(opt)}&lt;/option&gt;
+                                ))}
+                              &lt;/select&gt;
+                            ) : (
+                              &lt;input
+                                type=&quot;number&quot;
+                                value={String(current)}
+                                min={meta?.min}
+                                max={meta?.max}
+                                step={meta?.step || (controlType === &quot;integer&quot; ? 1 : 0.01)}
+                                onChange={(e) =&gt; {
+                                  const raw = e.target.value;
+                                  if (raw === &quot;&quot;) {
+                                    updateModelHyperparam(name, paramName, &quot;&quot;);
+                                    return;
+                                  }
+                                  const num = controlType === &quot;integer&quot; ? parseInt(raw, 10) : Number(raw);
+                                  updateModelHyperparam(name, paramName, Number.isNaN(num) ? raw : num);
+                                }}
+                                className=&quot;w-full rounded border border-outline/25 bg-surface px-2 py-1 text-xs text-text-primary&quot;
+                              /&gt;
+                            )}
+                          &lt;/label&gt;
+                        );
+                      })}
+                    &lt;/div&gt;
+                  &lt;/div&gt;
+                );
+              })}
+            &lt;/div&gt;
+          )}
+          {heavySelected.length &gt; 0 &amp;&amp; (
+            &lt;div className=&quot;mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200&quot;&gt;
+              Heavy models selected ({heavySelected.length}): {heavySelected.join(&quot;, &quot;)}. Training can take significantly longer.
+            &lt;/div&gt;
+          )}
+          &lt;div className=&quot;mt-4 rounded-lg border border-outline/25 bg-surface-variant/25 p-3&quot;&gt;
+            &lt;p className=&quot;text-xs text-text-muted&quot;&gt;
+              Model list is fully configurable per run. Current task filter: &lt;span className=&quot;text-text-primary&quot;&gt;{taskType}&lt;/span&gt;.
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      {/* Job status */}
+      {currentJob &amp;&amp; (
+        &lt;div className=&quot;panel mt-6 rounded-xl p-6&quot;&gt;
+          &lt;h2 className=&quot;mb-4 flex items-center gap-2 font-display font-semibold text-text-primary&quot;&gt;
+            {currentJob.status === &quot;completed&quot; ? (
+              &lt;CheckCircle className=&quot;h-4 w-4 text-emerald-300&quot; /&gt;
+            ) : currentJob.status === &quot;failed&quot; ? (
+              &lt;AlertTriangle className=&quot;h-4 w-4 text-red-300&quot; /&gt;
+            ) : (
+              &lt;Loader2 className=&quot;h-4 w-4 animate-spin text-primary&quot; /&gt;
+            )}
+            Job: &lt;span className=&quot;font-mono text-primary&quot;&gt;{currentJob.job_id.slice(0, 8)}…&lt;/span&gt;
+          &lt;/h2&gt;
+
+          {/* Progress bar */}
+          &lt;div className=&quot;mb-4&quot;&gt;
+            &lt;div className=&quot;mb-1.5 flex justify-between text-xs text-text-muted&quot;&gt;
+              &lt;span className=&quot;capitalize&quot;&gt;{currentJob.status}&lt;/span&gt;
+              &lt;span&gt;{progressBar}%&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div className=&quot;h-2 overflow-hidden rounded-full bg-surface-variant&quot;&gt;
+              &lt;div
+                className=&quot;h-full rounded-full bg-gradient-to-r from-primary-deep to-primary transition-all duration-500&quot;
+                style={{ width: `${progressBar}%` }}
+              /&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+
+          &lt;div className=&quot;grid grid-cols-3 gap-3 text-xs&quot;&gt;
+            &lt;div className=&quot;p-2 rounded bg-sigma-900/40&quot;&gt;
+              &lt;div className=&quot;text-sigma-500&quot;&gt;Task&lt;/div&gt;
+              &lt;div className=&quot;text-white font-medium&quot;&gt;{currentJob.task_type || &quot;detecting...&quot;}&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div className=&quot;p-2 rounded bg-sigma-900/40&quot;&gt;
+              &lt;div className=&quot;text-sigma-500&quot;&gt;Target&lt;/div&gt;
+              &lt;div className=&quot;text-white font-medium&quot;&gt;{currentJob.target_column}&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div className=&quot;p-2 rounded bg-sigma-900/40&quot;&gt;
+              &lt;div className=&quot;text-sigma-500&quot;&gt;Status&lt;/div&gt;
+              &lt;div className={`font-medium capitalize ${
+                currentJob.status === &quot;completed&quot; ? &quot;text-neon-green&quot; :
+                currentJob.status === &quot;failed&quot; ? &quot;text-red-400&quot; : &quot;text-neon-amber&quot;
+              }`}&gt;{currentJob.status}&lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+
+          {currentJob.status === &quot;completed&quot; &amp;&amp; (
+            &lt;Link
+              href={`/dashboard/models?job=${currentJob.job_id}`}
+              className=&quot;btn-primary mt-4 inline-flex&quot;
+            &gt;
+              View Results &lt;ChevronRight className=&quot;w-4 h-4&quot; /&gt;
+            &lt;/Link&gt;
+          )}
+
+          {currentJob.error_message &amp;&amp; (
+            &lt;div className=&quot;mt-3 p-3 rounded bg-red-900/20 border border-red-800/40 text-red-400 text-xs font-mono&quot;&gt;
+              {currentJob.error_message}
+            &lt;/div&gt;
+          )}
+        &lt;/div&gt;
+      )}
+
+      &lt;div className=&quot;panel mt-6 rounded-xl p-6&quot;&gt;
+        &lt;h2 className=&quot;mb-3 font-display font-semibold text-text-primary&quot;&gt;Experiment Registry&lt;/h2&gt;
+        &lt;p className=&quot;mb-4 text-xs text-text-muted&quot;&gt;Latest runs with config snapshots and best-model summary.&lt;/p&gt;
+        &lt;div className=&quot;space-y-2&quot;&gt;
+          {experiments.slice(0, 8).map((run) =&gt; (
+            &lt;div key={run.run_id} className=&quot;rounded-lg border border-outline/20 bg-surface-variant/25 p-3 text-xs&quot;&gt;
+              &lt;div className=&quot;flex flex-wrap items-center justify-between gap-2&quot;&gt;
+                &lt;span className=&quot;font-mono text-text-primary&quot;&gt;{run.run_id.slice(0, 8)}…&lt;/span&gt;
+                &lt;StatusBadge label={run.status} tone={run.status === &quot;completed&quot; ? &quot;healthy&quot; : run.status === &quot;failed&quot; ? &quot;error&quot; : &quot;idle&quot;} /&gt;
+              &lt;/div&gt;
+              &lt;div className=&quot;mt-1 text-text-muted&quot;&gt;
+                job: {run.job_id.slice(0, 8)}… • target: {run.target_column} • task: {run.task_type || &quot;auto&quot;}
+              &lt;/div&gt;
+              &lt;div className=&quot;mt-1 text-text-muted&quot;&gt;
+                best: {run.best_model_name || &quot;-&quot;} {typeof run.best_score === &quot;number&quot; ? `(${run.best_score.toFixed(4)})` : &quot;&quot;}
+              &lt;/div&gt;
+            &lt;/div&gt;
+          ))}
+          {experiments.length === 0 &amp;&amp; (
+            &lt;div className=&quot;text-xs text-text-muted&quot;&gt;No experiment runs yet.&lt;/div&gt;
+          )}
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>Adaptive</strong>: No official citation linked here.</li><li><strong>Agent</strong>: No official citation linked here.</li><li><strong>AlertTriangle</strong>: No official citation linked here.</li><li><strong>Array</strong>: No official citation linked here.</li><li><strong>Auto</strong>: No official citation linked here.</li><li><strong>AutoML</strong>: No official citation linked here.</li><li><strong>Automatic</strong>: No official citation linked here.</li><li><strong>Backend</strong>: No official citation linked here.</li><li><strong>Balanced</strong>: No official citation linked here.</li><li><strong>Blob</strong>: No official citation linked here.</li><li><strong>Boost</strong>: No official citation linked here.</li><li><strong>Boosting</strong>: No official citation linked here.</li><li><strong>BrainCircuit</strong>: No official citation linked here.</li><li><strong>Budget</strong>: No official citation linked here.</li><li><strong>CPU</strong>: No official citation linked here.</li><li><strong>CV</strong>: No official citation linked here.</li><li><strong>CheckCircle</strong>: No official citation linked here.</li><li><strong>ChevronRight</strong>: No official citation linked here.</li><li><strong>Choose</strong>: No official citation linked here.</li><li><strong>Classification</strong>: No official citation linked here.</li><li><strong>CleanPreview</strong>: No official citation linked here.</li><li><strong>Cleaning</strong>: No official citation linked here.</li><li><strong>Clear</strong>: No official citation linked here.</li><li><strong>Click</strong>: No official citation linked here.</li><li><strong>Cockpit</strong>: No official citation linked here.</li><li><strong>Column</strong>: No official citation linked here.</li><li><strong>Config</strong>: No official citation linked here.</li><li><strong>Configure</strong>: No official citation linked here.</li><li><strong>Controls</strong>: No official citation linked here.</li><li><strong>Copied</strong>: No official citation linked here.</li><li><strong>Copy</strong>: No official citation linked here.</li><li><strong>Could</strong>: No official citation linked here.</li><li><strong>Current</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>DatasetQualityReport</strong>: No official citation linked here.</li><li><strong>Deep</strong>: No official citation linked here.</li><li><strong>Depth</strong>: No official citation linked here.</li><li><strong>Disabled</strong>: No official citation linked here.</li><li><strong>Download</strong>: No official citation linked here.</li><li><strong>EDA</strong>: No official citation linked here.</li><li><strong>EDAReport</strong>: No official citation linked here.</li><li><strong>Enabled</strong>: No official citation linked here.</li><li><strong>Enter</strong>: No official citation linked here.</li><li><strong>Execution</strong>: No official citation linked here.</li><li><strong>Experiment</strong>: No official citation linked here.</li><li><strong>ExperimentRun</strong>: No official citation linked here.</li><li><strong>Expert</strong>: No official citation linked here.</li><li><strong>Extra</strong>: No official citation linked here.</li><li><strong>Failed</strong>: No official citation linked here.</li><li><strong>Firebase</strong>: <a href="https://firebase.google.com/docs">https://firebase.google.com/docs</a></li><li><strong>Folds</strong>: No official citation linked here.</li><li><strong>Forest</strong>: No official citation linked here.</li><li><strong>GNN</strong>: No official citation linked here.</li><li><strong>GPU</strong>: No official citation linked here.</li><li><strong>Gradient</strong>: No official citation linked here.</li><li><strong>Graph</strong>: No official citation linked here.</li><li><strong>Heavy</strong>: No official citation linked here.</li><li><strong>High</strong>: No official citation linked here.</li><li><strong>Hyperparameter</strong>: No official citation linked here.</li><li><strong>Hyperparameters</strong>: No official citation linked here.</li><li><strong>ID</strong>: No official citation linked here.</li><li><strong>Install</strong>: No official citation linked here.</li><li><strong>Job</strong>: No official citation linked here.</li><li><strong>KNN</strong>: No official citation linked here.</li><li><strong>Large</strong>: No official citation linked here.</li><li><strong>Latest</strong>: No official citation linked here.</li><li><strong>Layers</strong>: No official citation linked here.</li><li><strong>LeakageReport</strong>: No official citation linked here.</li><li><strong>LightGBM</strong>: No official citation linked here.</li><li><strong>Linear</strong>: No official citation linked here.</li><li><strong>Link</strong>: No official citation linked here.</li><li><strong>Live</strong>: No official citation linked here.</li><li><strong>Loader2</strong>: No official citation linked here.</li><li><strong>Local</strong>: No official citation linked here.</li><li><strong>LocalTrainingJobSpec</strong>: No official citation linked here.</li><li><strong>Logistic</strong>: No official citation linked here.</li><li><strong>Logs</strong>: No official citation linked here.</li><li><strong>MAX_CV_FOLDS</strong>: No official citation linked here.</li><li><strong>MAX_MODELS_PER_RUN</strong>: No official citation linked here.</li><li><strong>MLP</strong>: No official citation linked here.</li><li><strong>Math</strong>: No official citation linked here.</li><li><strong>Mode</strong>: No official citation linked here.</li><li><strong>Model</strong>: No official citation linked here.</li><li><strong>Models</strong>: No official citation linked here.</li><li><strong>Moderate</strong>: No official citation linked here.</li><li><strong>Net</strong>: No official citation linked here.</li><li><strong>Network</strong>: No official citation linked here.</li><li><strong>Neural</strong>: No official citation linked here.</li><li><strong>Never</strong>: No official citation linked here.</li><li><strong>No</strong>: No official citation linked here.</li><li><strong>Number</strong>: No official citation linked here.</li><li><strong>Object</strong>: No official citation linked here.</li><li><strong>On</strong>: No official citation linked here.</li><li><strong>PanelHeader</strong>: No official citation linked here.</li><li><strong>Paste</strong>: No official citation linked here.</li><li><strong>Play</strong>: No official citation linked here.</li><li><strong>Please</strong>: No official citation linked here.</li><li><strong>Port</strong>: No official citation linked here.</li><li><strong>Prepare</strong>: No official citation linked here.</li><li><strong>Prepared</strong>: No official citation linked here.</li><li><strong>Progress</strong>: No official citation linked here.</li><li><strong>Promise</strong>: No official citation linked here.</li><li><strong>Quick</strong>: No official citation linked here.</li><li><strong>Random</strong>: No official citation linked here.</li><li><strong>Recommended</strong>: No official citation linked here.</li><li><strong>Record</strong>: No official citation linked here.</li><li><strong>Registry</strong>: No official citation linked here.</li><li><strong>Regression</strong>: No official citation linked here.</li><li><strong>Results</strong>: No official citation linked here.</li><li><strong>ReturnType</strong>: No official citation linked here.</li><li><strong>Run</strong>: No official citation linked here.</li><li><strong>SVM</strong>: No official citation linked here.</li><li><strong>SVR</strong>: No official citation linked here.</li><li><strong>Select</strong>: No official citation linked here.</li><li><strong>Session</strong>: No official citation linked here.</li><li><strong>Set</strong>: No official citation linked here.</li><li><strong>Setup</strong>: No official citation linked here.</li><li><strong>Size</strong>: No official citation linked here.</li><li><strong>Start</strong>: No official citation linked here.</li><li><strong>Status</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

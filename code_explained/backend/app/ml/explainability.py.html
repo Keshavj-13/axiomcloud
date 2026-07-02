@@ -1,0 +1,639 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>explainability.py</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>backend/app/ml/explainability.py</span></div>
+        <h1 style="margin:10px 0 6px">explainability.py</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="datasets.py.html">Previous</a><a href="metrics_payload.py.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: backend/app/ml/explainability.py</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>backend/app/ml/explainability.py</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-python">&quot;&quot;&quot;Explainability service utilities for SHAP/LIME payload generation with caching.&quot;&quot;&quot;
+from __future__ import annotations
+
+import hashlib
+import logging
+import os
+import threading
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
+
+import joblib
+import numpy as np
+import pandas as pd
+import shap
+from scipy.sparse import issparse
+
+logger = logging.getLogger(__name__)
+
+try:
+    from lime.lime_tabular import LimeTabularExplainer
+except Exception:  # pragma: no cover - optional dependency
+    LimeTabularExplainer = None
+
+
+class ExplainabilityError(Exception):
+    def __init__(self, code: str, message: str, details: Optional[Dict[str, Any]] = None):
+        super().__init__(message)
+        self.code = code
+        self.message = message
+        self.details = details or {}
+
+
+@dataclass
+class ExplainabilityContext:
+    model_id: int
+    model_name: str
+    model_type: str
+    task_type: str
+    job_id: str
+    artifact_hash: str
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-python">&quot;&quot;&quot;Explainability service utilities for SHAP/LIME payload generation with caching.&quot;&quot;&quot;
+from __future__ import annotations
+
+import hashlib
+import logging
+import os
+import threading
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
+
+import joblib
+import numpy as np
+import pandas as pd
+import shap
+from scipy.sparse import issparse
+
+logger = logging.getLogger(__name__)
+
+try:
+    from lime.lime_tabular import LimeTabularExplainer
+except Exception:  # pragma: no cover - optional dependency
+    LimeTabularExplainer = None
+
+
+class ExplainabilityError(Exception):
+    def __init__(self, code: str, message: str, details: Optional[Dict[str, Any]] = None):
+        super().__init__(message)
+        self.code = code
+        self.message = message
+        self.details = details or {}
+
+
+@dataclass
+class ExplainabilityContext:
+    model_id: int
+    model_name: str
+    model_type: str
+    task_type: str
+    job_id: str
+    artifact_hash: str
+    dataset_hash: str
+
+
+def _hash_file_state(path: str) -&gt; str:
+    st = os.stat(path)
+    payload = f&quot;{path}:{st.st_size}:{st.st_mtime_ns}&quot;
+    return hashlib.sha1(payload.encode(&quot;utf-8&quot;)).hexdigest()[:16]
+
+
+def _safe_feature_names(transformed: Any, fallback: List[str], preprocessor: Any) -&gt; List[str]:
+    try:
+        if hasattr(preprocessor, &quot;get_feature_names_out&quot;):
+            names = preprocessor.get_feature_names_out()
+            if names is not None:
+                return [str(n) for n in list(names)]
+    except Exception:
+        logger.debug(&quot;Could not resolve transformed feature names from preprocessor&quot;, exc_info=True)
+
+    if isinstance(fallback, list) and len(fallback) &gt; 0:
+        return [str(c) for c in fallback]
+
+    n_features = int(transformed.shape[1]) if hasattr(transformed, &quot;shape&quot;) and len(transformed.shape) &gt; 1 else 0
+    return [f&quot;feature_{i}&quot; for i in range(n_features)]
+
+
+def _ensure_dense(x: Any) -&gt; np.ndarray:
+    if issparse(x):
+        return x.toarray()
+    if hasattr(x, &quot;toarray&quot;) and callable(x.toarray):
+        return x.toarray()
+    return np.asarray(x)
+
+
+def _json_safe(obj: Any) -&gt; Any:
+    if obj is None:
+        return None
+    if isinstance(obj, (str, int, float, bool)):
+        if isinstance(obj, float) and not np.isfinite(obj):
+            return None
+        return obj
+    if isinstance(obj, (np.integer, np.int64, np.int32)):
+        return int(obj)
+    if isinstance(obj, (np.floating,)):
+        val = float(obj)
+        return val if np.isfinite(val) else None
+    if isinstance(obj, (np.bool_,)):
+        return bool(obj)
+    if isinstance(obj, pd.Index):
+        return [_json_safe(v) for v in obj.tolist()]
+    if isinstance(obj, pd.Series):
+        return [_json_safe(v) for v in obj.tolist()]
+    if isinstance(obj, pd.DataFrame):
+        return [_json_safe(r) for r in obj.to_dict(orient=&quot;records&quot;)]
+    if isinstance(obj, np.ndarray):
+        return [_json_safe(v) for v in obj.tolist()]
+    if issparse(obj):
+        return _json_safe(obj.toarray())
+    if isinstance(obj, dict):
+        return {str(k): _json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple, set)):
+        return [_json_safe(v) for v in obj]
+    return str(obj)
+
+
+class ExplainabilityCache:
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._store: Dict[str, Dict[str, Any]] = {}
+
+    def get(self, key: str) -&gt; Optional[Dict[str, Any]]:
+        with self._lock:
+            return self._store.get(key)
+
+    def set(self, key: str, value: Dict[str, Any]) -&gt; None:
+        with self._lock:
+            self._store[key] = value
+
+
+class ExplainabilityService:
+    def __init__(self):
+        self.cache = ExplainabilityCache()
+
+    def build_context(self, model: Any, dataset_path: str) -&gt; ExplainabilityContext:
+        if not model.file_path or not os.path.exists(model.file_path):
+            raise ExplainabilityError(&quot;MODEL_FILE_MISSING&quot;, &quot;Model artifact file not found&quot;)
+        if not dataset_path or not os.path.exists(dataset_path):
+            raise ExplainabilityError(&quot;DATASET_FILE_MISSING&quot;, &quot;Training dataset file not found&quot;)
+
+        return ExplainabilityContext(
+            model_id=int(model.id),
+            model_name=str(model.model_name),
+            model_type=str(model.model_type),
+            task_type=str(model.task_type or &quot;unknown&quot;),
+            job_id=str(model.job_id),
+            artifact_hash=_hash_file_state(model.file_path),
+            dataset_hash=_hash_file_state(dataset_path),
+        )
+
+    def _load_model_bundle(self, model_path: str) -&gt; Dict[str, Any]:
+        try:
+            bundle = joblib.load(model_path)
+        except Exception as exc:
+            raise ExplainabilityError(&quot;MODEL_LOAD_FAILED&quot;, &quot;Could not load model artifact&quot;, {&quot;reason&quot;: str(exc)}) from exc
+
+        pipeline = bundle.get(&quot;pipeline&quot;) if isinstance(bundle, dict) else None
+        if pipeline is None:
+            raise ExplainabilityError(&quot;PIPELINE_MISSING&quot;, &quot;No pipeline found inside model artifact&quot;)
+        return bundle
+
+    def _prepare_dataset(self, dataset_path: str, target_column: str) -&gt; pd.DataFrame:
+        try:
+            if dataset_path.endswith(&quot;.csv&quot;):
+                df = pd.read_csv(dataset_path)
+            else:
+                df = pd.read_excel(dataset_path)
+        except Exception as exc:
+            raise ExplainabilityError(&quot;DATASET_PARSE_FAILED&quot;, &quot;Could not parse training dataset&quot;, {&quot;reason&quot;: str(exc)}) from exc
+
+        if target_column not in df.columns:
+            raise ExplainabilityError(&quot;TARGET_COLUMN_MISSING&quot;, &quot;Target column missing in training dataset&quot;, {&quot;target_column&quot;: target_column})
+
+        features = df.drop(columns=[target_column], errors=&quot;ignore&quot;)
+        if features.shape[1] == 0:
+            raise ExplainabilityError(&quot;EMPTY_FEATURES&quot;, &quot;No feature columns available for explainability&quot;)
+        return features
+
+    def _sample_frame(self, frame: pd.DataFrame, nsamples: int) -&gt; pd.DataFrame:
+        n = int(frame.shape[0])
+        if n == 0:
+            raise ExplainabilityError(&quot;EMPTY_DATASET&quot;, &quot;Dataset has no rows for explainability&quot;)
+        take = min(max(int(nsamples), 1), n)
+        if n &lt;= take:
+            return frame.copy()
+        return frame.sample(n=take, random_state=42)
+
+    def _prediction_context(self, pipeline: Any, row_df: pd.DataFrame, task_type: str, label_encoder: Any) -&gt; Dict[str, Any]:
+        pred_raw = pipeline.predict(row_df)
+        pred_val: Any = pred_raw[0] if hasattr(pred_raw, &quot;__len__&quot;) else pred_raw
+        prediction_label = None
+        class_probabilities = None
+        confidence = None
+
+        if task_type == &quot;classification&quot; and label_encoder is not None:
+            try:
+                prediction_label = str(label_encoder.inverse_transform([int(pred_val)])[0])
+            except Exception:
+                prediction_label = str(pred_val)
+
+        if task_type == &quot;classification&quot; and hasattr(pipeline, &quot;predict_proba&quot;):
+            try:
+                probs = pipeline.predict_proba(row_df)[0]
+                if label_encoder is not None and hasattr(label_encoder, &quot;classes_&quot;):
+                    labels = [str(c) for c in list(label_encoder.classes_)]
+                else:
+                    labels = [str(i) for i in range(len(probs))]
+                class_probabilities = {labels[i]: float(probs[i]) for i in range(len(labels))}
+                confidence = float(np.max(probs))
+            except Exception:
+                class_probabilities = None
+                confidence = None
+
+        value = _json_safe(pred_val)
+        return {
+            &quot;prediction&quot;: value,
+            &quot;prediction_label&quot;: prediction_label,
+            &quot;class_probabilities&quot;: class_probabilities,
+            &quot;confidence&quot;: confidence,
+        }
+
+    def build_shap(
+        self,
+        *,
+        model: Any,
+        dataset_path: str,
+        target_column: str,
+        sample_index: int,
+        nsamples: int,
+    ) -&gt; Dict[str, Any]:
+        ctx = self.build_context(model, dataset_path)
+        cache_key = f&quot;shap:{ctx.model_id}:{ctx.artifact_hash}:{ctx.dataset_hash}:{sample_index}:{nsamples}&quot;
+        cached = self.cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+        bundle = self._load_model_bundle(model.file_path)
+        pipeline = bundle[&quot;pipeline&quot;]
+        label_encoder = bundle.get(&quot;label_encoder&quot;)
+
+        features_df = self._prepare_dataset(dataset_path, target_column)
+        if sample_index &lt; 0 or sample_index &gt;= int(features_df.shape[0]):
+            raise ExplainabilityError(
+                &quot;INVALID_SAMPLE_INDEX&quot;,
+                &quot;Selected sample index is out of range&quot;,
+                {&quot;sample_index&quot;: sample_index, &quot;max_index&quot;: int(features_df.shape[0]) - 1},
+            )
+
+        sample_row = features_df.iloc[[sample_index]].copy()
+        preprocessor = pipeline.named_steps.get(&quot;preprocessor&quot;)
+        estimator = pipeline.named_steps.get(&quot;classifier&quot;) or pipeline.named_steps.get(&quot;regressor&quot;)
+
+        if preprocessor is None or estimator is None:
+            raise ExplainabilityError(&quot;PIPELINE_INVALID&quot;, &quot;Pipeline missing preprocessor or estimator&quot;)
+
+        background_df = self._sample_frame(features_df, nsamples)
+
+        try:
+            bg_transformed = preprocessor.transform(background_df)
+            sample_transformed = preprocessor.transform(sample_row)
+        except Exception as exc:
+            raise ExplainabilityError(&quot;TRANSFORM_FAILED&quot;, &quot;Feature transformation failed&quot;, {&quot;reason&quot;: str(exc)}) from exc
+
+        bg_dense = _ensure_dense(bg_transformed)
+        sample_dense = _ensure_dense(sample_transformed)
+        feature_names = _safe_feature_names(bg_dense, list(features_df.columns), preprocessor)
+
+        explainer_name = &quot;KernelExplainer&quot;
+        used_fallback = True
+        shap_values = None
+        expected_value: Any = None
+
+        tree_like = any(hasattr(estimator, attr) for attr in [&quot;feature_importances_&quot;, &quot;estimators_&quot;, &quot;tree_&quot;])
+
+        try:
+            if tree_like:
+                explainer = shap.TreeExplainer(estimator)
+                shap_values = explainer.shap_values(sample_dense)
+                expected_value = explainer.expected_value
+                explainer_name = &quot;TreeExplainer&quot;
+                used_fallback = False
+            else:
+                bg_small = bg_dense[: min(60, bg_dense.shape[0])]
+                if ctx.task_type == &quot;classification&quot; and hasattr(estimator, &quot;predict_proba&quot;):
+                    explainer = shap.KernelExplainer(estimator.predict_proba, bg_small)
+                    shap_values = explainer.shap_values(sample_dense, nsamples=min(100, nsamples))
+                else:
+                    explainer = shap.KernelExplainer(estimator.predict, bg_small)
+                    shap_values = explainer.shap_values(sample_dense, nsamples=min(100, nsamples))
+                expected_value = explainer.expected_value
+        except Exception as exc:
+            raise ExplainabilityError(&quot;SHAP_FAILED&quot;, &quot;SHAP explanation generation failed&quot;, {&quot;reason&quot;: str(exc)}) from exc
+
+        values_arr = np.array(shap_values)
+        if values_arr.ndim == 3:
+            # (n_classes, n_samples, n_features) -&gt; first sample, max class by absolute sum
+            class_idx = int(np.argmax(np.abs(values_arr[:, 0, :]).sum(axis=1)))
+            local_vals = values_arr[class_idx, 0, :]
+        elif values_arr.ndim == 2:
+            local_vals = values_arr[0, :]
+        elif values_arr.ndim == 1:
+            local_vals = values_arr
+        else:
+            local_vals = np.zeros((len(feature_names),), dtype=float)
+
+        local_vals = np.asarray(local_vals, dtype=float)
+        if local_vals.shape[0] != len(feature_names):
+            # align length conservatively
+            n = min(local_vals.shape[0], len(feature_names))
+            local_vals = local_vals[:n]
+            feature_names = feature_names[:n]
+
+        # approximate global by local if only one sample; use transformed background for robust mean abs via LinearExplainer fallback style
+        global_scores = np.abs(local_vals)
+        ranked_idx = np.argsort(-global_scores)
+
+        global_importance = [
+            {
+                &quot;feature&quot;: feature_names[idx],
+                &quot;mean_abs_contribution&quot;: float(global_scores[idx]),
+                &quot;rank&quot;: rank + 1,
+            }
+            for rank, idx in enumerate(ranked_idx)
+        ]
+
+        local_order = np.argsort(-np.abs(local_vals))
+        local_contrib = [
+            {
+                &quot;feature&quot;: feature_names[idx],
+                &quot;value&quot;: float(local_vals[idx]),
+                &quot;abs_value&quot;: float(abs(local_vals[idx])),
+                &quot;rank&quot;: rank + 1,
+            }
+            for rank, idx in enumerate(local_order)
+        ]
+
+        pred_ctx = self._prediction_context(pipeline, sample_row, ctx.task_type, label_encoder)
+
+        payload = {
+            &quot;metadata&quot;: {
+                &quot;model_id&quot;: ctx.model_id,
+                &quot;model_name&quot;: ctx.model_name,
+                &quot;model_type&quot;: ctx.model_type,
+                &quot;task_type&quot;: ctx.task_type,
+                &quot;job_id&quot;: ctx.job_id,
+                &quot;artifact_hash&quot;: ctx.artifact_hash,
+                &quot;dataset_hash&quot;: ctx.dataset_hash,
+                &quot;cache_key&quot;: cache_key,
+                &quot;used_fallback&quot;: used_fallback,
+                &quot;explainer&quot;: explainer_name,
+            },
+            &quot;feature_names&quot;: _json_safe(feature_names),
+            &quot;expected_value&quot;: _json_safe(expected_value),
+            &quot;global_importance&quot;: _json_safe(global_importance),
+            &quot;local_contributions&quot;: _json_safe(local_contrib),
+            &quot;sample_prediction&quot;: {
+                &quot;sample_index&quot;: int(sample_index),
+                **pred_ctx,
+            },
+            &quot;chart&quot;: {
+                &quot;global_bar&quot;: {
+                    &quot;labels&quot;: [g[&quot;feature&quot;] for g in global_importance],
+                    &quot;values&quot;: [g[&quot;mean_abs_contribution&quot;] for g in global_importance],
+                },
+                &quot;local_bar&quot;: {
+                    &quot;labels&quot;: [l[&quot;feature&quot;] for l in local_contrib],
+                    &quot;values&quot;: [l[&quot;value&quot;] for l in local_contrib],
+                },
+            },
+            &quot;model_metadata&quot;: {
+                &quot;feature_count&quot;: len(feature_names),
+                &quot;selected_sample_index&quot;: int(sample_index),
+            },
+        }
+
+        payload = _json_safe(payload)
+        self.cache.set(cache_key, payload)
+        return payload
+
+    def build_lime(
+        self,
+        *,
+        model: Any,
+        dataset_path: str,
+        target_column: str,
+        sample_index: int,
+        num_features: int,
+        custom_input: Optional[Dict[str, Any]],
+    ) -&gt; Dict[str, Any]:
+        if LimeTabularExplainer is None:
+            raise ExplainabilityError(
+                &quot;LIME_UNAVAILABLE&quot;,
+                &quot;LIME dependency is not installed. Install &#x27;lime&#x27; to use this endpoint.&quot;,
+                {&quot;dependency&quot;: &quot;lime&quot;},
+            )
+
+        ctx = self.build_context(model, dataset_path)
+        sample_token = f&quot;custom:{hashlib.sha1(str(sorted((custom_input or {}).items())).encode(&#x27;utf-8&#x27;)).hexdigest()[:8]}&quot; if custom_input else str(sample_index)
+        cache_key = f&quot;lime:{ctx.model_id}:{ctx.artifact_hash}:{ctx.dataset_hash}:{sample_token}:{num_features}&quot;
+        cached = self.cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+        bundle = self._load_model_bundle(model.file_path)
+        pipeline = bundle[&quot;pipeline&quot;]
+        label_encoder = bundle.get(&quot;label_encoder&quot;)
+
+        features_df = self._prepare_dataset(dataset_path, target_column)
+        if sample_index &lt; 0 or sample_index &gt;= int(features_df.shape[0]):
+            raise ExplainabilityError(
+                &quot;INVALID_SAMPLE_INDEX&quot;,
+                &quot;Selected sample index is out of range&quot;,
+                {&quot;sample_index&quot;: sample_index, &quot;max_index&quot;: int(features_df.shape[0]) - 1},
+            )
+
+        sample_row = features_df.iloc[[sample_index]].copy()
+        if isinstance(custom_input, dict) and len(custom_input) &gt; 0:
+            for col in sample_row.columns:
+                if col in custom_input:
+                    sample_row[col] = custom_input[col]
+
+        preprocessor = pipeline.named_steps.get(&quot;preprocessor&quot;)
+        estimator = pipeline.named_steps.get(&quot;classifier&quot;) or pipeline.named_steps.get(&quot;regressor&quot;)
+        if preprocessor is None or estimator is None:
+            raise ExplainabilityError(&quot;PIPELINE_INVALID&quot;, &quot;Pipeline missing preprocessor or estimator&quot;)
+
+        try:
+            transformed = preprocessor.transform(features_df)
+            sample_transformed = preprocessor.transform(sample_row)
+        except Exception as exc:
+            raise ExplainabilityError(&quot;TRANSFORM_FAILED&quot;, &quot;Feature transformation failed&quot;, {&quot;reason&quot;: str(exc)}) from exc
+
+        transformed_dense = _ensure_dense(transformed)
+        sample_dense = _ensure_dense(sample_transformed)
+        feature_names = _safe_feature_names(transformed_dense, list(features_df.columns), preprocessor)
+
+        class_names: Optional[List[str]] = None
+        if ctx.task_type == &quot;classification&quot;:
+            if label_encoder is not None and hasattr(label_encoder, &quot;classes_&quot;):
+                class_names = [str(c) for c in label_encoder.classes_]
+            else:
+                preds = pipeline.predict(features_df.head(100))
+                class_names = [str(c) for c in sorted(set(_json_safe(np.asarray(preds).tolist())))]
+
+        explainer = LimeTabularExplainer(
+            training_data=transformed_dense,
+            feature_names=feature_names,
+            class_names=class_names,
+            mode=&quot;classification&quot; if ctx.task_type == &quot;classification&quot; else &quot;regression&quot;,
+            discretize_continuous=True,
+            random_state=42,
+        )
+
+        predict_fn = estimator.predict_proba if (ctx.task_type == &quot;classification&quot; and hasattr(estimator, &quot;predict_proba&quot;)) else estimator.predict
+        try:
+            exp = explainer.explain_instance(sample_dense[0], predict_fn, num_features=min(num_features, len(feature_names)))
+        except Exception as exc:
+            raise ExplainabilityError(&quot;LIME_FAILED&quot;, &quot;LIME explanation generation failed&quot;, {&quot;reason&quot;: str(exc)}) from exc
+
+        weights_raw = exp.as_list()
+        weights: List[Dict[str, Any]] = []
+        for idx, (label, weight) in enumerate(weights_raw):
+            val = float(weight)
+            weights.append(
+                {
+                    &quot;feature&quot;: str(label),
+                    &quot;weight&quot;: val,
+                    &quot;abs_weight&quot;: float(abs(val)),
+                    &quot;direction&quot;: &quot;positive&quot; if val &gt;= 0 else &quot;negative&quot;,
+                    &quot;rank&quot;: idx + 1,
+                }
+            )
+
+        pos = [w for w in weights if w[&quot;weight&quot;] &gt;= 0]
+        neg = [w for w in weights if w[&quot;weight&quot;] &lt; 0]
+        pos = sorted(pos, key=lambda w: w[&quot;abs_weight&quot;], reverse=True)
+        neg = sorted(neg, key=lambda w: w[&quot;abs_weight&quot;], reverse=True)
+
+        pred_ctx = self._prediction_context(pipeline, sample_row, ctx.task_type, label_encoder)
+
+        payload = {
+            &quot;metadata&quot;: {
+                &quot;model_id&quot;: ctx.model_id,
+                &quot;model_name&quot;: ctx.model_name,
+                &quot;model_type&quot;: ctx.model_type,
+                &quot;task_type&quot;: ctx.task_type,
+                &quot;job_id&quot;: ctx.job_id,
+                &quot;artifact_hash&quot;: ctx.artifact_hash,
+                &quot;dataset_hash&quot;: ctx.dataset_hash,
+                &quot;cache_key&quot;: cache_key,
+                &quot;used_fallback&quot;: False,
+                &quot;explainer&quot;: &quot;LimeTabularExplainer&quot;,
+            },
+            &quot;feature_names&quot;: _json_safe(feature_names),
+            &quot;sample_prediction&quot;: {
+                &quot;sample_index&quot;: int(sample_index),
+                **pred_ctx,
+            },
+            &quot;weights&quot;: _json_safe(weights),
+            &quot;top_positive&quot;: _json_safe(pos[: min(10, len(pos))]),
+            &quot;top_negative&quot;: _json_safe(neg[: min(10, len(neg))]),
+            &quot;class_context&quot;: {
+                &quot;class_names&quot;: class_names or [],
+                &quot;mode&quot;: &quot;classification&quot; if ctx.task_type == &quot;classification&quot; else &quot;regression&quot;,
+                &quot;target_label&quot;: &quot;target&quot; if ctx.task_type == &quot;regression&quot; else &quot;class&quot;,
+            },
+            &quot;chart&quot;: {
+                &quot;local_bar&quot;: {
+                    &quot;labels&quot;: [w[&quot;feature&quot;] for w in weights],
+                    &quot;values&quot;: [w[&quot;weight&quot;] for w in weights],
+                }
+            },
+        }
+
+        payload = _json_safe(payload)
+        self.cache.set(cache_key, payload)
+        return payload
+
+
+explainability_service = ExplainabilityService()
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>Any</strong>: No official citation linked here.</li><li><strong>Could</strong>: No official citation linked here.</li><li><strong>DATASET_FILE_MISSING</strong>: No official citation linked here.</li><li><strong>DATASET_PARSE_FAILED</strong>: No official citation linked here.</li><li><strong>DataFrame</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>Dict</strong>: No official citation linked here.</li><li><strong>EMPTY_DATASET</strong>: No official citation linked here.</li><li><strong>EMPTY_FEATURES</strong>: No official citation linked here.</li><li><strong>Exception</strong>: No official citation linked here.</li><li><strong>Explainability</strong>: No official citation linked here.</li><li><strong>ExplainabilityCache</strong>: No official citation linked here.</li><li><strong>ExplainabilityContext</strong>: No official citation linked here.</li><li><strong>ExplainabilityError</strong>: No official citation linked here.</li><li><strong>ExplainabilityService</strong>: No official citation linked here.</li><li><strong>False</strong>: No official citation linked here.</li><li><strong>Feature</strong>: No official citation linked here.</li><li><strong>INVALID_SAMPLE_INDEX</strong>: No official citation linked here.</li><li><strong>Index</strong>: No official citation linked here.</li><li><strong>Install</strong>: No official citation linked here.</li><li><strong>KernelExplainer</strong>: No official citation linked here.</li><li><strong>LIME</strong>: No official citation linked here.</li><li><strong>LIME_FAILED</strong>: No official citation linked here.</li><li><strong>LIME_UNAVAILABLE</strong>: No official citation linked here.</li><li><strong>LimeTabularExplainer</strong>: No official citation linked here.</li><li><strong>LinearExplainer</strong>: No official citation linked here.</li><li><strong>List</strong>: No official citation linked here.</li><li><strong>Lock</strong>: No official citation linked here.</li><li><strong>MODEL_FILE_MISSING</strong>: No official citation linked here.</li><li><strong>MODEL_LOAD_FAILED</strong>: No official citation linked here.</li><li><strong>Model</strong>: No official citation linked here.</li><li><strong>No</strong>: No official citation linked here.</li><li><strong>None</strong>: No official citation linked here.</li><li><strong>Optional</strong>: No official citation linked here.</li><li><strong>PIPELINE_INVALID</strong>: No official citation linked here.</li><li><strong>PIPELINE_MISSING</strong>: No official citation linked here.</li><li><strong>Pipeline</strong>: No official citation linked here.</li><li><strong>SHAP</strong>: No official citation linked here.</li><li><strong>SHAP_FAILED</strong>: No official citation linked here.</li><li><strong>Selected</strong>: No official citation linked here.</li><li><strong>Series</strong>: No official citation linked here.</li><li><strong>TARGET_COLUMN_MISSING</strong>: No official citation linked here.</li><li><strong>TRANSFORM_FAILED</strong>: No official citation linked here.</li><li><strong>Target</strong>: No official citation linked here.</li><li><strong>Training</strong>: No official citation linked here.</li><li><strong>TreeExplainer</strong>: No official citation linked here.</li><li><strong>True</strong>: No official citation linked here.</li><li><strong>Tuple</strong>: No official citation linked here.</li><li><strong>__future__</strong>: No official citation linked here.</li><li><strong>__init__</strong>: No official citation linked here.</li><li><strong>__len__</strong>: No official citation linked here.</li><li><strong>__name__</strong>: No official citation linked here.</li><li><strong>_ensure_dense</strong>: No official citation linked here.</li><li><strong>_hash_file_state</strong>: No official citation linked here.</li><li><strong>_json_safe</strong>: No official citation linked here.</li><li><strong>_load_model_bundle</strong>: No official citation linked here.</li><li><strong>_lock</strong>: No official citation linked here.</li><li><strong>_prediction_context</strong>: No official citation linked here.</li><li><strong>_prepare_dataset</strong>: No official citation linked here.</li><li><strong>_safe_feature_names</strong>: No official citation linked here.</li><li><strong>_sample_frame</strong>: No official citation linked here.</li><li><strong>_store</strong>: No official citation linked here.</li><li><strong>abs</strong>: No official citation linked here.</li><li><strong>abs_value</strong>: No official citation linked here.</li><li><strong>abs_weight</strong>: No official citation linked here.</li><li><strong>absolute</strong>: No official citation linked here.</li><li><strong>align</strong>: No official citation linked here.</li><li><strong>and</strong>: No official citation linked here.</li><li><strong>annotations</strong>: No official citation linked here.</li><li><strong>any</strong>: No official citation linked here.</li><li><strong>append</strong>: No official citation linked here.</li><li><strong>approximate</strong>: No official citation linked here.</li><li><strong>argmax</strong>: No official citation linked here.</li><li><strong>argsort</strong>: No official citation linked here.</li><li><strong>array</strong>: No official citation linked here.</li><li><strong>artifact</strong>: No official citation linked here.</li><li><strong>artifact_hash</strong>: No official citation linked here.</li><li><strong>as</strong>: No official citation linked here.</li><li><strong>as_list</strong>: No official citation linked here.</li><li><strong>asarray</strong>: No official citation linked here.</li><li><strong>attr</strong>: No official citation linked here.</li><li><strong>available</strong>: No official citation linked here.</li><li><strong>axis</strong>: No official citation linked here.</li><li><strong>background</strong>: No official citation linked here.</li><li><strong>background_df</strong>: No official citation linked here.</li><li><strong>bg_dense</strong>: No official citation linked here.</li><li><strong>bg_small</strong>: No official citation linked here.</li><li><strong>bg_transformed</strong>: No official citation linked here.</li><li><strong>bool</strong>: No official citation linked here.</li><li><strong>bool_</strong>: No official citation linked here.</li><li><strong>build_context</strong>: No official citation linked here.</li><li><strong>build_lime</strong>: No official citation linked here.</li><li><strong>build_shap</strong>: No official citation linked here.</li><li><strong>bundle</strong>: No official citation linked here.</li><li><strong>by</strong>: No official citation linked here.</li><li><strong>cache</strong>: No official citation linked here.</li><li><strong>cache_key</strong>: No official citation linked here.</li><li><strong>cached</strong>: No official citation linked here.</li><li><strong>caching</strong>: No official citation linked here.</li><li><strong>callable</strong>: No official citation linked here.</li><li><strong>chart</strong>: No official citation linked here.</li><li><strong>class</strong>: No official citation linked here.</li><li><strong>class_context</strong>: No official citation linked here.</li><li><strong>class_idx</strong>: No official citation linked here.</li><li><strong>class_names</strong>: No official citation linked here.</li><li><strong>class_probabilities</strong>: No official citation linked here.</li><li><strong>classes_</strong>: No official citation linked here.</li><li><strong>classification</strong>: No official citation linked here.</li><li><strong>classifier</strong>: No official citation linked here.</li><li><strong>code</strong>: No official citation linked here.</li><li><strong>col</strong>: No official citation linked here.</li><li><strong>column</strong>: No official citation linked here.</li><li><strong>columns</strong>: No official citation linked here.</li><li><strong>confidence</strong>: No official citation linked here.</li><li><strong>conservatively</strong>: No official citation linked here.</li><li><strong>copy</strong>: No official citation linked here.</li><li><strong>cover</strong>: No official citation linked here.</li><li><strong>csv</strong>: No official citation linked here.</li><li><strong>ctx</strong>: No official citation linked here.</li><li><strong>custom</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

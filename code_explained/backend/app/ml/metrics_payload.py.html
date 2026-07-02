@@ -1,0 +1,354 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>metrics_payload.py</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>backend/app/ml/metrics_payload.py</span></div>
+        <h1 style="margin:10px 0 6px">metrics_payload.py</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="explainability.py.html">Previous</a><a href="pipeline.py.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: backend/app/ml/metrics_payload.py</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>backend/app/ml/metrics_payload.py</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-python">&quot;&quot;&quot;Utilities to build chart-ready metrics payloads for leaderboard and model analytics.&quot;&quot;&quot;
+from __future__ import annotations
+
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+
+
+def _safe_float(value: Any) -&gt; Optional[float]:
+    try:
+        if value is None:
+            return None
+        val = float(value)
+        if np.isnan(val) or np.isinf(val):
+            return None
+        return val
+    except Exception:
+        return None
+
+
+def _build_confusion_chart(cm: Any) -&gt; Optional[Dict[str, Any]]:
+    if not isinstance(cm, list) or len(cm) == 0:
+        return None
+
+    matrix = []
+    for row in cm:
+        if not isinstance(row, list):
+            return None
+        matrix.append([int(v) for v in row])
+
+    if len(matrix) == 0:
+        return None
+
+    labels = [f&quot;Class {i}&quot; for i in range(len(matrix))]
+    normalized = []
+    for row in matrix:
+        total = sum(row)
+        if total &lt;= 0:
+            normalized.append([0.0 for _ in row])
+        else:
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-python">&quot;&quot;&quot;Utilities to build chart-ready metrics payloads for leaderboard and model analytics.&quot;&quot;&quot;
+from __future__ import annotations
+
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+
+
+def _safe_float(value: Any) -&gt; Optional[float]:
+    try:
+        if value is None:
+            return None
+        val = float(value)
+        if np.isnan(val) or np.isinf(val):
+            return None
+        return val
+    except Exception:
+        return None
+
+
+def _build_confusion_chart(cm: Any) -&gt; Optional[Dict[str, Any]]:
+    if not isinstance(cm, list) or len(cm) == 0:
+        return None
+
+    matrix = []
+    for row in cm:
+        if not isinstance(row, list):
+            return None
+        matrix.append([int(v) for v in row])
+
+    if len(matrix) == 0:
+        return None
+
+    labels = [f&quot;Class {i}&quot; for i in range(len(matrix))]
+    normalized = []
+    for row in matrix:
+        total = sum(row)
+        if total &lt;= 0:
+            normalized.append([0.0 for _ in row])
+        else:
+            normalized.append([round(v / total, 6) for v in row])
+
+    return {
+        &quot;labels&quot;: labels,
+        &quot;matrix&quot;: matrix,
+        &quot;normalized_matrix&quot;: normalized,
+    }
+
+
+def _build_roc_chart(roc_data: Any) -&gt; Optional[Dict[str, Any]]:
+    if not isinstance(roc_data, dict):
+        return None
+
+    fpr = roc_data.get(&quot;fpr&quot;)
+    tpr = roc_data.get(&quot;tpr&quot;)
+    thresholds = roc_data.get(&quot;thresholds&quot;)
+
+    if not isinstance(fpr, list) or not isinstance(tpr, list) or len(fpr) == 0 or len(fpr) != len(tpr):
+        return None
+
+    payload = {
+        &quot;fpr&quot;: [_safe_float(v) or 0.0 for v in fpr],
+        &quot;tpr&quot;: [_safe_float(v) or 0.0 for v in tpr],
+    }
+    if isinstance(thresholds, list) and len(thresholds) == len(fpr):
+        cleaned_thresholds = [_safe_float(v) for v in thresholds]
+        if all(v is not None for v in cleaned_thresholds):
+            payload[&quot;thresholds&quot;] = cleaned_thresholds
+    return payload
+
+
+def _extract_per_class(metrics: Dict[str, Any]) -&gt; Dict[str, Any]:
+    report = metrics.get(&quot;classification_report&quot;) if isinstance(metrics, dict) else None
+    if not isinstance(report, dict):
+        return {}
+
+    per_class = {}
+    for label, values in report.items():
+        if label in {&quot;accuracy&quot;, &quot;macro avg&quot;, &quot;weighted avg&quot;}:
+            continue
+        if isinstance(values, dict):
+            per_class[label] = {
+                &quot;precision&quot;: _safe_float(values.get(&quot;precision&quot;)),
+                &quot;recall&quot;: _safe_float(values.get(&quot;recall&quot;)),
+                &quot;f1-score&quot;: _safe_float(values.get(&quot;f1-score&quot;)),
+                &quot;support&quot;: int(values.get(&quot;support&quot;, 0)),
+            }
+    return per_class
+
+
+def build_metrics_payload(job_id: str, task_type: str, status: str, models: List[Any], dataset_profile: Optional[Dict[str, Any]] = None) -&gt; Dict[str, Any]:
+    enriched_models: List[Dict[str, Any]] = []
+
+    for model in models:
+        metrics = model.metrics if isinstance(model.metrics, dict) else {}
+
+        core = {
+            &quot;accuracy&quot;: _safe_float(model.accuracy),
+            &quot;f1_score&quot;: _safe_float(model.f1_score),
+            &quot;roc_auc&quot;: _safe_float(model.roc_auc),
+            &quot;precision&quot;: _safe_float(metrics.get(&quot;precision&quot;)),
+            &quot;recall&quot;: _safe_float(metrics.get(&quot;recall&quot;)),
+            &quot;balanced_accuracy&quot;: _safe_float(metrics.get(&quot;balanced_accuracy&quot;)),
+            &quot;rmse&quot;: _safe_float(model.rmse),
+            &quot;mae&quot;: _safe_float(model.mae),
+            &quot;r2_score&quot;: _safe_float(model.r2_score),
+            &quot;explained_variance&quot;: _safe_float(metrics.get(&quot;explained_variance&quot;)),
+            &quot;median_ae&quot;: _safe_float(metrics.get(&quot;median_ae&quot;)),
+            &quot;mape&quot;: _safe_float(metrics.get(&quot;mape&quot;)),
+        }
+
+        payload = {
+            &quot;id&quot;: model.id,
+            &quot;model_name&quot;: model.model_name,
+            &quot;model_type&quot;: model.model_type,
+            &quot;task_type&quot;: model.task_type,
+            &quot;training_time&quot;: _safe_float(model.training_time),
+            &quot;is_deployed&quot;: bool(model.is_deployed),
+            &quot;metrics&quot;: {**metrics, **{k: v for k, v in core.items() if v is not None}},
+            &quot;cv_scores&quot;: model.cv_scores if isinstance(model.cv_scores, list) else None,
+            &quot;per_fold&quot;: metrics.get(&quot;per_fold&quot;) if isinstance(metrics.get(&quot;per_fold&quot;), list) else None,
+            &quot;per_class&quot;: _extract_per_class(metrics),
+            &quot;feature_importance&quot;: model.feature_importance if isinstance(model.feature_importance, dict) else None,
+            &quot;confusion_matrix_chart&quot;: _build_confusion_chart(model.confusion_matrix),
+            &quot;roc_curve_chart&quot;: _build_roc_chart(model.roc_curve_data),
+            # backward-compatible fields
+            &quot;accuracy&quot;: core[&quot;accuracy&quot;],
+            &quot;f1_score&quot;: core[&quot;f1_score&quot;],
+            &quot;roc_auc&quot;: core[&quot;roc_auc&quot;],
+            &quot;precision&quot;: core[&quot;precision&quot;],
+            &quot;recall&quot;: core[&quot;recall&quot;],
+            &quot;balanced_accuracy&quot;: core[&quot;balanced_accuracy&quot;],
+            &quot;rmse&quot;: core[&quot;rmse&quot;],
+            &quot;mae&quot;: core[&quot;mae&quot;],
+            &quot;r2_score&quot;: core[&quot;r2_score&quot;],
+            &quot;mape&quot;: core[&quot;mape&quot;],
+            &quot;explained_variance&quot;: core[&quot;explained_variance&quot;],
+            &quot;median_ae&quot;: core[&quot;median_ae&quot;],
+            &quot;confusion_matrix&quot;: model.confusion_matrix,
+            &quot;roc_curve_data&quot;: model.roc_curve_data,
+            &quot;cv_scores&quot;: model.cv_scores,
+        }
+        enriched_models.append(payload)
+
+    primary_metric = &quot;accuracy&quot; if task_type == &quot;classification&quot; else &quot;r2_score&quot;
+
+    def _metric_for_sort(m: Dict[str, Any]) -&gt; float:
+        v = _safe_float((m.get(&quot;metrics&quot;) or {}).get(primary_metric))
+        return v if v is not None else -1e9
+
+    enriched_models.sort(key=_metric_for_sort, reverse=True)
+
+    leaderboard = [
+        {
+            &quot;rank&quot;: idx + 1,
+            &quot;model_id&quot;: m[&quot;id&quot;],
+            &quot;model_name&quot;: m[&quot;model_name&quot;],
+            &quot;primary_metric&quot;: (m.get(&quot;metrics&quot;) or {}).get(primary_metric),
+            &quot;metric_name&quot;: primary_metric,
+            &quot;training_time&quot;: m.get(&quot;training_time&quot;),
+            &quot;is_deployed&quot;: m.get(&quot;is_deployed&quot;),
+        }
+        for idx, m in enumerate(enriched_models)
+    ]
+
+    metric_catalog = sorted(
+        {
+            k
+            for m in enriched_models
+            for k, v in (m.get(&quot;metrics&quot;) or {}).items()
+            if isinstance(v, (int, float))
+        }
+    )
+
+    labels = [m[&quot;model_name&quot;] for m in enriched_models]
+    comparison_series: Dict[str, List[Optional[float]]] = {}
+    for metric_name in metric_catalog:
+        comparison_series[metric_name] = [
+            _safe_float((m.get(&quot;metrics&quot;) or {}).get(metric_name))
+            for m in enriched_models
+        ]
+
+    roc_curves = [
+        {
+            &quot;model_id&quot;: m[&quot;id&quot;],
+            &quot;model_name&quot;: m[&quot;model_name&quot;],
+            &quot;curve&quot;: m.get(&quot;roc_curve_chart&quot;),
+        }
+        for m in enriched_models
+        if m.get(&quot;roc_curve_chart&quot;) is not None
+    ]
+
+    confusion_matrices = [
+        {
+            &quot;model_id&quot;: m[&quot;id&quot;],
+            &quot;model_name&quot;: m[&quot;model_name&quot;],
+            &quot;matrix&quot;: m.get(&quot;confusion_matrix_chart&quot;),
+        }
+        for m in enriched_models
+        if m.get(&quot;confusion_matrix_chart&quot;) is not None
+    ]
+
+    best_model_id = enriched_models[0][&quot;id&quot;] if len(enriched_models) &gt; 0 else None
+
+    return {
+        &quot;job_id&quot;: job_id,
+        &quot;task_type&quot;: task_type,
+        &quot;status&quot;: status,
+        &quot;metric_catalog&quot;: metric_catalog,
+        &quot;models&quot;: enriched_models,
+        &quot;best_model_id&quot;: best_model_id,
+        &quot;best_model&quot;: enriched_models[0] if len(enriched_models) &gt; 0 else None,
+        &quot;leaderboard&quot;: leaderboard,
+        &quot;chart_data&quot;: {
+            &quot;metric_comparison&quot;: {
+                &quot;labels&quot;: labels,
+                &quot;series&quot;: comparison_series,
+            },
+            &quot;roc_curves&quot;: roc_curves,
+            &quot;confusion_matrices&quot;: confusion_matrices,
+        },
+        &quot;dataset_profile&quot;: dataset_profile,
+    }
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>Any</strong>: No official citation linked here.</li><li><strong>Class</strong>: No official citation linked here.</li><li><strong>Dict</strong>: No official citation linked here.</li><li><strong>Exception</strong>: No official citation linked here.</li><li><strong>List</strong>: No official citation linked here.</li><li><strong>None</strong>: No official citation linked here.</li><li><strong>Optional</strong>: No official citation linked here.</li><li><strong>True</strong>: No official citation linked here.</li><li><strong>Utilities</strong>: No official citation linked here.</li><li><strong>__future__</strong>: No official citation linked here.</li><li><strong>_build_confusion_chart</strong>: No official citation linked here.</li><li><strong>_build_roc_chart</strong>: No official citation linked here.</li><li><strong>_extract_per_class</strong>: No official citation linked here.</li><li><strong>_metric_for_sort</strong>: No official citation linked here.</li><li><strong>_safe_float</strong>: No official citation linked here.</li><li><strong>accuracy</strong>: No official citation linked here.</li><li><strong>all</strong>: No official citation linked here.</li><li><strong>analytics</strong>: No official citation linked here.</li><li><strong>and</strong>: No official citation linked here.</li><li><strong>annotations</strong>: No official citation linked here.</li><li><strong>append</strong>: No official citation linked here.</li><li><strong>as</strong>: No official citation linked here.</li><li><strong>avg</strong>: No official citation linked here.</li><li><strong>backward</strong>: No official citation linked here.</li><li><strong>balanced_accuracy</strong>: No official citation linked here.</li><li><strong>best_model</strong>: No official citation linked here.</li><li><strong>best_model_id</strong>: No official citation linked here.</li><li><strong>bool</strong>: No official citation linked here.</li><li><strong>build</strong>: No official citation linked here.</li><li><strong>build_metrics_payload</strong>: No official citation linked here.</li><li><strong>chart</strong>: No official citation linked here.</li><li><strong>chart_data</strong>: No official citation linked here.</li><li><strong>classification</strong>: No official citation linked here.</li><li><strong>classification_report</strong>: No official citation linked here.</li><li><strong>cleaned_thresholds</strong>: No official citation linked here.</li><li><strong>cm</strong>: No official citation linked here.</li><li><strong>comparison_series</strong>: No official citation linked here.</li><li><strong>compatible</strong>: No official citation linked here.</li><li><strong>confusion_matrices</strong>: No official citation linked here.</li><li><strong>confusion_matrix</strong>: No official citation linked here.</li><li><strong>confusion_matrix_chart</strong>: No official citation linked here.</li><li><strong>continue</strong>: No official citation linked here.</li><li><strong>core</strong>: No official citation linked here.</li><li><strong>curve</strong>: No official citation linked here.</li><li><strong>cv_scores</strong>: No official citation linked here.</li><li><strong>dataset_profile</strong>: No official citation linked here.</li><li><strong>def</strong>: No official citation linked here.</li><li><strong>dict</strong>: No official citation linked here.</li><li><strong>e9</strong>: No official citation linked here.</li><li><strong>else</strong>: No official citation linked here.</li><li><strong>enriched_models</strong>: No official citation linked here.</li><li><strong>enumerate</strong>: No official citation linked here.</li><li><strong>except</strong>: No official citation linked here.</li><li><strong>explained_variance</strong>: No official citation linked here.</li><li><strong>f1</strong>: No official citation linked here.</li><li><strong>f1_score</strong>: No official citation linked here.</li><li><strong>feature_importance</strong>: No official citation linked here.</li><li><strong>fields</strong>: No official citation linked here.</li><li><strong>float</strong>: No official citation linked here.</li><li><strong>for</strong>: No official citation linked here.</li><li><strong>fpr</strong>: No official citation linked here.</li><li><strong>from</strong>: No official citation linked here.</li><li><strong>get</strong>: No official citation linked here.</li><li><strong>id</strong>: No official citation linked here.</li><li><strong>idx</strong>: No official citation linked here.</li><li><strong>if</strong>: No official citation linked here.</li><li><strong>import</strong>: No official citation linked here.</li><li><strong>in</strong>: No official citation linked here.</li><li><strong>int</strong>: No official citation linked here.</li><li><strong>is</strong>: No official citation linked here.</li><li><strong>is_deployed</strong>: No official citation linked here.</li><li><strong>isinf</strong>: No official citation linked here.</li><li><strong>isinstance</strong>: No official citation linked here.</li><li><strong>isnan</strong>: No official citation linked here.</li><li><strong>items</strong>: No official citation linked here.</li><li><strong>job_id</strong>: No official citation linked here.</li><li><strong>key</strong>: No official citation linked here.</li><li><strong>label</strong>: No official citation linked here.</li><li><strong>labels</strong>: No official citation linked here.</li><li><strong>leaderboard</strong>: No official citation linked here.</li><li><strong>len</strong>: No official citation linked here.</li><li><strong>list</strong>: No official citation linked here.</li><li><strong>macro</strong>: No official citation linked here.</li><li><strong>mae</strong>: No official citation linked here.</li><li><strong>mape</strong>: No official citation linked here.</li><li><strong>matrix</strong>: No official citation linked here.</li><li><strong>median_ae</strong>: No official citation linked here.</li><li><strong>metric_catalog</strong>: No official citation linked here.</li><li><strong>metric_comparison</strong>: No official citation linked here.</li><li><strong>metric_name</strong>: No official citation linked here.</li><li><strong>metrics</strong>: No official citation linked here.</li><li><strong>model</strong>: No official citation linked here.</li><li><strong>model_id</strong>: No official citation linked here.</li><li><strong>model_name</strong>: No official citation linked here.</li><li><strong>model_type</strong>: No official citation linked here.</li><li><strong>models</strong>: No official citation linked here.</li><li><strong>normalized</strong>: No official citation linked here.</li><li><strong>normalized_matrix</strong>: No official citation linked here.</li><li><strong>not</strong>: No official citation linked here.</li><li><strong>np</strong>: No official citation linked here.</li><li><strong>numpy</strong>: No official citation linked here.</li><li><strong>or</strong>: No official citation linked here.</li><li><strong>payload</strong>: No official citation linked here.</li><li><strong>payloads</strong>: No official citation linked here.</li><li><strong>per_class</strong>: No official citation linked here.</li><li><strong>per_fold</strong>: No official citation linked here.</li><li><strong>precision</strong>: No official citation linked here.</li><li><strong>primary_metric</strong>: No official citation linked here.</li><li><strong>r2_score</strong>: No official citation linked here.</li><li><strong>range</strong>: No official citation linked here.</li><li><strong>rank</strong>: No official citation linked here.</li><li><strong>ready</strong>: No official citation linked here.</li><li><strong>recall</strong>: No official citation linked here.</li><li><strong>report</strong>: No official citation linked here.</li><li><strong>return</strong>: No official citation linked here.</li><li><strong>reverse</strong>: No official citation linked here.</li><li><strong>rmse</strong>: No official citation linked here.</li><li><strong>roc_auc</strong>: No official citation linked here.</li><li><strong>roc_curve_chart</strong>: No official citation linked here.</li><li><strong>roc_curve_data</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>datasets.py</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>backend/app/ml/datasets.py</span></div>
+        <h1 style="margin:10px 0 6px">datasets.py</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="dataset_profiling.py.html">Previous</a><a href="explainability.py.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: backend/app/ml/datasets.py</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>backend/app/ml/datasets.py</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-python">&quot;&quot;&quot;
+Axiom Cloud AI - Example Dataset Loaders
+Provides California Housing, Titanic, and Breast Cancer datasets.
+&quot;&quot;&quot;
+import pandas as pd
+import numpy as np
+from sklearn.datasets import (
+    fetch_california_housing,
+    load_breast_cancer,
+    load_iris,
+    load_wine,
+)
+from typing import Tuple
+
+
+def load_titanic() -&gt; pd.DataFrame:
+    &quot;&quot;&quot;Load a synthetic Titanic-like dataset.&quot;&quot;&quot;
+    np.random.seed(42)
+    n = 891
+
+    df = pd.DataFrame({
+        &quot;pclass&quot;: np.random.choice([1, 2, 3], n, p=[0.24, 0.21, 0.55]),
+        &quot;sex&quot;: np.random.choice([&quot;male&quot;, &quot;female&quot;], n, p=[0.65, 0.35]),
+        &quot;age&quot;: np.random.normal(29.7, 14.5, n).clip(1, 80),
+        &quot;sibsp&quot;: np.random.choice([0, 1, 2, 3, 4, 5, 8], n, p=[0.68, 0.23, 0.03, 0.02, 0.02, 0.01, 0.01]),
+        &quot;parch&quot;: np.random.choice([0, 1, 2, 3, 4, 5, 6], n, p=[0.76, 0.13, 0.09, 0.005, 0.004, 0.004, 0.003]),
+        &quot;fare&quot;: np.random.lognormal(3.2, 1.2, n).clip(3.2, 512),
+        &quot;embarked&quot;: np.random.choice([&quot;S&quot;, &quot;C&quot;, &quot;Q&quot;], n, p=[0.72, 0.19, 0.09]),
+    })
+
+    # Introduce missing values
+    df.loc[np.random.choice(n, 177, replace=False), &quot;age&quot;] = np.nan
+    df.loc[np.random.choice(n, 2, replace=False), &quot;embarked&quot;] = np.nan
+
+    # Target based on realistic survival rules
+    survival_prob = (
+        0.1
+        + 0.3 * (df[&quot;sex&quot;] == &quot;female&quot;)
+        + 0.25 * (df[&quot;pclass&quot;] == 1)
+        + 0.1 * (df[&quot;pclass&quot;] == 2)
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-python">&quot;&quot;&quot;
+Axiom Cloud AI - Example Dataset Loaders
+Provides California Housing, Titanic, and Breast Cancer datasets.
+&quot;&quot;&quot;
+import pandas as pd
+import numpy as np
+from sklearn.datasets import (
+    fetch_california_housing,
+    load_breast_cancer,
+    load_iris,
+    load_wine,
+)
+from typing import Tuple
+
+
+def load_titanic() -&gt; pd.DataFrame:
+    &quot;&quot;&quot;Load a synthetic Titanic-like dataset.&quot;&quot;&quot;
+    np.random.seed(42)
+    n = 891
+
+    df = pd.DataFrame({
+        &quot;pclass&quot;: np.random.choice([1, 2, 3], n, p=[0.24, 0.21, 0.55]),
+        &quot;sex&quot;: np.random.choice([&quot;male&quot;, &quot;female&quot;], n, p=[0.65, 0.35]),
+        &quot;age&quot;: np.random.normal(29.7, 14.5, n).clip(1, 80),
+        &quot;sibsp&quot;: np.random.choice([0, 1, 2, 3, 4, 5, 8], n, p=[0.68, 0.23, 0.03, 0.02, 0.02, 0.01, 0.01]),
+        &quot;parch&quot;: np.random.choice([0, 1, 2, 3, 4, 5, 6], n, p=[0.76, 0.13, 0.09, 0.005, 0.004, 0.004, 0.003]),
+        &quot;fare&quot;: np.random.lognormal(3.2, 1.2, n).clip(3.2, 512),
+        &quot;embarked&quot;: np.random.choice([&quot;S&quot;, &quot;C&quot;, &quot;Q&quot;], n, p=[0.72, 0.19, 0.09]),
+    })
+
+    # Introduce missing values
+    df.loc[np.random.choice(n, 177, replace=False), &quot;age&quot;] = np.nan
+    df.loc[np.random.choice(n, 2, replace=False), &quot;embarked&quot;] = np.nan
+
+    # Target based on realistic survival rules
+    survival_prob = (
+        0.1
+        + 0.3 * (df[&quot;sex&quot;] == &quot;female&quot;)
+        + 0.25 * (df[&quot;pclass&quot;] == 1)
+        + 0.1 * (df[&quot;pclass&quot;] == 2)
+        - 0.1 * (df[&quot;age&quot;].fillna(30) &gt; 60)
+    ).clip(0, 1)
+    df[&quot;survived&quot;] = (np.random.rand(n) &lt; survival_prob).astype(int)
+
+    return df
+
+
+def load_california_housing_df() -&gt; pd.DataFrame:
+    &quot;&quot;&quot;Load California Housing dataset as DataFrame.&quot;&quot;&quot;
+    data = fetch_california_housing()
+    df = pd.DataFrame(data.data, columns=data.feature_names)
+    df[&quot;MedHouseVal&quot;] = data.target
+    return df
+
+
+def load_breast_cancer_df() -&gt; pd.DataFrame:
+    &quot;&quot;&quot;Load Breast Cancer dataset as DataFrame.&quot;&quot;&quot;
+    data = load_breast_cancer()
+    df = pd.DataFrame(data.data, columns=data.feature_names)
+    df[&quot;diagnosis&quot;] = data.target
+    df[&quot;diagnosis&quot;] = df[&quot;diagnosis&quot;].map({0: &quot;malignant&quot;, 1: &quot;benign&quot;})
+    return df
+
+
+def load_iris_df() -&gt; pd.DataFrame:
+    &quot;&quot;&quot;Load Iris dataset as DataFrame.&quot;&quot;&quot;
+    data = load_iris()
+    df = pd.DataFrame(data.data, columns=data.feature_names)
+    df[&quot;species&quot;] = [data.target_names[i] for i in data.target]
+    return df
+
+
+EXAMPLE_DATASETS = {
+    &quot;california_housing&quot;: {
+        &quot;name&quot;: &quot;California Housing&quot;,
+        &quot;description&quot;: &quot;Predict median house values in California districts&quot;,
+        &quot;loader&quot;: load_california_housing_df,
+        &quot;target&quot;: &quot;MedHouseVal&quot;,
+        &quot;task_type&quot;: &quot;regression&quot;,
+        &quot;filename&quot;: &quot;california_housing.csv&quot;,
+    },
+    &quot;titanic&quot;: {
+        &quot;name&quot;: &quot;Titanic Survival&quot;,
+        &quot;description&quot;: &quot;Predict passenger survival on the Titanic&quot;,
+        &quot;loader&quot;: load_titanic,
+        &quot;target&quot;: &quot;survived&quot;,
+        &quot;task_type&quot;: &quot;classification&quot;,
+        &quot;filename&quot;: &quot;titanic.csv&quot;,
+    },
+    &quot;breast_cancer&quot;: {
+        &quot;name&quot;: &quot;Breast Cancer&quot;,
+        &quot;description&quot;: &quot;Classify breast cancer tumors as malignant or benign&quot;,
+        &quot;loader&quot;: load_breast_cancer_df,
+        &quot;target&quot;: &quot;diagnosis&quot;,
+        &quot;task_type&quot;: &quot;classification&quot;,
+        &quot;filename&quot;: &quot;breast_cancer.csv&quot;,
+    },
+    &quot;iris&quot;: {
+        &quot;name&quot;: &quot;Iris Flowers&quot;,
+        &quot;description&quot;: &quot;Classify Iris flowers into 3 species&quot;,
+        &quot;loader&quot;: load_iris_df,
+        &quot;target&quot;: &quot;species&quot;,
+        &quot;task_type&quot;: &quot;classification&quot;,
+        &quot;filename&quot;: &quot;iris.csv&quot;,
+    },
+}
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>AI</strong>: No official citation linked here.</li><li><strong>Axiom</strong>: No official citation linked here.</li><li><strong>Breast</strong>: No official citation linked here.</li><li><strong>California</strong>: No official citation linked here.</li><li><strong>Cancer</strong>: No official citation linked here.</li><li><strong>Classify</strong>: No official citation linked here.</li><li><strong>Cloud</strong>: No official citation linked here.</li><li><strong>DataFrame</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>EXAMPLE_DATASETS</strong>: No official citation linked here.</li><li><strong>Example</strong>: No official citation linked here.</li><li><strong>False</strong>: No official citation linked here.</li><li><strong>Flowers</strong>: No official citation linked here.</li><li><strong>Housing</strong>: No official citation linked here.</li><li><strong>Introduce</strong>: No official citation linked here.</li><li><strong>Iris</strong>: No official citation linked here.</li><li><strong>Load</strong>: No official citation linked here.</li><li><strong>Loaders</strong>: No official citation linked here.</li><li><strong>MedHouseVal</strong>: No official citation linked here.</li><li><strong>Predict</strong>: No official citation linked here.</li><li><strong>Provides</strong>: No official citation linked here.</li><li><strong>Survival</strong>: No official citation linked here.</li><li><strong>Target</strong>: No official citation linked here.</li><li><strong>Titanic</strong>: No official citation linked here.</li><li><strong>Tuple</strong>: No official citation linked here.</li><li><strong>age</strong>: No official citation linked here.</li><li><strong>and</strong>: No official citation linked here.</li><li><strong>as</strong>: No official citation linked here.</li><li><strong>astype</strong>: No official citation linked here.</li><li><strong>based</strong>: No official citation linked here.</li><li><strong>benign</strong>: No official citation linked here.</li><li><strong>breast</strong>: No official citation linked here.</li><li><strong>breast_cancer</strong>: No official citation linked here.</li><li><strong>california_housing</strong>: No official citation linked here.</li><li><strong>cancer</strong>: No official citation linked here.</li><li><strong>choice</strong>: No official citation linked here.</li><li><strong>classification</strong>: No official citation linked here.</li><li><strong>clip</strong>: No official citation linked here.</li><li><strong>columns</strong>: No official citation linked here.</li><li><strong>csv</strong>: No official citation linked here.</li><li><strong>data</strong>: No official citation linked here.</li><li><strong>dataset</strong>: No official citation linked here.</li><li><strong>datasets</strong>: No official citation linked here.</li><li><strong>def</strong>: No official citation linked here.</li><li><strong>description</strong>: No official citation linked here.</li><li><strong>df</strong>: No official citation linked here.</li><li><strong>diagnosis</strong>: No official citation linked here.</li><li><strong>districts</strong>: No official citation linked here.</li><li><strong>embarked</strong>: No official citation linked here.</li><li><strong>fare</strong>: No official citation linked here.</li><li><strong>feature_names</strong>: No official citation linked here.</li><li><strong>female</strong>: No official citation linked here.</li><li><strong>fetch_california_housing</strong>: No official citation linked here.</li><li><strong>filename</strong>: No official citation linked here.</li><li><strong>fillna</strong>: No official citation linked here.</li><li><strong>flowers</strong>: No official citation linked here.</li><li><strong>for</strong>: No official citation linked here.</li><li><strong>from</strong>: No official citation linked here.</li><li><strong>house</strong>: No official citation linked here.</li><li><strong>import</strong>: No official citation linked here.</li><li><strong>in</strong>: No official citation linked here.</li><li><strong>int</strong>: No official citation linked here.</li><li><strong>into</strong>: No official citation linked here.</li><li><strong>iris</strong>: No official citation linked here.</li><li><strong>like</strong>: No official citation linked here.</li><li><strong>load_breast_cancer</strong>: No official citation linked here.</li><li><strong>load_breast_cancer_df</strong>: No official citation linked here.</li><li><strong>load_california_housing_df</strong>: No official citation linked here.</li><li><strong>load_iris</strong>: No official citation linked here.</li><li><strong>load_iris_df</strong>: No official citation linked here.</li><li><strong>load_titanic</strong>: No official citation linked here.</li><li><strong>load_wine</strong>: No official citation linked here.</li><li><strong>loader</strong>: No official citation linked here.</li><li><strong>loc</strong>: No official citation linked here.</li><li><strong>lognormal</strong>: No official citation linked here.</li><li><strong>male</strong>: No official citation linked here.</li><li><strong>malignant</strong>: No official citation linked here.</li><li><strong>map</strong>: No official citation linked here.</li><li><strong>median</strong>: No official citation linked here.</li><li><strong>missing</strong>: No official citation linked here.</li><li><strong>name</strong>: No official citation linked here.</li><li><strong>nan</strong>: No official citation linked here.</li><li><strong>normal</strong>: No official citation linked here.</li><li><strong>np</strong>: No official citation linked here.</li><li><strong>numpy</strong>: No official citation linked here.</li><li><strong>on</strong>: No official citation linked here.</li><li><strong>or</strong>: No official citation linked here.</li><li><strong>pandas</strong>: No official citation linked here.</li><li><strong>parch</strong>: No official citation linked here.</li><li><strong>passenger</strong>: No official citation linked here.</li><li><strong>pclass</strong>: No official citation linked here.</li><li><strong>pd</strong>: No official citation linked here.</li><li><strong>rand</strong>: No official citation linked here.</li><li><strong>random</strong>: No official citation linked here.</li><li><strong>realistic</strong>: No official citation linked here.</li><li><strong>regression</strong>: No official citation linked here.</li><li><strong>replace</strong>: No official citation linked here.</li><li><strong>return</strong>: No official citation linked here.</li><li><strong>rules</strong>: No official citation linked here.</li><li><strong>seed</strong>: No official citation linked here.</li><li><strong>sex</strong>: No official citation linked here.</li><li><strong>sibsp</strong>: No official citation linked here.</li><li><strong>sklearn</strong>: No official citation linked here.</li><li><strong>species</strong>: No official citation linked here.</li><li><strong>survival</strong>: No official citation linked here.</li><li><strong>survival_prob</strong>: No official citation linked here.</li><li><strong>survived</strong>: No official citation linked here.</li><li><strong>synthetic</strong>: No official citation linked here.</li><li><strong>target</strong>: No official citation linked here.</li><li><strong>target_names</strong>: No official citation linked here.</li><li><strong>task_type</strong>: No official citation linked here.</li><li><strong>the</strong>: No official citation linked here.</li><li><strong>titanic</strong>: No official citation linked here.</li><li><strong>tumors</strong>: No official citation linked here.</li><li><strong>typing</strong>: No official citation linked here.</li><li><strong>values</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

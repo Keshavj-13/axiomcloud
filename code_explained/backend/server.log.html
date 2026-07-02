@@ -1,0 +1,132 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>server.log</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>backend/server.log</span></div>
+        <h1 style="margin:10px 0 6px">server.log</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="requirements.txt.html">Previous</a><a href="tests.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: backend/server.log</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card">
+      <h2>Why This File Is Excluded</h2>
+      <p><strong>backend/server.log</strong> is excluded from line-by-line explanation because it is generated, compiled, a lockfile, a log, or otherwise unsuitable for line-by-line explanation.</p>
+      <pre><code>/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/pydantic/_internal/_fields.py:160: UserWarning: Field &quot;model_id&quot; has conflict with protected namespace &quot;model_&quot;.
+
+You may be able to resolve this warning by setting `model_config[&#x27;protected_namespaces&#x27;] = ()`.
+  warnings.warn(
+/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/pydantic/_internal/_fields.py:160: UserWarning: Field &quot;model_name&quot; has conflict with protected namespace &quot;model_&quot;.
+
+You may be able to resolve this warning by setting `model_config[&#x27;protected_namespaces&#x27;] = ()`.
+  warnings.warn(
+/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/pydantic/_internal/_fields.py:160: UserWarning: Field &quot;model_type&quot; has conflict with protected namespace &quot;model_&quot;.
+
+You may be able to resolve this warning by setting `model_config[&#x27;protected_namespaces&#x27;] = ()`.
+  warnings.warn(
+/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/pydantic/_internal/_fields.py:160: UserWarning: Field &quot;model_metadata&quot; has conflict with protected namespace &quot;model_&quot;.
+
+You may be able to resolve this warning by setting `model_config[&#x27;protected_namespaces&#x27;] = ()`.
+  warnings.warn(
+INFO:     Started server process [220696]
+INFO:     Waiting for application startup.
+2026-03-22 19:24:46,973 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 19:24:46,973 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 19:24:46,973 - app.main - INFO - Dataset storage: ./storage/datasets
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-03-22 19:24:59,578 - app.main - ERROR - Unhandled request error | id=f019cc21 method=GET path=/api/models duration_ms=54.77
+Traceback (most recent call last):
+  File &quot;/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py&quot;, line 159, in call_next
+    message = await recv_stream.receive()
+  File &quot;/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/anyio/streams/memory.py&quot;, line 132, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &quot;/home/keshav/Downloads/sigmacloud/backend/app/main.py&quot;, line 83, in request_logging_middleware
+    response = await call_next(request)
+  File &quot;/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py&quot;, line 165, in call_next
+    raise app_exc
+  File &quot;/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/base.py&quot;, line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File &quot;/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/gzip.py&quot;, line 26, in __call__
+    await self.app(scope, receive, send)
+  File &quot;/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/cors.py&quot;, line 85, in __call__
+    await self.app(scope, receive, send)
+  File &quot;/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/middleware/exceptions.py&quot;, line 65, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File &quot;/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py&quot;, line 64, in wrapped_app
+    raise exc
+  File &quot;/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/_exception_handler.py&quot;, line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File &quot;/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py&quot;, line 756, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File &quot;/home/keshav/miniconda3/envs/sigmacld310/lib/python3.10/site-packages/starlette/routing.py&quot;, line 776, in app
+    await route.handle(scope, receive, send)
+  File &quot;/home/keshav/miniconda3/envs/sigmacld310</code></pre>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

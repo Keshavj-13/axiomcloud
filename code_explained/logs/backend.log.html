@@ -1,0 +1,118 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>backend.log</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>logs/backend.log</span></div>
+        <h1 style="margin:10px 0 6px">backend.log</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="../frontend/tsconfig.json.html">Previous</a><a href="../scripts/dev-backend.js.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: logs/backend.log</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card">
+      <h2>Why This File Is Excluded</h2>
+      <p><strong>logs/backend.log</strong> is excluded from line-by-line explanation because it is generated, compiled, a lockfile, a log, or otherwise unsuitable for line-by-line explanation.</p>
+      <pre><code>2026-03-22 18:00:04,354 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 18:00:04,355 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 18:00:04,355 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-22 18:00:06,443 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 18:00:06,443 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 18:00:06,443 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-22 18:00:08,111 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 18:00:08,112 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 18:00:08,112 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-22 18:00:10,072 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 18:00:10,072 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 18:00:10,072 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-22 18:00:15,642 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 18:00:15,642 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 18:00:15,642 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-22 18:00:17,447 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 18:00:17,447 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 18:00:17,447 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-22 18:00:19,584 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 18:00:19,584 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 18:00:19,584 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-22 18:00:23,299 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 18:00:23,299 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 18:00:23,299 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-22 18:00:50,345 - app.main - INFO - Axiom Cloud AI started successfully
+2026-03-22 18:00:50,346 - app.main - INFO - Model storage: ./storage/models
+2026-03-22 18:00:50,346 - app.main - INFO - Dataset storage: ./storage/datasets
+2026-03-22 18:01:13,265 - app.main - INFO - Request completed | id=acc76ea5 method=GET path=/api/training-jobs status=200 duration_ms=23.53
+2026-03-22 18:01:13,268 - app.main - INFO - Request completed | id=3a2bccce method=GET path=/api/dashboard/summary status=200 duration_ms=27.70
+2026-03-22 18:01:13,276 - app.main - INFO - Request completed | id=c006ac3f method=GET path=/api/training-jobs status=200 duration_ms=6.93
+2026-03-22 18:01:13,277 - app.main - INFO - Request completed | id=8df11f59 method=GET path=/api/dashboard/summary status=200 duration_ms=6.03
+2026-03-22 18:01:18,734 - app.main - INFO - Request completed | id=46287818 method=GET path=/api/training-jobs status=200 duration_ms=5.83
+2026-03-22 18:01:18,739 - app.main - INFO - Request completed | id=7b7c9f8d method=GET path=/api/datasets status=200 duration_ms=10.26
+2026-03-22 18:01:18,745 - app.main - INFO - Request completed | id=22af0ea8 method=GET path=/api/training-jobs status=200 duration_ms=7.29
+2026-03-22 18:01:18,753 - app.main - INFO - Request completed | id=60a6d1e7 method=GET path=/api/datasets status=200 duration_ms=9.96
+2026-03-22 18:01:18,847 - app.main - INFO - Request completed | id=8bc012cc method=GET path=/api/metrics/c452a7e8-1151-411e-b797-6be19a7de74f status=200 duration_ms=104.22
+2026-03-22 18:04:53,901 - app.main - INFO - Request completed | id=620be5fc method=GET path=/api/datasets status=200 duration_ms=5.81
+2026-03-22 18:04:53,908 - app.main - INFO - Request completed | id=33500cf4 method=GET path=/api/datasets status=200 duration_ms=4.22
+2026-03-22 18:04:55,721 - app.main - INFO - Request completed | id=4599fa05 method=GET path=/api/example-datasets status=200 duration_ms=1.32
+2026-03-22 18:04:55,726 - app.main - INFO - Request completed | id=c62962e9 method=GET path=/api/datasets status=200 duration_ms=7.79
+2026-03-22 18:04:55,726 - app.main - INFO - Req</code></pre>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

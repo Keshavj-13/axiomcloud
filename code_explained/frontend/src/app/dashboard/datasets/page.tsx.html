@@ -1,0 +1,809 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>page.tsx</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>frontend/src/app/dashboard/datasets/page.tsx</span></div>
+        <h1 style="margin:10px 0 6px">page.tsx</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="../../../components/ui/charts.tsx.html">Previous</a><a href="../deploy/page.tsx.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: frontend/src/app/dashboard/datasets/page.tsx</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>frontend/src/app/dashboard/datasets/page.tsx</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-tsx">&quot;use client&quot;;
+import { useState, useCallback, useEffect } from &quot;react&quot;;
+import { useDropzone } from &quot;react-dropzone&quot;;
+import { datasetsAPI } from &quot;@/lib/api&quot;;
+import { logToFile } from &quot;@/lib/logger&quot;;
+import { Dataset, ExampleDataset, DatasetQualityReport, CleanPreview, DatasetProfile, EDAReport, AnalyticsReport, AnalyticsChart } from &quot;@/types&quot;;
+import toast from &quot;react-hot-toast&quot;;
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, ScatterChart, Scatter } from &quot;recharts&quot;;
+import {
+  Upload, Database, Trash2, Table, Info,
+  CloudUpload, FileSpreadsheet, Loader2, Sparkles, ShieldCheck, Wand2
+} from &quot;lucide-react&quot;;
+import PanelHeader from &quot;@/components/ui/PanelHeader&quot;;
+import DataTable from &quot;@/components/ui/DataTable&quot;;
+import StatusBadge from &quot;@/components/ui/StatusBadge&quot;;
+
+function formatBytes(bytes?: number) {
+  if (!bytes) return &quot;–&quot;;
+  if (bytes &lt; 1024) return `${bytes} B`;
+  if (bytes &lt; 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1048576).toFixed(1)} MB`;
+}
+
+function HeatCell({ value }: { value: number }) {
+  const clamped = Math.max(-1, Math.min(1, Number.isFinite(value) ? value : 0));
+  const alpha = Math.abs(clamped);
+  const bg = clamped &gt;= 0
+    ? `rgba(110, 59, 215, ${0.2 + alpha * 0.5})`
+    : `rgba(239, 68, 68, ${0.2 + alpha * 0.5})`;
+  return &lt;div className=&quot;h-7 w-7 rounded&quot; style={{ background: bg }} title={clamped.toFixed(3)} /&gt;;
+}
+
+function AnalyticsChartCard({ chart }: { chart: AnalyticsChart }) {
+  const spec = (chart.spec || {}) as Record&lt;string, unknown&gt;;
+  const rows = (spec.rows as Record&lt;string, unknown&gt;[] | undefined) || [];
+  const xKey = (spec.xKey as string | undefined) || &quot;label&quot;;
+  const yKey = (spec.yKey as string | undefined) || &quot;value&quot;;
+  const series = (spec.series as Array&lt;{ key: string; name: string; color?: string }&gt; | undefined) || [];
+
+  return (
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-tsx">&quot;use client&quot;;
+import { useState, useCallback, useEffect } from &quot;react&quot;;
+import { useDropzone } from &quot;react-dropzone&quot;;
+import { datasetsAPI } from &quot;@/lib/api&quot;;
+import { logToFile } from &quot;@/lib/logger&quot;;
+import { Dataset, ExampleDataset, DatasetQualityReport, CleanPreview, DatasetProfile, EDAReport, AnalyticsReport, AnalyticsChart } from &quot;@/types&quot;;
+import toast from &quot;react-hot-toast&quot;;
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, ScatterChart, Scatter } from &quot;recharts&quot;;
+import {
+  Upload, Database, Trash2, Table, Info,
+  CloudUpload, FileSpreadsheet, Loader2, Sparkles, ShieldCheck, Wand2
+} from &quot;lucide-react&quot;;
+import PanelHeader from &quot;@/components/ui/PanelHeader&quot;;
+import DataTable from &quot;@/components/ui/DataTable&quot;;
+import StatusBadge from &quot;@/components/ui/StatusBadge&quot;;
+
+function formatBytes(bytes?: number) {
+  if (!bytes) return &quot;–&quot;;
+  if (bytes &lt; 1024) return `${bytes} B`;
+  if (bytes &lt; 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1048576).toFixed(1)} MB`;
+}
+
+function HeatCell({ value }: { value: number }) {
+  const clamped = Math.max(-1, Math.min(1, Number.isFinite(value) ? value : 0));
+  const alpha = Math.abs(clamped);
+  const bg = clamped &gt;= 0
+    ? `rgba(110, 59, 215, ${0.2 + alpha * 0.5})`
+    : `rgba(239, 68, 68, ${0.2 + alpha * 0.5})`;
+  return &lt;div className=&quot;h-7 w-7 rounded&quot; style={{ background: bg }} title={clamped.toFixed(3)} /&gt;;
+}
+
+function AnalyticsChartCard({ chart }: { chart: AnalyticsChart }) {
+  const spec = (chart.spec || {}) as Record&lt;string, unknown&gt;;
+  const rows = (spec.rows as Record&lt;string, unknown&gt;[] | undefined) || [];
+  const xKey = (spec.xKey as string | undefined) || &quot;label&quot;;
+  const yKey = (spec.yKey as string | undefined) || &quot;value&quot;;
+  const series = (spec.series as Array&lt;{ key: string; name: string; color?: string }&gt; | undefined) || [];
+
+  return (
+    &lt;div className=&quot;rounded-lg border border-outline/25 bg-surface-variant/30 p-4&quot;&gt;
+      &lt;div className=&quot;mb-2 flex items-start justify-between gap-2&quot;&gt;
+        &lt;div&gt;
+          &lt;div className=&quot;text-sm font-semibold text-text-primary&quot;&gt;{chart.title}&lt;/div&gt;
+          &lt;div className=&quot;text-xs text-text-muted&quot;&gt;{chart.purpose}&lt;/div&gt;
+        &lt;/div&gt;
+        {chart.fallback_used ? &lt;StatusBadge label=&quot;fallback&quot; tone=&quot;idle&quot; /&gt; : null}
+      &lt;/div&gt;
+
+      {chart.chart_type === &quot;bar&quot; &amp;&amp; rows.length &gt; 0 ? (
+        &lt;ResponsiveContainer width=&quot;100%&quot; height={220}&gt;
+          &lt;BarChart data={rows}&gt;
+            &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(71,71,77,0.25)&quot; /&gt;
+            &lt;XAxis dataKey={xKey} tick={{ fontSize: 10, fill: &quot;#acaab1&quot; }} interval={0} angle={-20} textAnchor=&quot;end&quot; height={48} /&gt;
+            &lt;YAxis tick={{ fontSize: 10, fill: &quot;#acaab1&quot; }} /&gt;
+            &lt;Tooltip contentStyle={{ background: &quot;#19191d&quot;, border: &quot;1px solid rgba(71,71,77,0.6)&quot;, borderRadius: &quot;8px&quot; }} /&gt;
+            {(series.length ? series : [{ key: &quot;value&quot;, name: &quot;Value&quot;, color: &quot;#d0bcff&quot; }]).map((s) =&gt; (
+              &lt;Bar key={s.key} dataKey={s.key} name={s.name} fill={s.color || &quot;#d0bcff&quot;} radius={[3, 3, 0, 0]} /&gt;
+            ))}
+          &lt;/BarChart&gt;
+        &lt;/ResponsiveContainer&gt;
+      ) : chart.chart_type === &quot;line&quot; &amp;&amp; rows.length &gt; 0 ? (
+        &lt;ResponsiveContainer width=&quot;100%&quot; height={220}&gt;
+          &lt;LineChart data={rows}&gt;
+            &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(71,71,77,0.25)&quot; /&gt;
+            &lt;XAxis dataKey={xKey} tick={{ fontSize: 10, fill: &quot;#acaab1&quot; }} /&gt;
+            &lt;YAxis tick={{ fontSize: 10, fill: &quot;#acaab1&quot; }} /&gt;
+            &lt;Tooltip contentStyle={{ background: &quot;#19191d&quot;, border: &quot;1px solid rgba(71,71,77,0.6)&quot;, borderRadius: &quot;8px&quot; }} /&gt;
+            {(series.length ? series : [{ key: &quot;value&quot;, name: &quot;Value&quot;, color: &quot;#d0bcff&quot; }]).map((s) =&gt; (
+              &lt;Line key={s.key} dataKey={s.key} name={s.name} stroke={s.color || &quot;#d0bcff&quot;} dot={false} /&gt;
+            ))}
+          &lt;/LineChart&gt;
+        &lt;/ResponsiveContainer&gt;
+      ) : chart.chart_type === &quot;scatter&quot; &amp;&amp; rows.length &gt; 0 ? (
+        &lt;ResponsiveContainer width=&quot;100%&quot; height={220}&gt;
+          &lt;ScatterChart&gt;
+            &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(71,71,77,0.25)&quot; /&gt;
+            &lt;XAxis dataKey={xKey} name={xKey} tick={{ fontSize: 10, fill: &quot;#acaab1&quot; }} /&gt;
+            &lt;YAxis dataKey={yKey} name={yKey} tick={{ fontSize: 10, fill: &quot;#acaab1&quot; }} /&gt;
+            &lt;Tooltip cursor={{ strokeDasharray: &quot;3 3&quot; }} contentStyle={{ background: &quot;#19191d&quot;, border: &quot;1px solid rgba(71,71,77,0.6)&quot;, borderRadius: &quot;8px&quot; }} /&gt;
+            &lt;Scatter data={rows} fill=&quot;#d0bcff&quot; /&gt;
+          &lt;/ScatterChart&gt;
+        &lt;/ResponsiveContainer&gt;
+      ) : chart.chart_type === &quot;heatmap&quot; ? (
+        &lt;div className=&quot;overflow-auto&quot;&gt;
+          &lt;div className=&quot;inline-flex flex-col gap-1&quot;&gt;
+            {(((spec.matrix as number[][] | undefined) || [])).slice(0, 10).map((row, r) =&gt; (
+              &lt;div key={r} className=&quot;flex gap-1&quot;&gt;
+                {row.slice(0, 10).map((v, c) =&gt; &lt;HeatCell key={`${r}-${c}`} value={v} /&gt;)}
+              &lt;/div&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/div&gt;
+      ) : (
+        &lt;div className=&quot;max-h-48 overflow-auto rounded border border-outline/20 bg-surface/40 p-2 text-xs&quot;&gt;
+          {rows.length &gt; 0 ? (
+            &lt;ul className=&quot;space-y-1 text-text-muted&quot;&gt;
+              {rows.slice(0, 12).map((r, idx) =&gt; (
+                &lt;li key={idx} className=&quot;font-mono text-[11px]&quot;&gt;{JSON.stringify(r)}&lt;/li&gt;
+              ))}
+            &lt;/ul&gt;
+          ) : (
+            &lt;div className=&quot;text-text-muted&quot;&gt;No chart rows available.&lt;/div&gt;
+          )}
+        &lt;/div&gt;
+      )}
+
+      &lt;div className=&quot;mt-2 text-[11px] text-text-muted&quot;&gt;Insight: {chart.insight}&lt;/div&gt;
+      &lt;div className=&quot;mt-1 text-[10px] font-mono text-text-muted/80&quot;&gt;artifact: {(chart.artifact_ref?.relative_path || chart.artifact_ref?.url || &quot;n/a&quot;)}&lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default function DatasetsPage() {
+  const [datasets, setDatasets] = useState&lt;Dataset[]&gt;([]);
+  const [examples, setExamples] = useState&lt;ExampleDataset[]&gt;([]);
+  const [uploading, setUploading] = useState(false);
+  const [loadingExample, setLoadingExample] = useState&lt;string | null&gt;(null);
+  const [selectedDataset, setSelectedDataset] = useState&lt;Dataset | null&gt;(null);
+  const [targetColumn, setTargetColumn] = useState(&quot;&quot;);
+  const [qualityReport, setQualityReport] = useState&lt;DatasetQualityReport | null&gt;(null);
+  const [cleanPreview, setCleanPreview] = useState&lt;CleanPreview | null&gt;(null);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [cleaningLoading, setCleaningLoading] = useState(false);
+  const [cleanAndSaveLoading, setCleanAndSaveLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profile, setProfile] = useState&lt;DatasetProfile | null&gt;(null);
+  const [edaLoading, setEdaLoading] = useState(false);
+  const [edaReport, setEdaReport] = useState&lt;EDAReport | null&gt;(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [analyticsReport, setAnalyticsReport] = useState&lt;AnalyticsReport | null&gt;(null);
+
+  const fetchDatasets = async () =&gt; {
+    try {
+      const res = await datasetsAPI.list();
+      setDatasets(res.data);
+    } catch (e: any) {
+      toast.error(&quot;Could not connect to backend&quot;);
+      logToFile(`Backend not connected when fetching datasets: ${e?.message || e}`,&#x27;error&#x27;);
+    }
+  };
+
+  useEffect(() =&gt; {
+    fetchDatasets();
+    datasetsAPI.listExamples().then(r =&gt; setExamples(r.data)).catch(() =&gt; {});
+  }, []);
+
+  const onDrop = useCallback(async (acceptedFiles: File[]) =&gt; {
+    const file = acceptedFiles[0];
+    if (!file) return;
+    setUploading(true);
+    const formData = new FormData();
+    formData.append(&quot;file&quot;, file);
+    formData.append(&quot;name&quot;, file.name.replace(/\.[^/.]+$/, &quot;&quot;));
+    if (targetColumn) formData.append(&quot;target_column&quot;, targetColumn);
+    logToFile(`Upload attempt: ${file.name} (target_column=${targetColumn})`,&#x27;info&#x27;);
+    try {
+      await datasetsAPI.upload(formData);
+      toast.success(`&quot;${file.name}&quot; uploaded successfully`);
+      logToFile(`Upload success: ${file.name}`,&#x27;info&#x27;);
+      fetchDatasets();
+    } catch (e: any) {
+      toast.error(e.response?.data?.detail || &quot;Upload failed&quot;);
+      logToFile(`Upload failed: ${file.name} | ${e?.message || e}`,&#x27;error&#x27;);
+    } finally { setUploading(false); }
+  }, [targetColumn]);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { &quot;text/csv&quot;: [&quot;.csv&quot;], &quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&quot;: [&quot;.xlsx&quot;] },
+    maxFiles: 1,
+  });
+
+  const loadExample = async (key: string) =&gt; {
+    setLoadingExample(key);
+    try {
+      await datasetsAPI.loadExample(key);
+      toast.success(&quot;Example dataset loaded!&quot;);
+      fetchDatasets();
+    } catch { toast.error(&quot;Failed to load example&quot;); }
+    finally { setLoadingExample(null); }
+  };
+
+  const deleteDataset = async (id: number) =&gt; {
+    if (!confirm(&quot;Delete this dataset?&quot;)) return;
+    try {
+      await datasetsAPI.delete(id);
+      toast.success(&quot;Dataset deleted&quot;);
+      fetchDatasets();
+      if (selectedDataset?.id === id) setSelectedDataset(null);
+    } catch { toast.error(&quot;Delete failed&quot;); }
+  };
+
+  const runQualityReport = async () =&gt; {
+    if (!selectedDataset) return;
+    setReportLoading(true);
+    try {
+      const res = await datasetsAPI.qualityReport(selectedDataset.id);
+      setQualityReport(res.data);
+      toast.success(&quot;Quality report ready&quot;);
+    } catch {
+      toast.error(&quot;Failed to generate quality report&quot;);
+    } finally {
+      setReportLoading(false);
+    }
+  };
+
+  const runCleanPreview = async () =&gt; {
+    if (!selectedDataset) return;
+    setCleaningLoading(true);
+    try {
+      const res = await datasetsAPI.cleanPreview(selectedDataset.id, 8);
+      setCleanPreview(res.data);
+      toast.success(&quot;Auto-clean preview ready&quot;);
+    } catch {
+      toast.error(&quot;Failed to generate clean preview&quot;);
+    } finally {
+      setCleaningLoading(false);
+    }
+  };
+
+  const runCleanAndSave = async () =&gt; {
+    if (!selectedDataset) return;
+    setCleanAndSaveLoading(true);
+    try {
+      await datasetsAPI.cleanAndSave(selectedDataset.id);
+      toast.success(&quot;Cleaned dataset copy created&quot;);
+      await fetchDatasets();
+    } catch {
+      toast.error(&quot;Failed to create cleaned dataset copy&quot;);
+    } finally {
+      setCleanAndSaveLoading(false);
+    }
+  };
+
+  const runProfile = async () =&gt; {
+    if (!selectedDataset) return;
+    setProfileLoading(true);
+    try {
+      const res = await datasetsAPI.profile(selectedDataset.id);
+      setProfile(res.data);
+      toast.success(&quot;Dataset profile ready&quot;);
+    } catch {
+      toast.error(&quot;Failed to build dataset profile&quot;);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  const runEDA = async () =&gt; {
+    if (!selectedDataset) return;
+    setEdaLoading(true);
+    try {
+      const res = await datasetsAPI.edaReport(selectedDataset.id);
+      setEdaReport(res.data);
+      toast.success(&quot;EDA report ready&quot;);
+    } catch {
+      toast.error(&quot;Failed to build EDA report&quot;);
+    } finally {
+      setEdaLoading(false);
+    }
+  };
+
+  const runAnalyticsReport = async () =&gt; {
+    if (!selectedDataset) return;
+    setAnalyticsLoading(true);
+    try {
+      const res = await datasetsAPI.analyticsReport(selectedDataset.id, {
+        target_column: selectedDataset.target_column,
+      });
+      setAnalyticsReport(res.data);
+      toast.success(`Analytics report ready (${res.data.chart_count} charts)`);
+    } catch {
+      toast.error(&quot;Failed to generate analytics report&quot;);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
+  return (
+    &lt;div className=&quot;mx-auto max-w-7xl&quot;&gt;
+      &lt;div className=&quot;mb-8&quot;&gt;
+        &lt;div className=&quot;section-kicker mb-2&quot;&gt;Datasets&lt;/div&gt;
+        &lt;h1 className=&quot;font-display mb-1 text-4xl font-semibold text-text-primary&quot;&gt;Dataset Registry&lt;/h1&gt;
+        &lt;p className=&quot;text-text-muted&quot;&gt;Ingest data, inspect quality, and stage secure training sources.&lt;/p&gt;
+      &lt;/div&gt;
+
+      &lt;div className=&quot;grid lg:grid-cols-2 gap-6&quot;&gt;
+        {/* Upload zone */}
+        &lt;div className=&quot;panel-glass p-6&quot;&gt;
+          &lt;PanelHeader title=&quot;Upload / Ingestion&quot; subtitle=&quot;CSV and XLSX are supported for now.&quot; icon={CloudUpload} className=&quot;mb-4&quot; /&gt;
+
+          &lt;div className=&quot;mb-4&quot;&gt;
+            &lt;label className=&quot;mb-1 block text-xs text-text-muted&quot;&gt;Target Column (optional)&lt;/label&gt;
+            &lt;input
+              value={targetColumn}
+              onChange={e =&gt; setTargetColumn(e.target.value)}
+              placeholder=&quot;e.g. price, survived, label&quot;
+              className=&quot;w-full rounded-lg border border-outline/25 bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary/50&quot;
+            /&gt;
+          &lt;/div&gt;
+
+          &lt;div
+            {...getRootProps()}
+            className={`cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-all
+              ${isDragActive
+                ? &quot;border-primary/70 bg-surface-variant/70&quot;
+                : &quot;border-outline/50 hover:border-primary/50 hover:bg-surface-variant/55&quot;
+              }`}
+          &gt;
+            &lt;input {...getInputProps()} /&gt;
+            {uploading ? (
+              &lt;Loader2 className=&quot;mx-auto mb-3 h-8 w-8 animate-spin text-primary&quot; /&gt;
+            ) : (
+              &lt;Upload className={`mx-auto mb-3 h-8 w-8 ${isDragActive ? &quot;text-primary&quot; : &quot;text-text-muted&quot;}`} /&gt;
+            )}
+            &lt;p className=&quot;mb-1 text-sm text-text-primary&quot;&gt;
+              {uploading ? &quot;Uploading...&quot; : isDragActive ? &quot;Drop it here!&quot; : &quot;Drag &amp; drop your CSV or Excel file&quot;}
+            &lt;/p&gt;
+            &lt;p className=&quot;text-xs text-text-muted&quot;&gt;or click to browse · Max 50MB&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        {/* Example datasets */}
+        &lt;div className=&quot;panel p-6&quot;&gt;
+          &lt;PanelHeader title=&quot;Context Datasets&quot; subtitle=&quot;Load examples to validate workflow quickly.&quot; icon={Sparkles} className=&quot;mb-4&quot; /&gt;
+          &lt;div className=&quot;space-y-3&quot;&gt;
+            {examples.map(ex =&gt; (
+              &lt;div key={ex.key} className=&quot;flex items-center gap-3 rounded-lg border border-outline/20 bg-surface-variant/35 p-3 transition-colors hover:border-primary/35&quot;&gt;
+                &lt;FileSpreadsheet className=&quot;h-8 w-8 flex-shrink-0 text-text-muted&quot; /&gt;
+                &lt;div className=&quot;flex-1 min-w-0&quot;&gt;
+                  &lt;div className=&quot;text-sm font-medium text-text-primary&quot;&gt;{ex.name}&lt;/div&gt;
+                  &lt;div className=&quot;truncate text-xs text-text-muted&quot;&gt;{ex.description}&lt;/div&gt;
+                  &lt;div className=&quot;flex gap-2 mt-1&quot;&gt;
+                    &lt;StatusBadge label={ex.task_type} tone=&quot;primary&quot; /&gt;
+                    &lt;StatusBadge label={`target: ${ex.target}`} tone=&quot;idle&quot; /&gt;
+                  &lt;/div&gt;
+                &lt;/div&gt;
+                &lt;button
+                  onClick={() =&gt; loadExample(ex.key)}
+                  disabled={loadingExample === ex.key}
+                  className=&quot;btn-outline text-xs py-1.5 px-3 flex-shrink-0&quot;
+                &gt;
+                  {loadingExample === ex.key ? &lt;Loader2 className=&quot;w-3 h-3 animate-spin&quot; /&gt; : &quot;Load&quot;}
+                &lt;/button&gt;
+              &lt;/div&gt;
+            ))}
+            {examples.length === 0 &amp;&amp; (
+              &lt;div className=&quot;py-6 text-center text-sm text-text-muted&quot;&gt;Loading examples...&lt;/div&gt;
+            )}
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      {/* Dataset list */}
+      &lt;div className=&quot;panel mt-6 rounded-xl p-6&quot;&gt;
+        &lt;PanelHeader title=&quot;Registry&quot; subtitle={`Your datasets (${datasets.length})`} icon={Database} className=&quot;mb-4&quot; /&gt;
+        &lt;DataTable
+          data={datasets}
+          rowKey={(ds) =&gt; ds.id}
+          emptyState={
+            &lt;div className=&quot;py-12 text-center text-text-muted&quot;&gt;
+              &lt;Database className=&quot;mx-auto mb-3 h-10 w-10 opacity-30&quot; /&gt;
+              &lt;p className=&quot;text-sm&quot;&gt;No datasets yet. Upload one or load an example.&lt;/p&gt;
+            &lt;/div&gt;
+          }
+          columns={[
+            {
+              key: &quot;name&quot;,
+              header: &quot;Name&quot;,
+              render: (ds) =&gt; (
+                &lt;div className=&quot;font-medium text-text-primary&quot;&gt;
+                  {ds.is_example &amp;&amp; &lt;StatusBadge label=&quot;example&quot; tone=&quot;idle&quot; className=&quot;mr-2&quot; /&gt;}
+                  {ds.name}
+                &lt;/div&gt;
+              ),
+            },
+            { key: &quot;rows&quot;, header: &quot;Rows&quot;, align: &quot;right&quot;, className: &quot;font-mono text-text-muted&quot;, render: (ds) =&gt; ds.num_rows?.toLocaleString() ?? &quot;–&quot; },
+            { key: &quot;columns&quot;, header: &quot;Columns&quot;, align: &quot;right&quot;, className: &quot;font-mono text-text-muted&quot;, render: (ds) =&gt; ds.num_columns ?? &quot;–&quot; },
+            { key: &quot;size&quot;, header: &quot;Size&quot;, align: &quot;right&quot;, className: &quot;font-mono text-text-muted&quot;, render: (ds) =&gt; formatBytes(ds.file_size) },
+            { key: &quot;target&quot;, header: &quot;Target&quot;, className: &quot;font-mono text-xs text-primary&quot;, render: (ds) =&gt; ds.target_column || &quot;–&quot; },
+            {
+              key: &quot;task&quot;,
+              header: &quot;Task&quot;,
+              render: (ds) =&gt; ds.task_type ? &lt;StatusBadge label={ds.task_type} tone=&quot;primary&quot; /&gt; : &quot;–&quot;,
+            },
+            {
+              key: &quot;actions&quot;,
+              header: &quot;Actions&quot;,
+              align: &quot;right&quot;,
+              render: (ds) =&gt; (
+                &lt;div className=&quot;flex justify-end gap-2&quot;&gt;
+                  &lt;button onClick={() =&gt; setSelectedDataset(selectedDataset?.id === ds.id ? null : ds)}
+                    className=&quot;rounded p-1.5 text-text-muted transition-colors hover:bg-surface-variant hover:text-text-primary&quot;&gt;
+                    &lt;Table className=&quot;h-3.5 w-3.5&quot; /&gt;
+                  &lt;/button&gt;
+                  &lt;button onClick={() =&gt; deleteDataset(ds.id)}
+                    className=&quot;rounded p-1.5 text-text-muted transition-colors hover:bg-red-500/20 hover:text-red-300&quot;&gt;
+                    &lt;Trash2 className=&quot;h-3.5 w-3.5&quot; /&gt;
+                  &lt;/button&gt;
+                &lt;/div&gt;
+              ),
+            },
+          ]}
+        /&gt;
+      &lt;/div&gt;
+
+      {/* Preview */}
+      {selectedDataset &amp;&amp; (
+        &lt;div className=&quot;panel mt-6 rounded-xl p-6&quot;&gt;
+          &lt;PanelHeader title={`Preview: ${selectedDataset.name}`} icon={Info} className=&quot;mb-4&quot; /&gt;
+
+          &lt;div className=&quot;flex flex-wrap gap-2 mb-4&quot;&gt;
+            &lt;button onClick={runQualityReport} disabled={reportLoading} className=&quot;btn-outline text-xs py-1.5 px-3&quot;&gt;
+              {reportLoading ? &lt;Loader2 className=&quot;w-3 h-3 animate-spin&quot; /&gt; : &lt;ShieldCheck className=&quot;w-3.5 h-3.5&quot; /&gt;} Quality Report
+            &lt;/button&gt;
+            &lt;button onClick={runCleanPreview} disabled={cleaningLoading} className=&quot;btn-outline text-xs py-1.5 px-3&quot;&gt;
+              {cleaningLoading ? &lt;Loader2 className=&quot;w-3 h-3 animate-spin&quot; /&gt; : &lt;Wand2 className=&quot;w-3.5 h-3.5&quot; /&gt;} Auto-Clean Preview
+            &lt;/button&gt;
+            &lt;button onClick={runCleanAndSave} disabled={cleanAndSaveLoading} className=&quot;btn-outline text-xs py-1.5 px-3&quot;&gt;
+              {cleanAndSaveLoading ? &lt;Loader2 className=&quot;w-3 h-3 animate-spin&quot; /&gt; : &lt;Wand2 className=&quot;w-3.5 h-3.5&quot; /&gt;} Clean &amp; Save Copy
+            &lt;/button&gt;
+            &lt;button onClick={runProfile} disabled={profileLoading} className=&quot;btn-outline text-xs py-1.5 px-3&quot;&gt;
+              {profileLoading ? &lt;Loader2 className=&quot;w-3 h-3 animate-spin&quot; /&gt; : &lt;Table className=&quot;w-3.5 h-3.5&quot; /&gt;} Build Profile
+            &lt;/button&gt;
+            &lt;button onClick={runEDA} disabled={edaLoading} className=&quot;btn-outline text-xs py-1.5 px-3&quot;&gt;
+              {edaLoading ? &lt;Loader2 className=&quot;w-3 h-3 animate-spin&quot; /&gt; : &lt;ShieldCheck className=&quot;w-3.5 h-3.5&quot; /&gt;} EDA Report
+            &lt;/button&gt;
+            &lt;button onClick={runAnalyticsReport} disabled={analyticsLoading} className=&quot;btn-outline text-xs py-1.5 px-3&quot;&gt;
+              {analyticsLoading ? &lt;Loader2 className=&quot;w-3 h-3 animate-spin&quot; /&gt; : &lt;Sparkles className=&quot;w-3.5 h-3.5&quot; /&gt;} Full Analytics
+            &lt;/button&gt;
+          &lt;/div&gt;
+
+          &lt;div className=&quot;overflow-x-auto&quot;&gt;
+            &lt;table className=&quot;w-full text-xs font-mono&quot;&gt;
+              &lt;thead&gt;
+                &lt;tr className=&quot;border-b border-outline/20 text-left text-text-muted&quot;&gt;
+                  {selectedDataset.columns_info?.map(c =&gt; (
+                    &lt;th key={c.name} className=&quot;pb-2 pr-4 font-medium whitespace-nowrap&quot;&gt;{c.name}&lt;/th&gt;
+                  ))}
+                &lt;/tr&gt;
+              &lt;/thead&gt;
+              &lt;tbody&gt;
+                {selectedDataset.preview_data?.slice(0, 8).map((row, i) =&gt; (
+                  &lt;tr key={i} className=&quot;border-b border-outline/10 hover:bg-surface-variant/35&quot;&gt;
+                    {selectedDataset.columns_info?.map(c =&gt; (
+                      &lt;td key={c.name} className=&quot;max-w-[150px] whitespace-nowrap truncate py-1.5 pr-4 text-text-primary&quot;&gt;
+                        {String(row[c.name] ?? &quot;&quot;)}
+                      &lt;/td&gt;
+                    ))}
+                  &lt;/tr&gt;
+                ))}
+              &lt;/tbody&gt;
+            &lt;/table&gt;
+          &lt;/div&gt;
+
+          {(qualityReport || cleanPreview) &amp;&amp; (
+            &lt;div className=&quot;grid lg:grid-cols-2 gap-4 mt-5&quot;&gt;
+              {qualityReport &amp;&amp; (
+                &lt;div className=&quot;rounded-lg border border-outline/25 bg-surface-variant/30 p-4&quot;&gt;
+                  &lt;div className=&quot;mb-2 text-sm font-semibold text-text-primary&quot;&gt;Data Quality&lt;/div&gt;
+                  &lt;div className=&quot;grid grid-cols-2 gap-2 text-xs&quot;&gt;
+                    &lt;div className=&quot;text-text-muted&quot;&gt;Quality score&lt;/div&gt;
+                    &lt;div className=&quot;font-mono text-text-primary&quot;&gt;{qualityReport.quality_score}/100&lt;/div&gt;
+                    &lt;div className=&quot;text-text-muted&quot;&gt;Missing cells&lt;/div&gt;
+                    &lt;div className=&quot;font-mono text-text-primary&quot;&gt;{qualityReport.missing_cells}&lt;/div&gt;
+                    &lt;div className=&quot;text-text-muted&quot;&gt;Duplicate rows&lt;/div&gt;
+                    &lt;div className=&quot;font-mono text-text-primary&quot;&gt;{qualityReport.duplicate_rows}&lt;/div&gt;
+                    &lt;div className=&quot;text-text-muted&quot;&gt;Columns with outliers&lt;/div&gt;
+                    &lt;div className=&quot;font-mono text-text-primary&quot;&gt;{Object.keys(qualityReport.outliers_by_column || {}).length}&lt;/div&gt;
+                  &lt;/div&gt;
+                  &lt;ul className=&quot;mt-3 list-disc space-y-1 pl-4 text-xs text-text-muted&quot;&gt;
+                    {(qualityReport.recommendations || []).slice(0, 3).map((r, i) =&gt; &lt;li key={i}&gt;{r}&lt;/li&gt;)}
+                  &lt;/ul&gt;
+                &lt;/div&gt;
+              )}
+
+              {cleanPreview &amp;&amp; (
+                &lt;div className=&quot;rounded-lg border border-outline/25 bg-surface-variant/30 p-4&quot;&gt;
+                  &lt;div className=&quot;mb-2 text-sm font-semibold text-text-primary&quot;&gt;Auto-Clean Summary&lt;/div&gt;
+                  &lt;div className=&quot;mb-2 text-xs text-text-muted&quot;&gt;Applied fixes&lt;/div&gt;
+                  &lt;ul className=&quot;max-h-28 list-disc space-y-1 overflow-auto pl-4 text-xs text-text-muted&quot;&gt;
+                    {cleanPreview.applied_fixes.length &gt; 0
+                      ? cleanPreview.applied_fixes.map((f, i) =&gt; &lt;li key={i}&gt;{f}&lt;/li&gt;)
+                      : &lt;li&gt;No fixes required&lt;/li&gt;}
+                  &lt;/ul&gt;
+                &lt;/div&gt;
+              )}
+            &lt;/div&gt;
+          )}
+
+          {profile &amp;&amp; (
+            &lt;div className=&quot;mt-6 space-y-4&quot;&gt;
+              &lt;div className=&quot;grid md:grid-cols-3 gap-3&quot;&gt;
+                {profile.summary_cards.map((card) =&gt; (
+                  &lt;div key={card.label} className=&quot;rounded-lg border border-outline/20 bg-surface-variant/30 p-3 text-xs&quot;&gt;
+                    &lt;div className=&quot;text-text-muted&quot;&gt;{card.label}&lt;/div&gt;
+                    &lt;div className=&quot;font-mono text-text-primary&quot;&gt;{String(card.value)}&lt;/div&gt;
+                  &lt;/div&gt;
+                ))}
+              &lt;/div&gt;
+
+              &lt;div className=&quot;grid lg:grid-cols-2 gap-4&quot;&gt;
+                &lt;div className=&quot;rounded-lg border border-outline/25 bg-surface-variant/30 p-4&quot;&gt;
+                  &lt;div className=&quot;text-sm font-semibold text-text-primary mb-2&quot;&gt;Feature Typing Intelligence&lt;/div&gt;
+                  {profile.typing_intelligence ? (
+                    &lt;div className=&quot;grid grid-cols-2 gap-2 text-xs&quot;&gt;
+                      &lt;div className=&quot;text-text-muted&quot;&gt;Numeric&lt;/div&gt;
+                      &lt;div className=&quot;font-mono text-text-primary&quot;&gt;{profile.typing_intelligence.numeric}&lt;/div&gt;
+                      &lt;div className=&quot;text-text-muted&quot;&gt;Categorical&lt;/div&gt;
+                      &lt;div className=&quot;font-mono text-text-primary&quot;&gt;{profile.typing_intelligence.categorical}&lt;/div&gt;
+                      &lt;div className=&quot;text-text-muted&quot;&gt;Datetime-like&lt;/div&gt;
+                      &lt;div className=&quot;font-mono text-text-primary&quot;&gt;{profile.typing_intelligence.datetime}&lt;/div&gt;
+                      &lt;div className=&quot;text-text-muted&quot;&gt;Boolean&lt;/div&gt;
+                      &lt;div className=&quot;font-mono text-text-primary&quot;&gt;{profile.typing_intelligence.boolean}&lt;/div&gt;
+                    &lt;/div&gt;
+                  ) : (
+                    &lt;p className=&quot;text-xs text-text-muted&quot;&gt;No typing intelligence available.&lt;/p&gt;
+                  )}
+                  {(profile.typing_intelligence?.high_cardinality_candidates?.length || 0) &gt; 0 &amp;&amp; (
+                    &lt;div className=&quot;mt-3&quot;&gt;
+                      &lt;div className=&quot;text-xs text-text-muted mb-1&quot;&gt;High-cardinality candidates&lt;/div&gt;
+                      &lt;div className=&quot;flex flex-wrap gap-1&quot;&gt;
+                        {profile.typing_intelligence!.high_cardinality_candidates.slice(0, 8).map((name) =&gt; (
+                          &lt;span key={name} className=&quot;rounded bg-surface px-2 py-1 text-[10px] text-text-primary&quot;&gt;{name}&lt;/span&gt;
+                        ))}
+                      &lt;/div&gt;
+                    &lt;/div&gt;
+                  )}
+                  {profile.drift_baseline &amp;&amp; (
+                    &lt;div className=&quot;mt-3 rounded border border-outline/20 bg-surface/40 p-2 text-xs&quot;&gt;
+                      &lt;div className=&quot;text-text-muted&quot;&gt;Drift baseline snapshot&lt;/div&gt;
+                      &lt;div className=&quot;font-mono text-text-primary&quot;&gt;
+                        rows: {profile.drift_baseline.rows} • cols: {profile.drift_baseline.columns}
+                      &lt;/div&gt;
+                    &lt;/div&gt;
+                  )}
+                &lt;/div&gt;
+
+                &lt;div className=&quot;rounded-lg border border-outline/25 bg-surface-variant/30 p-4&quot;&gt;
+                  &lt;div className=&quot;text-sm font-semibold text-text-primary mb-2&quot;&gt;Target Leakage Risk&lt;/div&gt;
+                  {(profile.leakage_risks?.length || 0) &gt; 0 ? (
+                    &lt;div className=&quot;space-y-2 text-xs&quot;&gt;
+                      {profile.leakage_risks!.slice(0, 5).map((risk) =&gt; (
+                        &lt;div key={risk.feature} className=&quot;rounded border border-outline/20 bg-surface/40 p-2&quot;&gt;
+                          &lt;div className=&quot;flex items-center justify-between&quot;&gt;
+                            &lt;span className=&quot;text-text-primary&quot;&gt;{risk.feature}&lt;/span&gt;
+                            &lt;span className=&quot;font-mono text-amber-300&quot;&gt;score: {risk.risk_score.toFixed(2)}&lt;/span&gt;
+                          &lt;/div&gt;
+                          &lt;div className=&quot;mt-1 text-text-muted&quot;&gt;{risk.reasons.join(&quot;; &quot;)}&lt;/div&gt;
+                        &lt;/div&gt;
+                      ))}
+                    &lt;/div&gt;
+                  ) : (
+                    &lt;p className=&quot;text-xs text-text-muted&quot;&gt;No strong leakage risks detected.&lt;/p&gt;
+                  )}
+                &lt;/div&gt;
+              &lt;/div&gt;
+
+              &lt;div className=&quot;grid lg:grid-cols-2 gap-4&quot;&gt;
+                &lt;div className=&quot;rounded-lg border border-outline/25 bg-surface-variant/30 p-4&quot;&gt;
+                  &lt;div className=&quot;text-sm font-semibold text-text-primary mb-2&quot;&gt;Missing Values by Column&lt;/div&gt;
+                  &lt;ResponsiveContainer width=&quot;100%&quot; height={220}&gt;
+                    &lt;BarChart data={profile.missing_by_column.slice(0, 12)}&gt;
+                      &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(59,110,246,0.1)&quot; /&gt;
+                      &lt;XAxis dataKey=&quot;column&quot; tick={{ fontSize: 10, fill: &quot;#8a94ae&quot; }} interval={0} angle={-20} textAnchor=&quot;end&quot; height={45} /&gt;
+                      &lt;YAxis tick={{ fontSize: 10, fill: &quot;#8a94ae&quot; }} /&gt;
+                      &lt;Tooltip contentStyle={{ background: &quot;#0d1526&quot;, border: &quot;1px solid rgba(59,110,246,0.3)&quot;, borderRadius: &quot;8px&quot; }} /&gt;
+                      &lt;Bar dataKey=&quot;missing&quot; fill=&quot;#3b6ef6&quot; radius={[3, 3, 0, 0]} /&gt;
+                    &lt;/BarChart&gt;
+                  &lt;/ResponsiveContainer&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;rounded-lg border border-outline/25 bg-surface-variant/30 p-4&quot;&gt;
+                  &lt;div className=&quot;text-sm font-semibold text-text-primary mb-2&quot;&gt;Target Distribution&lt;/div&gt;
+                  {profile.target_distribution?.labels?.length ? (
+                    &lt;ResponsiveContainer width=&quot;100%&quot; height={220}&gt;
+                      &lt;BarChart
+                        data={profile.target_distribution.labels.map((label, i) =&gt; ({
+                          label,
+                          count: profile.target_distribution!.counts[i],
+                        }))}
+                      &gt;
+                        &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(59,110,246,0.1)&quot; /&gt;
+                        &lt;XAxis dataKey=&quot;label&quot; tick={{ fontSize: 10, fill: &quot;#8a94ae&quot; }} interval={0} angle={-20} textAnchor=&quot;end&quot; height={45} /&gt;
+                        &lt;YAxis tick={{ fontSize: 10, fill: &quot;#8a94ae&quot; }} /&gt;
+                        &lt;Tooltip contentStyle={{ background: &quot;#0d1526&quot;, border: &quot;1px solid rgba(59,110,246,0.3)&quot;, borderRadius: &quot;8px&quot; }} /&gt;
+                        &lt;Bar dataKey=&quot;count&quot; fill=&quot;#00f5ff&quot; radius={[3, 3, 0, 0]} /&gt;
+                      &lt;/BarChart&gt;
+                    &lt;/ResponsiveContainer&gt;
+                  ) : (
+                    &lt;p className=&quot;text-xs text-text-muted&quot;&gt;No target distribution available.&lt;/p&gt;
+                  )}
+                &lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          )}
+
+          {edaReport &amp;&amp; (
+            &lt;div className=&quot;mt-6 rounded-lg border border-outline/25 bg-surface-variant/30 p-4&quot;&gt;
+              &lt;div className=&quot;mb-3 text-sm font-semibold text-text-primary&quot;&gt;Exploratory Data Analysis&lt;/div&gt;
+              &lt;div className=&quot;grid md:grid-cols-3 gap-3 text-xs mb-4&quot;&gt;
+                &lt;div className=&quot;rounded border border-outline/20 bg-surface/40 p-2&quot;&gt;
+                  &lt;div className=&quot;text-text-muted&quot;&gt;Rows / Columns&lt;/div&gt;
+                  &lt;div className=&quot;font-mono text-text-primary&quot;&gt;{edaReport.overview.rows} / {edaReport.overview.columns}&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div className=&quot;rounded border border-outline/20 bg-surface/40 p-2&quot;&gt;
+                  &lt;div className=&quot;text-text-muted&quot;&gt;Missing / Duplicates&lt;/div&gt;
+                  &lt;div className=&quot;font-mono text-text-primary&quot;&gt;{edaReport.overview.missing_total} / {edaReport.overview.duplicate_rows}&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div className=&quot;rounded border border-outline/20 bg-surface/40 p-2&quot;&gt;
+                  &lt;div className=&quot;text-text-muted&quot;&gt;Numeric / Categorical&lt;/div&gt;
+                  &lt;div className=&quot;font-mono text-text-primary&quot;&gt;{edaReport.overview.numeric_columns} / {edaReport.overview.categorical_columns}&lt;/div&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+
+              &lt;div className=&quot;grid lg:grid-cols-2 gap-4&quot;&gt;
+                &lt;div&gt;
+                  &lt;div className=&quot;mb-2 text-xs font-semibold text-text-primary&quot;&gt;High Correlations&lt;/div&gt;
+                  {(edaReport.high_correlations || []).length &gt; 0 ? (
+                    &lt;div className=&quot;space-y-2 text-xs&quot;&gt;
+                      {edaReport.high_correlations.slice(0, 6).map((c) =&gt; (
+                        &lt;div key={`${c.feature_a}-${c.feature_b}`} className=&quot;rounded border border-outline/20 bg-surface/40 p-2&quot;&gt;
+                          &lt;div className=&quot;text-text-primary&quot;&gt;{c.feature_a} ↔ {c.feature_b}&lt;/div&gt;
+                          &lt;div className=&quot;font-mono text-amber-300&quot;&gt;corr: {c.correlation.toFixed(3)}&lt;/div&gt;
+                        &lt;/div&gt;
+                      ))}
+                    &lt;/div&gt;
+                  ) : &lt;p className=&quot;text-xs text-text-muted&quot;&gt;No strong correlations found.&lt;/p&gt;}
+                &lt;/div&gt;
+
+                &lt;div&gt;
+                  &lt;div className=&quot;mb-2 text-xs font-semibold text-text-primary&quot;&gt;Recommendations&lt;/div&gt;
+                  &lt;ul className=&quot;list-disc space-y-1 pl-4 text-xs text-text-muted&quot;&gt;
+                    {(edaReport.recommendations || []).map((r, i) =&gt; &lt;li key={i}&gt;{r}&lt;/li&gt;)}
+                  &lt;/ul&gt;
+                  &lt;div className=&quot;mt-3 text-xs font-semibold text-text-primary&quot;&gt;Leakage Risks: {(edaReport.leakage_risks || []).length}&lt;/div&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          )}
+
+          {analyticsReport &amp;&amp; (
+            &lt;div className=&quot;mt-6 space-y-4 rounded-lg border border-outline/25 bg-surface-variant/30 p-4&quot;&gt;
+              &lt;div className=&quot;flex flex-wrap items-center justify-between gap-3&quot;&gt;
+                &lt;div&gt;
+                  &lt;div className=&quot;text-sm font-semibold text-text-primary&quot;&gt;AutoML Analytics &amp; Diagnostics&lt;/div&gt;
+                  &lt;div className=&quot;text-xs text-text-muted&quot;&gt;
+                    Task: {analyticsReport.task_type} • Charts: {analyticsReport.chart_count} (min {analyticsReport.minimum_required_charts})
+                  &lt;/div&gt;
+                &lt;/div&gt;
+                &lt;StatusBadge label={`evaluation: ${analyticsReport.evaluation_status}`} tone={analyticsReport.evaluation_status === &quot;ready&quot; ? &quot;healthy&quot; : &quot;idle&quot;} /&gt;
+              &lt;/div&gt;
+
+              &lt;div&gt;
+                &lt;div className=&quot;mb-2 text-xs uppercase tracking-[0.12em] text-text-muted&quot;&gt;1) Exploratory data analysis&lt;/div&gt;
+                &lt;div className=&quot;grid gap-3 md:grid-cols-2 xl:grid-cols-3&quot;&gt;
+                  {analyticsReport.exploratory_charts.map((chart) =&gt; (
+                    &lt;AnalyticsChartCard key={chart.id} chart={chart} /&gt;
+                  ))}
+                &lt;/div&gt;
+              &lt;/div&gt;
+
+              &lt;div&gt;
+                &lt;div className=&quot;mb-2 text-xs uppercase tracking-[0.12em] text-text-muted&quot;&gt;2) Model evaluation&lt;/div&gt;
+                &lt;div className=&quot;grid gap-3 md:grid-cols-2 xl:grid-cols-3&quot;&gt;
+                  {analyticsReport.evaluation_charts.map((chart) =&gt; (
+                    &lt;AnalyticsChartCard key={chart.id} chart={chart} /&gt;
+                  ))}
+                &lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          )}
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>Actions</strong>: No official citation linked here.</li><li><strong>Analysis</strong>: No official citation linked here.</li><li><strong>Analytics</strong>: No official citation linked here.</li><li><strong>AnalyticsChart</strong>: No official citation linked here.</li><li><strong>AnalyticsChartCard</strong>: No official citation linked here.</li><li><strong>AnalyticsReport</strong>: No official citation linked here.</li><li><strong>Applied</strong>: No official citation linked here.</li><li><strong>Array</strong>: No official citation linked here.</li><li><strong>Auto</strong>: No official citation linked here.</li><li><strong>AutoML</strong>: No official citation linked here.</li><li><strong>Backend</strong>: No official citation linked here.</li><li><strong>Bar</strong>: No official citation linked here.</li><li><strong>BarChart</strong>: No official citation linked here.</li><li><strong>Boolean</strong>: No official citation linked here.</li><li><strong>Build</strong>: No official citation linked here.</li><li><strong>CSV</strong>: No official citation linked here.</li><li><strong>CartesianGrid</strong>: No official citation linked here.</li><li><strong>Categorical</strong>: No official citation linked here.</li><li><strong>Charts</strong>: No official citation linked here.</li><li><strong>Clean</strong>: No official citation linked here.</li><li><strong>CleanPreview</strong>: No official citation linked here.</li><li><strong>Cleaned</strong>: No official citation linked here.</li><li><strong>CloudUpload</strong>: No official citation linked here.</li><li><strong>Column</strong>: No official citation linked here.</li><li><strong>Columns</strong>: No official citation linked here.</li><li><strong>Context</strong>: No official citation linked here.</li><li><strong>Copy</strong>: No official citation linked here.</li><li><strong>Correlations</strong>: No official citation linked here.</li><li><strong>Could</strong>: No official citation linked here.</li><li><strong>Data</strong>: No official citation linked here.</li><li><strong>DataTable</strong>: No official citation linked here.</li><li><strong>Database</strong>: No official citation linked here.</li><li><strong>Dataset</strong>: No official citation linked here.</li><li><strong>DatasetProfile</strong>: No official citation linked here.</li><li><strong>DatasetQualityReport</strong>: No official citation linked here.</li><li><strong>Datasets</strong>: No official citation linked here.</li><li><strong>DatasetsPage</strong>: No official citation linked here.</li><li><strong>Datetime</strong>: No official citation linked here.</li><li><strong>Delete</strong>: No official citation linked here.</li><li><strong>Diagnostics</strong>: No official citation linked here.</li><li><strong>Distribution</strong>: No official citation linked here.</li><li><strong>Drag</strong>: No official citation linked here.</li><li><strong>Drift</strong>: No official citation linked here.</li><li><strong>Drop</strong>: No official citation linked here.</li><li><strong>Duplicate</strong>: No official citation linked here.</li><li><strong>Duplicates</strong>: No official citation linked here.</li><li><strong>EDA</strong>: No official citation linked here.</li><li><strong>EDAReport</strong>: No official citation linked here.</li><li><strong>Example</strong>: No official citation linked here.</li><li><strong>ExampleDataset</strong>: No official citation linked here.</li><li><strong>Excel</strong>: No official citation linked here.</li><li><strong>Exploratory</strong>: No official citation linked here.</li><li><strong>Failed</strong>: No official citation linked here.</li><li><strong>Feature</strong>: No official citation linked here.</li><li><strong>File</strong>: No official citation linked here.</li><li><strong>FileSpreadsheet</strong>: No official citation linked here.</li><li><strong>FormData</strong>: No official citation linked here.</li><li><strong>Full</strong>: No official citation linked here.</li><li><strong>HeatCell</strong>: No official citation linked here.</li><li><strong>High</strong>: No official citation linked here.</li><li><strong>Info</strong>: No official citation linked here.</li><li><strong>Ingest</strong>: No official citation linked here.</li><li><strong>Ingestion</strong>: No official citation linked here.</li><li><strong>Insight</strong>: No official citation linked here.</li><li><strong>Intelligence</strong>: No official citation linked here.</li><li><strong>JSON</strong>: No official citation linked here.</li><li><strong>KB</strong>: No official citation linked here.</li><li><strong>Leakage</strong>: No official citation linked here.</li><li><strong>Line</strong>: No official citation linked here.</li><li><strong>LineChart</strong>: No official citation linked here.</li><li><strong>Load</strong>: No official citation linked here.</li><li><strong>Loader2</strong>: No official citation linked here.</li><li><strong>Loading</strong>: No official citation linked here.</li><li><strong>MB</strong>: No official citation linked here.</li><li><strong>Math</strong>: No official citation linked here.</li><li><strong>Max</strong>: No official citation linked here.</li><li><strong>Missing</strong>: No official citation linked here.</li><li><strong>Model</strong>: No official citation linked here.</li><li><strong>Name</strong>: No official citation linked here.</li><li><strong>No</strong>: No official citation linked here.</li><li><strong>Number</strong>: No official citation linked here.</li><li><strong>Numeric</strong>: No official citation linked here.</li><li><strong>Object</strong>: No official citation linked here.</li><li><strong>PanelHeader</strong>: No official citation linked here.</li><li><strong>Preview</strong>: No official citation linked here.</li><li><strong>Profile</strong>: No official citation linked here.</li><li><strong>Quality</strong>: No official citation linked here.</li><li><strong>Recommendations</strong>: No official citation linked here.</li><li><strong>Record</strong>: No official citation linked here.</li><li><strong>Registry</strong>: No official citation linked here.</li><li><strong>Report</strong>: No official citation linked here.</li><li><strong>ResponsiveContainer</strong>: No official citation linked here.</li><li><strong>Risk</strong>: No official citation linked here.</li><li><strong>Risks</strong>: No official citation linked here.</li><li><strong>Rows</strong>: No official citation linked here.</li><li><strong>Save</strong>: No official citation linked here.</li><li><strong>Scatter</strong>: No official citation linked here.</li><li><strong>ScatterChart</strong>: No official citation linked here.</li><li><strong>ShieldCheck</strong>: No official citation linked here.</li><li><strong>Size</strong>: No official citation linked here.</li><li><strong>Sparkles</strong>: No official citation linked here.</li><li><strong>StatusBadge</strong>: No official citation linked here.</li><li><strong>String</strong>: No official citation linked here.</li><li><strong>Summary</strong>: No official citation linked here.</li><li><strong>Table</strong>: No official citation linked here.</li><li><strong>Target</strong>: No official citation linked here.</li><li><strong>Task</strong>: No official citation linked here.</li><li><strong>Tooltip</strong>: No official citation linked here.</li><li><strong>Trash2</strong>: No official citation linked here.</li><li><strong>Typing</strong>: No official citation linked here.</li><li><strong>Upload</strong>: No official citation linked here.</li><li><strong>Uploading</strong>: No official citation linked here.</li><li><strong>Value</strong>: No official citation linked here.</li><li><strong>Values</strong>: No official citation linked here.</li><li><strong>Wand2</strong>: No official citation linked here.</li><li><strong>XAxis</strong>: No official citation linked here.</li><li><strong>XLSX</strong>: No official citation linked here.</li><li><strong>YAxis</strong>: No official citation linked here.</li><li><strong>Your</strong>: No official citation linked here.</li><li><strong>a94ae</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

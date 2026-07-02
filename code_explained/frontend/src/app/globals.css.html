@@ -1,0 +1,268 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>globals.css</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>frontend/src/app/globals.css</span></div>
+        <h1 style="margin:10px 0 6px">globals.css</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="dashboard.html">Previous</a><a href="home-page.tsx.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: frontend/src/app/globals.css</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>frontend/src/app/globals.css</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-css">@import url(&#x27;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap&#x27;);
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sigma-bg: #0e0e10;
+  --sigma-surface: #19191d;
+  --sigma-surface-2: #25252b;
+  --sigma-border: rgba(71, 71, 77, 0.5);
+  --sigma-text: #e7e4ec;
+  --sigma-muted: #acaab1;
+  --sigma-primary: #d0bcff;
+  --sigma-primary-deep: #6e3bd7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: &#x27;Inter&#x27;, sans-serif;
+  background-color: var(--sigma-bg);
+  color: var(--sigma-text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: &#x27;Inter&#x27;, sans-serif;
+}
+
+code, pre, .font-mono {
+  font-family: &#x27;JetBrains Mono&#x27;, monospace;
+}
+
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-css">@import url(&#x27;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap&#x27;);
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sigma-bg: #0e0e10;
+  --sigma-surface: #19191d;
+  --sigma-surface-2: #25252b;
+  --sigma-border: rgba(71, 71, 77, 0.5);
+  --sigma-text: #e7e4ec;
+  --sigma-muted: #acaab1;
+  --sigma-primary: #d0bcff;
+  --sigma-primary-deep: #6e3bd7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: &#x27;Inter&#x27;, sans-serif;
+  background-color: var(--sigma-bg);
+  color: var(--sigma-text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: &#x27;Inter&#x27;, sans-serif;
+}
+
+code, pre, .font-mono {
+  font-family: &#x27;JetBrains Mono&#x27;, monospace;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--sigma-bg); }
+::-webkit-scrollbar-thumb { background: rgba(117,117,123,0.4); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(117,117,123,0.75); }
+
+/* Glass card */
+.glass {
+  background: rgba(37, 37, 43, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--sigma-border);
+}
+
+/* Subtle depth effects */
+.void-shadow { box-shadow: 0 24px 48px -12px rgba(0,0,0,0.5); }
+.glow-blue  { box-shadow: 0 0 24px rgba(110,59,215,0.18); }
+.glow-cyan  { box-shadow: 0 0 24px rgba(208,188,255,0.16); }
+.glow-green { box-shadow: 0 0 24px rgba(80,220,170,0.15); }
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #d0bcff 0%, #6e3bd7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-green {
+  background: linear-gradient(135deg, #d0bcff 0%, #8ddcc2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animated border */
+@keyframes borderPulse {
+  0%, 100% { border-color: rgba(110,59,215,0.25); }
+  50% { border-color: rgba(110,59,215,0.55); }
+}
+.border-pulse {
+  animation: borderPulse 3s ease-in-out infinite;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-primary-deep hover:bg-primary-deep/90 text-text-primary font-medium px-5 py-2.5 rounded-lg transition-all duration-200 inline-flex items-center gap-2;
+  box-shadow: 0 4px 20px rgba(110,59,215,0.35);
+}
+.btn-primary:hover {
+  box-shadow: 0 4px 28px rgba(110,59,215,0.5);
+}
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-outline {
+  @apply border border-outline/35 hover:border-primary/40 text-text-muted hover:text-text-primary font-medium px-5 py-2.5 rounded-lg transition-all duration-200 inline-flex items-center gap-2 bg-surface-variant/50;
+}
+
+/* Card */
+.sigma-card {
+  @apply glass rounded-xl p-6;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.sigma-card:hover {
+  border-color: rgba(110,59,215,0.35);
+}
+
+/* Stat badge */
+.metric-badge {
+  @apply text-xs font-mono px-2.5 py-1 rounded-full;
+}
+
+.panel {
+  @apply rounded-lg border border-outline/20 bg-surface;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.34);
+}
+
+.panel-glass {
+  @apply rounded-xl border border-primary/20;
+  background: linear-gradient(135deg, rgba(37, 37, 43, 0.8) 0%, rgba(25, 25, 29, 0.88) 100%);
+  backdrop-filter: blur(10px);
+}
+
+.section-kicker {
+  @apply text-[10px] uppercase tracking-[0.14em] text-text-muted;
+}
+
+input, select, textarea {
+  @apply transition-colors;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(208, 188, 255, 0.7);
+  outline-offset: 1px;
+}
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>Animated</strong>: No official citation linked here.</li><li><strong>Button</strong>: No official citation linked here.</li><li><strong>Card</strong>: No official citation linked here.</li><li><strong>Glass</strong>: No official citation linked here.</li><li><strong>Gradient</strong>: No official citation linked here.</li><li><strong>Inter</strong>: No official citation linked here.</li><li><strong>JetBrains</strong>: No official citation linked here.</li><li><strong>Mono</strong>: No official citation linked here.</li><li><strong>Scrollbar</strong>: No official citation linked here.</li><li><strong>Stat</strong>: No official citation linked here.</li><li><strong>Subtle</strong>: No official citation linked here.</li><li><strong>acaab1</strong>: No official citation linked here.</li><li><strong>active</strong>: No official citation linked here.</li><li><strong>all</strong>: No official citation linked here.</li><li><strong>animation</strong>: No official citation linked here.</li><li><strong>antialiased</strong>: No official citation linked here.</li><li><strong>apply</strong>: No official citation linked here.</li><li><strong>backdrop</strong>: No official citation linked here.</li><li><strong>background</strong>: No official citation linked here.</li><li><strong>badge</strong>: No official citation linked here.</li><li><strong>base</strong>: No official citation linked here.</li><li><strong>behavior</strong>: No official citation linked here.</li><li><strong>bg</strong>: No official citation linked here.</li><li><strong>blue</strong>: No official citation linked here.</li><li><strong>blur</strong>: No official citation linked here.</li><li><strong>body</strong>: No official citation linked here.</li><li><strong>border</strong>: No official citation linked here.</li><li><strong>borderPulse</strong>: No official citation linked here.</li><li><strong>box</strong>: No official citation linked here.</li><li><strong>btn</strong>: No official citation linked here.</li><li><strong>card</strong>: No official citation linked here.</li><li><strong>center</strong>: No official citation linked here.</li><li><strong>clip</strong>: No official citation linked here.</li><li><strong>code</strong>: No official citation linked here.</li><li><strong>color</strong>: No official citation linked here.</li><li><strong>colors</strong>: No official citation linked here.</li><li><strong>com</strong>: No official citation linked here.</li><li><strong>components</strong>: No official citation linked here.</li><li><strong>css2</strong>: No official citation linked here.</li><li><strong>cyan</strong>: No official citation linked here.</li><li><strong>d0bcff</strong>: No official citation linked here.</li><li><strong>ddcc2</strong>: No official citation linked here.</li><li><strong>deep</strong>: No official citation linked here.</li><li><strong>deg</strong>: No official citation linked here.</li><li><strong>depth</strong>: No official citation linked here.</li><li><strong>display</strong>: No official citation linked here.</li><li><strong>duration</strong>: No official citation linked here.</li><li><strong>e0e10</strong>: No official citation linked here.</li><li><strong>e3bd7</strong>: No official citation linked here.</li><li><strong>e7e4ec</strong>: No official citation linked here.</li><li><strong>ease</strong>: No official citation linked here.</li><li><strong>effects</strong>: No official citation linked here.</li><li><strong>em</strong>: No official citation linked here.</li><li><strong>family</strong>: No official citation linked here.</li><li><strong>fill</strong>: No official citation linked here.</li><li><strong>filter</strong>: No official citation linked here.</li><li><strong>flex</strong>: No official citation linked here.</li><li><strong>focus</strong>: No official citation linked here.</li><li><strong>font</strong>: No official citation linked here.</li><li><strong>fonts</strong>: No official citation linked here.</li><li><strong>full</strong>: No official citation linked here.</li><li><strong>gap</strong>: No official citation linked here.</li><li><strong>glass</strong>: No official citation linked here.</li><li><strong>glow</strong>: No official citation linked here.</li><li><strong>googleapis</strong>: No official citation linked here.</li><li><strong>gradient</strong>: No official citation linked here.</li><li><strong>green</strong>: No official citation linked here.</li><li><strong>h1</strong>: No official citation linked here.</li><li><strong>h2</strong>: No official citation linked here.</li><li><strong>h3</strong>: No official citation linked here.</li><li><strong>h4</strong>: No official citation linked here.</li><li><strong>h5</strong>: No official citation linked here.</li><li><strong>h6</strong>: No official citation linked here.</li><li><strong>height</strong>: No official citation linked here.</li><li><strong>hover</strong>: No official citation linked here.</li><li><strong>html</strong>: No official citation linked here.</li><li><strong>https</strong>: No official citation linked here.</li><li><strong>import</strong>: No official citation linked here.</li><li><strong>in</strong>: No official citation linked here.</li><li><strong>infinite</strong>: No official citation linked here.</li><li><strong>inline</strong>: No official citation linked here.</li><li><strong>input</strong>: No official citation linked here.</li><li><strong>items</strong>: No official citation linked here.</li><li><strong>keyframes</strong>: No official citation linked here.</li><li><strong>kicker</strong>: No official citation linked here.</li><li><strong>lg</strong>: No official citation linked here.</li><li><strong>linear</strong>: No official citation linked here.</li><li><strong>medium</strong>: No official citation linked here.</li><li><strong>metric</strong>: No official citation linked here.</li><li><strong>min</strong>: No official citation linked here.</li><li><strong>mono</strong>: No official citation linked here.</li><li><strong>monospace</strong>: No official citation linked here.</li><li><strong>muted</strong>: No official citation linked here.</li><li><strong>offset</strong>: No official citation linked here.</li><li><strong>out</strong>: No official citation linked here.</li><li><strong>outline</strong>: No official citation linked here.</li><li><strong>panel</strong>: No official citation linked here.</li><li><strong>pre</strong>: No official citation linked here.</li><li><strong>primary</strong>: No official citation linked here.</li><li><strong>pulse</strong>: No official citation linked here.</li><li><strong>px</strong>: No official citation linked here.</li><li><strong>py</strong>: No official citation linked here.</li><li><strong>radius</strong>: No official citation linked here.</li><li><strong>rgba</strong>: No official citation linked here.</li><li><strong>root</strong>: No official citation linked here.</li><li><strong>rounded</strong>: No official citation linked here.</li><li><strong>sans</strong>: No official citation linked here.</li><li><strong>scale</strong>: No official citation linked here.</li><li><strong>scroll</strong>: No official citation linked here.</li><li><strong>scrollbar</strong>: No official citation linked here.</li><li><strong>section</strong>: No official citation linked here.</li><li><strong>select</strong>: No official citation linked here.</li><li><strong>serif</strong>: No official citation linked here.</li><li><strong>shadow</strong>: No official citation linked here.</li><li><strong>sigma</strong>: No official citation linked here.</li><li><strong>sizing</strong>: No official citation linked here.</li><li><strong>smooth</strong>: No official citation linked here.</li><li><strong>smoothing</strong>: No official citation linked here.</li><li><strong>solid</strong>: No official citation linked here.</li><li><strong>styles</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

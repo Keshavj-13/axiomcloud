@@ -1,0 +1,245 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>charts.tsx</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #0b0d12; --panel: #141824; --panel-2: #1c2230; --text: #edf2ff; --muted: #aab3c5; --accent: #8ab4ff; --border: rgba(138,180,255,.22); }
+    @media (prefers-color-scheme: light) { :root { --bg: #f5f7fb; --panel: #ffffff; --panel-2: #eef2f8; --text: #101828; --muted: #526074; --accent: #2858d8; --border: rgba(40,88,216,.16); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.6 Inter, Segoe UI, Arial, sans-serif; background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 90%, var(--accent))); color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow:auto; border-right: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 90%, transparent); padding: 24px; }
+    .main { padding: 32px; max-width: 1200px; }
+    .crumbs, .navlinks, .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .card, .toc, .meta-box { background: color-mix(in oklab, var(--panel) 88%, transparent); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 0 0 18px; box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+    .toc ul { padding-left: 18px; }
+    pre { overflow:auto; background: var(--panel-2); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    code { font-family: Consolas, Menlo, Monaco, monospace; font-size: 13px; }
+    details { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); }
+    summary { cursor: pointer; font-weight: 600; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .muted { color: var(--muted); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; height:auto; } .main { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="meta-box">
+        <div class="crumbs"><a href="../index.html">code_explained</a><span>/</span><span>frontend/src/components/ui/charts.tsx</span></div>
+        <h1 style="margin:10px 0 6px">charts.tsx</h1>
+        <p class="muted">Mirrored explanation page.</p>
+      </div>
+      <input id="search" class="search" placeholder="Search this page" />
+      <nav class="toc">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#overview">Purpose</a></li>
+          <li><a href="#snippet">Code Snippet</a></li>
+          <li><a href="#step-by-step">Step by Step</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+      <div class="navlinks"><a href="StatusBadge.tsx.html">Previous</a><a href="../../app/dashboard/datasets/page.tsx.html">Next</a></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="meta"><span>File path: frontend/src/components/ui/charts.tsx</span></div>
+        <div class="meta"><span>Dark / light theme supported</span></div>
+      </div>
+      
+    <section class="card" id="overview">
+      <h2>Purpose</h2>
+      <p>This page explains the file <strong>frontend/src/components/ui/charts.tsx</strong> in very simple language. A file is a named container for information. A folder is a container for files and other folders.</p>
+      <p>This page exists because the repository asked for a mirrored explanation tree. The original file stays untouched.</p>
+    </section>
+    <section class="card" id="snippet">
+      <h2>Code Snippet</h2>
+      <pre><code class="language-tsx">&quot;use client&quot;;
+
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  LineChart,
+  Line,
+} from &quot;recharts&quot;;
+
+export function HorizontalBarChart({
+  data,
+  xKey,
+  yKey,
+  color = &quot;#3b6ef6&quot;,
+  height = 280,
+}: {
+  data: Record&lt;string, number | string&gt;[];
+  xKey: string;
+  yKey: string;
+  color?: string;
+  height?: number;
+}) {
+  if (!data?.length) return &lt;div className=&quot;py-8 text-xs text-text-muted&quot;&gt;No data available.&lt;/div&gt;;
+
+  return (
+    &lt;ResponsiveContainer width=&quot;100%&quot; height={height}&gt;
+      &lt;BarChart data={data} layout=&quot;vertical&quot; margin={{ left: 24, right: 12, top: 8, bottom: 8 }}&gt;
+        &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(59,110,246,0.1)&quot; /&gt;
+        &lt;XAxis type=&quot;number&quot; tick={{ fill: &quot;#6b7a9e&quot;, fontSize: 11 }} /&gt;
+        &lt;YAxis type=&quot;category&quot; dataKey={yKey} width={170} tick={{ fill: &quot;#8b97b8&quot;, fontSize: 11 }} /&gt;
+        &lt;Tooltip contentStyle={{ background: &quot;#0d1526&quot;, border: &quot;1px solid rgba(59,110,246,0.3)&quot;, borderRadius: &quot;8px&quot;, color: &quot;#e8edf8&quot; }} /&gt;
+        &lt;Bar dataKey={xKey} fill={color} radius={[0, 4, 4, 0]} /&gt;
+      &lt;/BarChart&gt;
+    &lt;/ResponsiveContainer&gt;
+  );
+...</code></pre>
+    </section>
+    <section class="card" id="step-by-step">
+      <h2>Step by Step</h2>
+      <p>The full file content is included below for search and inspection.</p>
+      <details open><summary>Full file text</summary><pre><code class="language-tsx">&quot;use client&quot;;
+
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  LineChart,
+  Line,
+} from &quot;recharts&quot;;
+
+export function HorizontalBarChart({
+  data,
+  xKey,
+  yKey,
+  color = &quot;#3b6ef6&quot;,
+  height = 280,
+}: {
+  data: Record&lt;string, number | string&gt;[];
+  xKey: string;
+  yKey: string;
+  color?: string;
+  height?: number;
+}) {
+  if (!data?.length) return &lt;div className=&quot;py-8 text-xs text-text-muted&quot;&gt;No data available.&lt;/div&gt;;
+
+  return (
+    &lt;ResponsiveContainer width=&quot;100%&quot; height={height}&gt;
+      &lt;BarChart data={data} layout=&quot;vertical&quot; margin={{ left: 24, right: 12, top: 8, bottom: 8 }}&gt;
+        &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(59,110,246,0.1)&quot; /&gt;
+        &lt;XAxis type=&quot;number&quot; tick={{ fill: &quot;#6b7a9e&quot;, fontSize: 11 }} /&gt;
+        &lt;YAxis type=&quot;category&quot; dataKey={yKey} width={170} tick={{ fill: &quot;#8b97b8&quot;, fontSize: 11 }} /&gt;
+        &lt;Tooltip contentStyle={{ background: &quot;#0d1526&quot;, border: &quot;1px solid rgba(59,110,246,0.3)&quot;, borderRadius: &quot;8px&quot;, color: &quot;#e8edf8&quot; }} /&gt;
+        &lt;Bar dataKey={xKey} fill={color} radius={[0, 4, 4, 0]} /&gt;
+      &lt;/BarChart&gt;
+    &lt;/ResponsiveContainer&gt;
+  );
+}
+
+export function RocLineChart({
+  data,
+  height = 280,
+}: {
+  data: { fpr: number; tpr: number }[];
+  height?: number;
+}) {
+  if (!data?.length) return &lt;div className=&quot;py-8 text-xs text-text-muted&quot;&gt;No ROC data available.&lt;/div&gt;;
+
+  return (
+    &lt;ResponsiveContainer width=&quot;100%&quot; height={height}&gt;
+      &lt;LineChart data={data}&gt;
+        &lt;CartesianGrid strokeDasharray=&quot;3 3&quot; stroke=&quot;rgba(59,110,246,0.1)&quot; /&gt;
+        &lt;XAxis dataKey=&quot;fpr&quot; type=&quot;number&quot; domain={[0, 1]} tick={{ fill: &quot;#6b7a9e&quot;, fontSize: 11 }} /&gt;
+        &lt;YAxis domain={[0, 1]} tick={{ fill: &quot;#6b7a9e&quot;, fontSize: 11 }} /&gt;
+        &lt;Tooltip contentStyle={{ background: &quot;#0d1526&quot;, border: &quot;1px solid rgba(59,110,246,0.3)&quot;, borderRadius: &quot;8px&quot;, color: &quot;#e8edf8&quot; }} /&gt;
+        &lt;Line type=&quot;monotone&quot; dataKey=&quot;tpr&quot; stroke=&quot;#00f5ff&quot; strokeWidth={2} dot={false} /&gt;
+      &lt;/LineChart&gt;
+    &lt;/ResponsiveContainer&gt;
+  );
+}
+
+export function MatrixHeatmap({
+  labels,
+  matrix,
+}: {
+  labels: string[];
+  matrix: number[][];
+}) {
+  if (!matrix?.length) return &lt;div className=&quot;py-8 text-xs text-text-muted&quot;&gt;No matrix data available.&lt;/div&gt;;
+
+  const max = Math.max(...matrix.flat(), 0);
+
+  return (
+    &lt;div className=&quot;overflow-x-auto&quot;&gt;
+      &lt;table className=&quot;mx-auto text-center text-xs font-mono&quot;&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th className=&quot;p-2 text-text-muted&quot;&gt;Actual\Predicted&lt;/th&gt;
+            {labels.map((label) =&gt; (
+              &lt;th key={label} className=&quot;p-2 text-text-muted&quot;&gt;{label}&lt;/th&gt;
+            ))}
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {matrix.map((row, i) =&gt; (
+            &lt;tr key={i}&gt;
+              &lt;td className=&quot;p-2 text-text-muted&quot;&gt;{labels[i] ?? `Class ${i}`}&lt;/td&gt;
+              {row.map((val, j) =&gt; {
+                const intensity = max &gt; 0 ? val / max : 0;
+                return (
+                  &lt;td
+                    key={`${i}-${j}`}
+                    className=&quot;rounded p-2 font-semibold text-white&quot;
+                    style={{
+                      background:
+                        i === j
+                          ? `rgba(0,255,148,${0.15 + intensity * 0.45})`
+                          : `rgba(239,68,68,${0.08 + intensity * 0.35})`,
+                    }}
+                  &gt;
+                    {val}
+                  &lt;/td&gt;
+                );
+              })}
+            &lt;/tr&gt;
+          ))}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+  );
+}
+</code></pre></details>
+    </section>
+    <section class="card" id="glossary">
+      <h2>Glossary</h2>
+      <ul><li><strong>Actual</strong>: No official citation linked here.</li><li><strong>Bar</strong>: No official citation linked here.</li><li><strong>BarChart</strong>: No official citation linked here.</li><li><strong>CartesianGrid</strong>: No official citation linked here.</li><li><strong>Class</strong>: No official citation linked here.</li><li><strong>HorizontalBarChart</strong>: No official citation linked here.</li><li><strong>Line</strong>: No official citation linked here.</li><li><strong>LineChart</strong>: No official citation linked here.</li><li><strong>Math</strong>: No official citation linked here.</li><li><strong>MatrixHeatmap</strong>: No official citation linked here.</li><li><strong>No</strong>: No official citation linked here.</li><li><strong>Predicted</strong>: No official citation linked here.</li><li><strong>ROC</strong>: No official citation linked here.</li><li><strong>Record</strong>: No official citation linked here.</li><li><strong>ResponsiveContainer</strong>: No official citation linked here.</li><li><strong>RocLineChart</strong>: No official citation linked here.</li><li><strong>Tooltip</strong>: No official citation linked here.</li><li><strong>XAxis</strong>: No official citation linked here.</li><li><strong>YAxis</strong>: No official citation linked here.</li><li><strong>auto</strong>: No official citation linked here.</li><li><strong>available</strong>: No official citation linked here.</li><li><strong>b6ef6</strong>: No official citation linked here.</li><li><strong>b7a9e</strong>: No official citation linked here.</li><li><strong>b97b8</strong>: No official citation linked here.</li><li><strong>background</strong>: No official citation linked here.</li><li><strong>border</strong>: No official citation linked here.</li><li><strong>borderRadius</strong>: No official citation linked here.</li><li><strong>bottom</strong>: No official citation linked here.</li><li><strong>category</strong>: No official citation linked here.</li><li><strong>center</strong>: No official citation linked here.</li><li><strong>className</strong>: No official citation linked here.</li><li><strong>client</strong>: No official citation linked here.</li><li><strong>color</strong>: No official citation linked here.</li><li><strong>const</strong>: No official citation linked here.</li><li><strong>contentStyle</strong>: No official citation linked here.</li><li><strong>d1526</strong>: No official citation linked here.</li><li><strong>data</strong>: No official citation linked here.</li><li><strong>dataKey</strong>: No official citation linked here.</li><li><strong>div</strong>: No official citation linked here.</li><li><strong>domain</strong>: No official citation linked here.</li><li><strong>dot</strong>: No official citation linked here.</li><li><strong>e8edf8</strong>: No official citation linked here.</li><li><strong>export</strong>: No official citation linked here.</li><li><strong>f5ff</strong>: No official citation linked here.</li><li><strong>false</strong>: No official citation linked here.</li><li><strong>fill</strong>: No official citation linked here.</li><li><strong>flat</strong>: No official citation linked here.</li><li><strong>font</strong>: No official citation linked here.</li><li><strong>fontSize</strong>: No official citation linked here.</li><li><strong>fpr</strong>: No official citation linked here.</li><li><strong>from</strong>: No official citation linked here.</li><li><strong>function</strong>: No official citation linked here.</li><li><strong>height</strong>: No official citation linked here.</li><li><strong>if</strong>: No official citation linked here.</li><li><strong>import</strong>: No official citation linked here.</li><li><strong>intensity</strong>: No official citation linked here.</li><li><strong>key</strong>: No official citation linked here.</li><li><strong>label</strong>: No official citation linked here.</li><li><strong>labels</strong>: No official citation linked here.</li><li><strong>layout</strong>: No official citation linked here.</li><li><strong>left</strong>: No official citation linked here.</li><li><strong>length</strong>: No official citation linked here.</li><li><strong>map</strong>: No official citation linked here.</li><li><strong>margin</strong>: No official citation linked here.</li><li><strong>matrix</strong>: No official citation linked here.</li><li><strong>max</strong>: No official citation linked here.</li><li><strong>mono</strong>: No official citation linked here.</li><li><strong>monotone</strong>: No official citation linked here.</li><li><strong>muted</strong>: No official citation linked here.</li><li><strong>mx</strong>: No official citation linked here.</li><li><strong>number</strong>: No official citation linked here.</li><li><strong>overflow</strong>: No official citation linked here.</li><li><strong>px</strong>: No official citation linked here.</li><li><strong>py</strong>: No official citation linked here.</li><li><strong>radius</strong>: No official citation linked here.</li><li><strong>recharts</strong>: No official citation linked here.</li><li><strong>return</strong>: No official citation linked here.</li><li><strong>rgba</strong>: No official citation linked here.</li><li><strong>right</strong>: No official citation linked here.</li><li><strong>rounded</strong>: No official citation linked here.</li><li><strong>row</strong>: No official citation linked here.</li><li><strong>semibold</strong>: No official citation linked here.</li><li><strong>solid</strong>: No official citation linked here.</li><li><strong>string</strong>: No official citation linked here.</li><li><strong>stroke</strong>: No official citation linked here.</li><li><strong>strokeDasharray</strong>: No official citation linked here.</li><li><strong>strokeWidth</strong>: No official citation linked here.</li><li><strong>style</strong>: No official citation linked here.</li><li><strong>table</strong>: No official citation linked here.</li><li><strong>tbody</strong>: No official citation linked here.</li><li><strong>td</strong>: No official citation linked here.</li><li><strong>text</strong>: No official citation linked here.</li><li><strong>th</strong>: No official citation linked here.</li><li><strong>thead</strong>: No official citation linked here.</li><li><strong>tick</strong>: No official citation linked here.</li><li><strong>top</strong>: No official citation linked here.</li><li><strong>tpr</strong>: No official citation linked here.</li><li><strong>tr</strong>: No official citation linked here.</li><li><strong>type</strong>: No official citation linked here.</li><li><strong>use</strong>: No official citation linked here.</li><li><strong>val</strong>: No official citation linked here.</li><li><strong>vertical</strong>: No official citation linked here.</li><li><strong>white</strong>: No official citation linked here.</li><li><strong>width</strong>: No official citation linked here.</li><li><strong>xKey</strong>: No official citation linked here.</li><li><strong>xs</strong>: No official citation linked here.</li><li><strong>yKey</strong>: No official citation linked here.</li></ul>
+    </section>
+    
+      <section class="card" id="references"><h2>References</h2><p>Official docs and reputable references are linked where the page describes a language or library feature.</p></section>
+    </main>
+  </div>
+  <script>
+    const input = document.getElementById('search');
+    input?.addEventListener('input', () => {
+      const term = input.value.trim().toLowerCase();
+      document.querySelectorAll('section, details').forEach((node) => {
+        const text = node.textContent?.toLowerCase() || '';
+        node.style.display = !term || text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>
