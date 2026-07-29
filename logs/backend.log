@@ -13959,3 +13959,6 @@ TypeError: numpy boolean subtract, the `-` operator, is not supported, use the b
 2026-03-23 18:12:02,766 - app.main - INFO - Request completed | id=e755fea9 method=GET path=/api/datasets/8/quality-report status=200 duration_ms=139.88
 2026-03-23 18:12:02,947 - app.main - INFO - Request completed | id=551dbca4 method=GET path=/api/datasets/8/eda-report status=200 duration_ms=320.66
 2026-03-23 18:12:02,954 - app.main - INFO - Request completed | id=4ae84e97 method=GET path=/api/datasets/8/leakage-report status=200 duration_ms=327.39
+2026-07-29 08:51:55,394 - app.main - INFO - Axiom Cloud AI started successfully
+2026-07-29 08:51:55,394 - app.main - INFO - Model storage: ./backend/storage/models
+2026-07-29 08:51:55,394 - app.main - INFO - Dataset storage: ./backend/storage/datasets
