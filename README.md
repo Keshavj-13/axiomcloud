@@ -1,493 +1,194 @@
-# Axiom Cloud AI — AutoML Platform
+# AxiomCloud
 
-> A production-grade, full-stack AutoML platform for dataset diagnostics, controlled model training (server or local GPU), explainability, deployment, and live inference.
-
----
-
-## Platform Overview
-
-Axiom Cloud AI mirrors a practical Vertex/Kaggle-style workflow with stronger diagnostics and controlled execution.
-
-### Shipped Features (Current)
-
-#### 1) Data onboarding and profiling
-- Upload CSV/Excel datasets.
-- Built-in example datasets for instant trials.
-- Dataset quality report (missingness, duplicates, outliers, score + recommendations).
-- EDA report with chart artifacts and metadata.
-- Leakage risk analysis per feature.
-- Drift baseline snapshot generation for later monitoring.
-- Clean preview and clean-and-save workflow.
-
-#### 2) AutoML training and experiment control
-- Auto-detect task type (`classification` / `regression`) when not explicitly set.
-- Task-aware model catalog and recommendation flow.
-- Hard safety limits enforced in UI + backend:
-  - max **5 models** per run,
-  - max **5 CV folds**.
-- Adaptive hyperparameter tuning with Optuna (trial and time budgets).
-- Dataset-aware starting hyperparameters (sensible defaults before tuning).
-- Expert mode with optional per-model hyperparameter overrides.
-- Experiment registry with run configs, status, best model, and summary metrics.
-
-#### 3) Execution modes
-- **Remote mode**: server-side training queue/execution.
-- **Local mode**: prepares local job spec, trains on your machine (GPU if available), then syncs results back.
-- Local agent download from UI with authenticated request.
-- Offline local sync payload support and later re-sync.
-
-#### 4) Model evaluation and explainability
-- Leaderboard comparison across trained models.
-- Classification visuals: confusion matrix, ROC, CV folds, key metrics.
-- Regression visuals: residual/error diagnostics and metric comparisons.
-- SHAP and LIME endpoints for model explainability.
-- Feature importance extraction for supported estimators.
-
-#### 5) Deployment and inference
-- Deploy/undeploy model lifecycle controls.
-- Inference sandbox with generated feature template.
-- Randomized defaults sampled from training data profile.
-- Integer-like numeric fields now produce integer defaults (not float-only noise).
-- REST prediction endpoint for programmatic inference.
-- Model artifact download (`.joblib`).
-
-#### 6) Security and UX
-- Firebase-authenticated API access.
-- Responsive dashboard pages for datasets, training, models, predict, deploy, and search.
-- Authenticated local-agent command generation for local runs.
+A production-grade, full-stack AutoML platform for dataset diagnostics, controlled model training, explainability, and live inference. AxiomCloud mirrors a practical Vertex AI or Kaggle-style workflow with deeper dataset quality controls and flexible GPU execution modes.
 
 ---
 
-## Website Use Cases
+## Features
 
-### 1) Fast baseline AutoML (analyst/data scientist)
-Upload a dataset, select target, use auto recommendations, train up to 5 models, and compare results quickly.
+### Dataset Upload and Profiling
 
-### 2) Safe dataset validation before training (ML engineer)
-Run quality + leakage + EDA checks first, then decide feature/target readiness before expensive runs.
+Upload CSV or Excel files (or use built-in example datasets) and receive an instant quality report covering missingness rates, duplicate rows, outlier flags, leakage risk per feature, and a composite quality score with actionable recommendations.
 
-### 3) Controlled experimentation (team workflows)
-Use CV/tuning budgets, store experiment runs, track best model and summary outcomes over time.
+![Dataset Upload and Profiling](docs/gifs/01_data_profiling.gif)
 
-### 4) Local compute / GPU-assisted training (hybrid workflow)
-Prepare a local job from the web UI, run training on a local machine, and sync metrics/artifacts back to the platform.
+### AutoML Training and Leaderboard
 
-### 5) Model review and explainability (stakeholder handoff)
-Use leaderboard metrics plus SHAP/LIME outputs to justify model behavior.
+Run Optuna-powered hyperparameter sweeps across up to five models in a single experiment. The platform auto-detects task type (classification or regression), applies dataset-aware starting hyperparameters, and populates a live leaderboard ranked by validation accuracy.
 
-### 6) Deployment + inference sandbox (productization)
-Deploy selected models, validate inputs in sandbox, and call prediction APIs from external applications.
+![AutoML Training and Leaderboard](docs/gifs/02_automl_training.gif)
 
-### 7) Demo/education workflow
-Use built-in example datasets to demonstrate complete ML lifecycle without external data prep.
+### SHAP Explainability and Inference Sandbox
 
----
+Inspect trained models with SHAP and LIME feature importance reports. The inference sandbox generates a pre-filled feature template sampled from the training data profile, accepts manual overrides, and returns class probabilities alongside a prediction verdict in real time.
 
-## Current Project Goals
-
-Use this as the active backlog. When a goal is fully implemented and verified, move it to the **Platform Overview** table and remove it from this section.
-
-- [ ] **Data Understanding Upgrade**
-  - [x] Automatic EDA report generation (distribution plots, correlation summaries)
-  - [x] Target leakage checks
-  - [x] Feature typing intelligence (ordinal/nominal/datetime-like)
-  - [x] Data drift baseline snapshot storage
-  - [ ] Pairplot-style feature relationship exploration
-  - [ ] Downloadable EDA artifact export (JSON/PDF)
-
-- [ ] **Adaptive AutoML Search**
-  - [x] Hyperparameter optimization (Optuna)
-  - [x] Time-budget-based tuning
-  - [x] Trial-budget tuning controls
-  - [ ] Early stopping of weak candidates
-  - Progressive resource allocation
-  - Metadata-driven model priors (meta-learning)
-
-- [ ] **Feature Engineering Engine**
-  - Automatic feature generation (interactions/polynomial/encodings)
-  - Feature selection (MI/RFE)
-  - Optional dimensionality reduction (PCA)
-
-- [ ] **Experiment Tracking and Reproducibility**
-  - [x] Experiment registry (configs + summary metrics + best model)
-  - [x] Training UI panel for latest experiment runs
-  - [ ] Dataset version linkage in experiment records
-  - [ ] Seed and pipeline snapshot tracking
-  - [ ] Run-to-run comparison UI
-
-- [ ] **Explainability Deepening**
-  - Strong global/local explainability views
-  - Feature interaction visualizations
-  - Counterfactual explanations
-
-- [ ] **Deployment Intelligence**
-  - A/B testing
-  - Shadow deployment
-  - Rollback mechanism
-  - Latency monitoring
-
-- [ ] **Production Monitoring Expansion**
-  - Data drift (KS/PSI)
-  - Concept drift/performance decay
-  - Alerting workflows
-
-- [ ] **Advanced EDA and Discovery**
-  - Class imbalance diagnostics with auto-threshold warnings
-  - Outlier cluster exploration views
-  - Target-feature interaction ranking
-
-- [ ] **Data Contract and Validation Layer**
-  - Schema expectation checks before training
-  - Constraint validation (ranges, enums, nullability)
-  - Contract drift alerts between versions
-
-- [ ] **Dataset Versioning and Lineage**
-  - Version every dataset stage
-  - Track lineage from raw to transformed assets
-
-- [ ] **Advanced Prediction Interface**
-  - Batch predictions
-  - Confidence presentation improvements
-  - Explain-prediction action in UI
-  - CSV bulk inference upload
-
-- [ ] **Performance Optimization**
-  - Parallel model training
-  - GPU support toggle
-  - Preprocessing/pipeline caching
-
-- [ ] **Security and Production Hardening**
-  - API authentication (JWT or API keys)
-  - Rate limiting
-  - Input validation hardening
-
-- [ ] **Advanced UX for Model Ops**
-  - Training progress timeline
-  - Interactive leaderboard filters
-  - Model comparison radar charts
-  - Dataset insights dashboard
-
-- [ ] **Strategic Differentiator**
-  - Choose and optimize for one identity:
-    - Explainability-first AutoML, or
-    - Low-data AutoML, or
-    - Real-time adaptive models, or
-    - Domain-specific AutoML
-
-### Goal Management Rule
-
-1. Do not mark a goal complete until backend, frontend, tests, and docs are all updated.
-2. When complete:
-   - Move it from **Current Project Goals** to **Platform Overview** as a shipped capability.
-   - Remove it from the goals checklist (no duplicates).
-3. Keep backlog depth constant:
-   - Every time one goal is completed and removed, add one new next-priority goal to this section.
+![SHAP Explainability and Inference](docs/gifs/03_shap_inference.gif)
 
 ---
 
 ## Architecture
 
 ```
-axiom-cloud-ai/
-├── backend/                   # FastAPI + Python ML backend
-│   ├── app/
-│   │   ├── main.py            # FastAPI app entry point
-│   │   ├── api/
-│   │   │   ├── datasets.py    # /upload-dataset, /datasets
-│   │   │   ├── training.py    # /train-model, /training-status
-│   │   │   ├── models.py      # /models, /deploy, /download
-│   │   │   ├── predictions.py # /predict
-│   │   │   └── metrics.py     # /metrics/{job_id}
-│   │   ├── core/
-│   │   │   ├── config.py      # Pydantic settings
-│   │   │   └── database.py    # SQLAlchemy engine
-│   │   ├── ml/
-│   │   │   ├── pipeline.py    # AutoML pipeline (core engine)
-│   │   │   └── datasets.py    # Example dataset loaders
-│   │   ├── models/
-│   │   │   └── db_models.py   # SQLAlchemy ORM models
-│   │   └── schemas/
-│   │       └── schemas.py     # Pydantic API schemas
-│   ├── requirements.txt
-│   ├── Dockerfile
-│   └── .env
-│
-├── frontend/                  # Next.js 14 + Tailwind frontend
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── page.tsx       # Landing page
-│   │   │   └── dashboard/
-│   │   │       ├── page.tsx          # Dashboard home
-│   │   │       ├── datasets/page.tsx # Dataset upload + explorer
-│   │   │       ├── training/page.tsx # AutoML training config
-│   │   │       ├── models/page.tsx   # Leaderboard + charts
-│   │   │       ├── predict/page.tsx  # Prediction interface
-│   │   │       └── deploy/page.tsx   # Deployment management
-│   │   ├── components/
-│   │   │   └── layout/Sidebar.tsx
-│   │   ├── lib/api.ts         # Axios API client
-│   │   └── types/index.ts     # TypeScript types
-│   ├── package.json
-│   ├── tailwind.config.js
-│   └── Dockerfile
-│
-├── database/
-│   └── init.sql               # PostgreSQL schema
-├── docker-compose.yml
-└── README.md
+┌────────────────────────────────────────────────────────────┐
+│                        Browser Client                      │
+│                    Next.js 14 / React                      │
+│       (Dashboard, Training, Leaderboard, Inference UI)     │
+└───────────────────────────┬────────────────────────────────┘
+                            │  HTTPS / REST / Firebase Auth
+┌───────────────────────────▼────────────────────────────────┐
+│                      FastAPI Backend                       │
+│   /datasets   /train   /models   /explain   /predict       │
+│   Optuna   scikit-learn   SHAP   LIME   joblib             │
+└────────┬──────────────────────────────────┬────────────────┘
+         │                                  │
+┌────────▼──────────┐             ┌─────────▼──────────────┐
+│   PostgreSQL DB   │             │   Model Artifact Store  │
+│  (experiment runs,│             │   (.joblib files,       │
+│   metrics, logs)  │             │    SHAP outputs)        │
+└───────────────────┘             └────────────────────────┘
+         │
+┌────────▼────────────────────────────────────────────────────┐
+│                        Docker Compose                       │
+│       backend   frontend   db   (optional local-agent)      │
+└─────────────────────────────────────────────────────────────┘
 ```
-
----
-
-## Quick Start (Local Dev — No Docker)
-
-### Prerequisites
-- Python 3.10 (recommended for pinned ML dependencies)
-- Node.js 18+
-- pip
-
-### 0. One-command local workflow (recommended)
-
-From the project root:
-
-```bash
-npm install
-npm run dev
-```
-
-This starts both services concurrently with labeled logs:
-- `BACKEND` → FastAPI on `http://localhost:8000` with reload
-- `FRONTEND` → Next.js on `http://localhost:3000` with hot reload
-
-If either service exits, the combined dev session stops immediately and the failure is visible in labeled logs.
-
-### 1. Clone the repository
-```bash
-git clone https://github.com/keshavj-13/axiom-cloud-ai.git
-cd axiom-cloud-ai
-```
-
-### 2. Backend Setup
-
-```bash
-cd backend
-
-# Option A (recommended): Conda + Python 3.10
-conda create -n sigmacld310 python=3.10 -y
-conda activate sigmacld310
-
-# Option B: venv
-# python3.10 -m venv venv
-# source venv/bin/activate       # macOS/Linux
-# venv\Scripts\activate          # Windows
-
-# Install dependencies (binds install to the active Python interpreter)
-python -m pip install -r requirements.txt
-
-# Configure environment (defaults to SQLite, no Redis needed for local dev)
-cp .env.example .env
-
-# Start the API server (uses the same interpreter/environment)
-python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-> After the backend environment is set up once, return to project root and use `npm run dev` for daily development.
-
-The API is now running at **http://localhost:8000**
-Swagger docs at **http://localhost:8000/api/docs**
-
-### 3. Frontend Setup
-
-```bash
-cd ../frontend
-
-# Install dependencies
-npm install --legacy-peer-deps
-
-# Start the dev server
-npm run dev
-```
-
-The frontend is now running at **http://localhost:3000**
-
----
-
-## 🐳 Docker Setup (Full Stack)
-
-```bash
-# From project root
-docker-compose up --build
-
-# Services:
-# Frontend:  http://localhost:3000
-# Backend:   http://localhost:8000
-# API Docs:  http://localhost:8000/api/docs
-# Postgres:  localhost:5432
-# Redis:     localhost:6379
-```
-
-### Production Deploy (VPS/Cloud VM)
-
-Use environment overrides so frontend points to your real API URL:
-
-```bash
-cp .env.production.example .env.production
-# edit .env.production values
-docker compose --env-file .env.production up -d --build
-```
-
-Detailed steps: see [`DEPLOYMENT.md`](DEPLOYMENT.md)
-
----
-
-## AutoML Pipeline
-
-The pipeline in `backend/app/ml/pipeline.py` performs:
-
-### 1. Task Detection
-```python
-# Auto-detects classification vs regression:
-# - dtype is object/bool → classification
-# - ≤ 20 unique values AND < 5% of total rows → classification
-# - Otherwise → regression
-```
-
-### 2. Preprocessing
-- **Missing values**: Median imputation (numeric), Mode imputation (categorical)
-- **Feature encoding**: OneHotEncoder for categoricals (≤50 unique values)
-- **Scaling**: StandardScaler for all numeric features
-- **Train/test split**: 80/20 by default, stratified for classification
-- Drops high-cardinality categoricals (>50 unique values)
-
-### 3. Models Trained
-
-**Classification:**
-| Model | Library |
-|---|---|
-| Logistic Regression | scikit-learn |
-| Random Forest | scikit-learn |
-| XGBoost | xgboost |
-| LightGBM | lightgbm |
-| Gradient Boosting | scikit-learn |
-
-**Regression:**
-| Model | Library |
-|---|---|
-| Ridge Regression | scikit-learn |
-| Random Forest | scikit-learn |
-| XGBoost | xgboost |
-| LightGBM | lightgbm |
-| Gradient Boosting | scikit-learn |
-
-### 4. Evaluation
-- **Classification**: Accuracy, F1, ROC-AUC, Confusion Matrix, ROC Curve
-- **Regression**: RMSE, MAE, R²
-- **Cross-Validation**: Stratified K-Fold (default 5 folds) on all models
-- **Feature importance**: Extracted from tree models; abs(coef) for linear models
-
----
-
-## API Reference
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/api/upload-dataset` | Upload CSV/Excel file |
-| `GET` | `/api/datasets` | List all datasets |
-| `GET` | `/api/datasets/{id}/quality-report` | Dataset quality report + recommendations |
-| `GET` | `/api/datasets/{id}/eda-report` | Structured exploratory data analysis report |
-| `GET` | `/api/datasets/{id}/leakage-report` | Target leakage risk report |
-| `GET` | `/api/datasets/{id}/drift-baseline` | Baseline distribution snapshot for drift monitoring |
-| `GET` | `/api/datasets/{id}/clean-preview` | Non-destructive auto-clean preview |
-| `GET` | `/api/datasets/{id}/analytics-report` | Combined analytics report (EDA + model evaluation charts) |
-| `POST` | `/api/datasets/{id}/clean-and-save` | Create and store cleaned dataset copy |
-| `POST` | `/api/load-example/{key}` | Load example dataset |
-| `POST` | `/api/train-model` | Start AutoML training job |
-| `GET` | `/api/training-status/{job_id}` | Poll training progress |
-| `GET` | `/api/training-jobs` | List training jobs |
-| `GET` | `/api/training/model-catalog` | Task-aware model catalog + model metadata |
-| `GET` | `/api/training/local-job-spec/{job_id}` | Fetch local training spec for local execution mode |
-| `POST` | `/api/training/local-sync` | Sync local training results to backend |
-| `GET` | `/api/training/local-agent/download` | Download `local_agent.py` |
-| `GET` | `/api/experiments` | List experiment runs |
-| `GET` | `/api/experiments/{run_id}` | Get single experiment run |
-| `GET` | `/api/models` | List trained models |
-| `GET` | `/api/models/{id}/shap` | SHAP explanation payload |
-| `GET` | `/api/models/{id}/lime` | LIME explanation payload |
-| `GET` | `/api/models/{id}/monitoring` | Model health + optional drift report |
-| `POST` | `/api/models/{id}/deploy` | Deploy model |
-| `GET` | `/api/models/{id}/download` | Download model (.joblib) |
-| `POST` | `/api/predict` | Run inference |
-| `GET` | `/api/metrics/{job_id}` | Get comparison metrics |
-| `GET` | `/api/health` | Health check |
-
-### Example: Train a model via API
-```bash
-# 1. Upload dataset
-curl -X POST http://localhost:8000/api/upload-dataset \
-  -F "file=@data.csv" \
-  -F "name=MyDataset"
-
-# 2. Start training
-curl -X POST http://localhost:8000/api/train-model \
-  -H "Content-Type: application/json" \
-  -d '{"dataset_id": 1, "target_column": "price", "cv_folds": 5, "enable_tuning": true, "tuning_trials": 16, "tuning_time_budget_sec": 180}'
-
-# 3. Check status
-curl http://localhost:8000/api/training-status/{job_id}
-
-# 4. Get metrics
-curl http://localhost:8000/api/metrics/{job_id}
-
-# 5. Run prediction
-curl -X POST http://localhost:8000/api/predict \
-  -H "Content-Type: application/json" \
-  -d '{"model_id": 1, "features": {"feature1": 5.2, "feature2": "value"}}'
-```
-
----
-
-## Dashboard Pages
-
-| Page | Route | Description |
-|---|---|---|
-| Landing | `/` | Marketing page with platform overview |
-| Dashboard | `/dashboard` | Stats, recent jobs, quick actions |
-| Datasets | `/dashboard/datasets` | Upload, clean, profile, leakage/EDA/analytics exploration |
-| Training | `/dashboard/training` | Configure remote/local runs, expert mode, tuning, local-agent flow |
-| Leaderboard | `/dashboard/models` | Compare models, evaluation visuals, diagnostics, explainability hooks |
-| Search | `/dashboard/search` | Cross-entity search for jobs, datasets, and models |
-| Predict | `/dashboard/predict` | Inference sandbox with dataset-derived feature defaults |
-| Deploy | `/dashboard/deploy` | Deploy lifecycle and endpoint-style inference testing |
-
----
-
-## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | Next.js 14, TypeScript, Tailwind CSS, Recharts |
-| **Backend** | FastAPI, Python 3.11, Pydantic v2 |
-| **ML** | scikit-learn, XGBoost, LightGBM, joblib |
-| **Database** | SQLite (dev) / PostgreSQL (prod) |
-| **ORM** | SQLAlchemy 2.0 |
-| **Background** | FastAPI BackgroundTasks / Celery + Redis (prod) |
-| **Container** | Docker + Docker Compose |
-| **Storage** | Local filesystem (extendable to S3) |
+| Frontend | Next.js 14, React, Tailwind CSS |
+| Backend API | FastAPI (Python 3.11) |
+| AutoML engine | scikit-learn, XGBoost, LightGBM, Optuna |
+| Explainability | SHAP, LIME |
+| Database | PostgreSQL 15 |
+| Auth | Firebase Authentication |
+| Container | Docker, Docker Compose |
 
 ---
 
-## Resume Highlights
+## Quickstart
 
-This project demonstrates:
-- **Full-stack ML system design** — API → training pipeline → frontend in production architecture
-- **AutoML concepts** — task detection, preprocessing pipelines, multi-model comparison, CV
-- **Clean REST API design** — proper schemas, error handling, background jobs
-- **Modern React** — hooks, TypeScript, real-time polling, drag & drop
-- **Production practices** — Docker, environment configs, health checks, logging
-- **ML engineering** — sklearn Pipelines, feature encoding, model serialization, evaluation metrics
+**Prerequisites:** Docker and Docker Compose installed.
+
+```bash
+git clone https://github.com/Keshavj-13/axiomcloud.git
+cd axiomcloud
+
+# Copy and configure environment variables
+cp .env.example .env
+# Edit .env with your Firebase credentials and desired settings
+
+# Start all services
+docker-compose up --build
+```
+
+The frontend will be available at `http://localhost:3000` and the API at `http://localhost:8000`.
+
+To stop all services:
+
+```bash
+docker-compose down
+```
+
+---
+
+## Execution Modes
+
+AxiomCloud supports two distinct training execution modes selectable from the experiment configuration UI.
+
+### Remote GPU Mode
+
+Training jobs are queued and executed on the server. The backend handles the full lifecycle: dataset loading, cross-validation, Optuna sweeps, artifact saving, and metric reporting. No local setup is required beyond a browser. This mode is suitable for most datasets and is the default.
+
+### Local GPU Mode
+
+For large datasets or when you want to leverage local hardware:
+
+1. Configure the experiment in the browser and select "Local" mode.
+2. Download the authenticated local agent script from the UI.
+3. Run the agent on your machine (GPU is used automatically if available via CUDA).
+
+```bash
+python local_agent.py --job-id <JOB_ID> --token <YOUR_TOKEN>
+```
+
+The agent trains the job locally, then syncs all metrics and model artifacts back to the platform over HTTPS. Offline sync payloads are supported for air-gapped or intermittently connected machines.
+
+---
+
+## Key Features
+
+**Dataset diagnostics**
+- Missingness, duplicate, and outlier analysis with per-feature breakdown
+- Composite quality score (0-100) with letter grade and fix recommendations
+- Leakage risk flagging per feature before training
+- EDA report generation with chart artifacts
+- Drift baseline snapshot for future monitoring
+
+**AutoML training**
+- Auto task-type detection (classification / regression)
+- Model catalog with dataset-aware hyperparameter defaults
+- Optuna hyperparameter tuning with configurable trial and time budgets
+- Expert mode with per-model override controls
+- Hard safety limits: max 5 models per run, max 5 CV folds
+- Experiment registry with run configs, status, and outcome history
+
+**Evaluation and explainability**
+- Leaderboard ranked by validation metric across all trained models
+- Classification visuals: confusion matrix, ROC curve, CV fold comparison
+- Regression visuals: residual diagnostics, prediction vs actual plots
+- SHAP global and local feature importance
+- LIME local explanations
+- Native feature importance for tree-based estimators
+
+**Deployment and inference**
+- Deploy and undeploy model lifecycle controls from the UI
+- Inference sandbox with auto-generated feature template
+- Integer-aware random defaults sampled from training data profile
+- REST prediction endpoint for programmatic integration
+- Model artifact download (.joblib)
+
+**Security**
+- Firebase-authenticated API access on all endpoints
+- Authenticated local-agent command generation
+- Token-scoped job execution for local runs
+
+---
+
+## Project Structure
+
+```
+axiomcloud/
+├── backend/          # FastAPI application, routers, ML pipeline
+├── frontend/         # Next.js application, pages, components
+├── database/         # PostgreSQL schema and migration scripts
+├── docs/
+│   └── gifs/         # Feature demo GIFs
+├── scripts/          # Utility and setup scripts
+├── local_agent.py    # Local GPU training agent
+├── docker-compose.yml
+└── DESIGN.md         # Architecture and design decisions
+```
+
+---
+
+## Configuration
+
+All configuration is managed through environment variables. Copy `.env.example` to `.env` and set the following:
+
+| Variable | Description |
+|---|---|
+| `FIREBASE_PROJECT_ID` | Firebase project identifier |
+| `FIREBASE_PRIVATE_KEY` | Firebase service account private key |
+| `FIREBASE_CLIENT_EMAIL` | Firebase service account email |
+| `POSTGRES_USER` | PostgreSQL username |
+| `POSTGRES_PASSWORD` | PostgreSQL password |
+| `POSTGRES_DB` | Database name |
+| `MODEL_ARTIFACT_DIR` | Path for storing .joblib model files |
+| `MAX_MODELS_PER_RUN` | Hard limit on models per experiment (default: 5) |
+| `MAX_CV_FOLDS` | Hard limit on cross-validation folds (default: 5) |
 
 ---
 
 ## License
 
-MIT © Axiom Cloud AI
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
