@@ -4,7 +4,24 @@ A production-grade, full-stack AutoML platform for dataset diagnostics, controll
 
 ---
 
-## Features
+## Web Control Plane
+
+AxiomCloud features a Next.js 14 control plane with a unified dark UI, real-time experiment tracking, interactive dataset diagnostics, and low-latency inference playgrounds.
+
+![AxiomCloud Web Control Plane](docs/gifs/00_frontend_control_plane.gif)
+
+### Core Control Plane Views
+
+| Control Surface | Focus & Key Interactions |
+|---|---|
+| **Platform Dashboard**<br><br>![Dashboard Overview](docs/screenshots/01_dashboard_overview.png) | Active training runs, cluster GPU health, registered models, throughput metrics, and dataset inventories. |
+| **Dataset Diagnostics**<br><br>![Dataset Diagnostics](docs/screenshots/02_dataset_diagnostics.png) | Quality scoring (0-100), automated schema inspection, missingness rates, outlier heatmaps, and data leakage detection. |
+| **AutoML Training Studio**<br><br>![AutoML Training Studio](docs/screenshots/03_automl_training.png) | Model selection, Optuna trial budget controls, hyperparameter search, and live accuracy leaderboard. |
+| **Inference & Explainability**<br><br>![Inference & Explainability](docs/screenshots/04_inference_explainability.png) | Interactive input sliders, real-time prediction confidence gauge, and global/local SHAP feature impact rankings. |
+
+---
+
+## Pipeline Features
 
 ### Dataset Upload and Profiling
 
@@ -162,7 +179,8 @@ axiomcloud/
 ├── frontend/         # Next.js application, pages, components
 ├── database/         # PostgreSQL schema and migration scripts
 ├── docs/
-│   └── gifs/         # Feature demo GIFs
+│   ├── gifs/         # Animated walkthrough GIFs
+│   └── screenshots/  # UI control plane screen captures
 ├── scripts/          # Utility and setup scripts
 ├── local_agent.py    # Local GPU training agent
 ├── docker-compose.yml
